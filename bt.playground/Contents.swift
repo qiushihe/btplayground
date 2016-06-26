@@ -42,7 +42,7 @@ func decode(data: NSData!) throws -> BDecoded {
     return BDecoded.String("lala");
 }
 
-let path = "/Users/billy/Google Drive/Personal/SyncOverBT/test.torrent";
+let path = "/Users/billy/Projects/btplayground/test.torrent";
 var encoding: UInt = 0;
 
 // NSASCIIStringEncoding

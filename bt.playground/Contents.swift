@@ -6,6 +6,12 @@ import Foundation;
 let BYTE_COLON: UInt8 = 58;
 let BYTE_LC_E: UInt8 = 101;
 
+let BYTE_ZERO: UInt8 = 48;
+let BYTE_NINE: UInt8 = 57;
+let BYTE_LC_I: UInt8 = 105;
+let BYTE_LC_L: UInt8 = 108;
+let BYTE_LC_D: UInt8 = 98;
+
 extension NSData {
   func getBytes() -> Array<UInt8> {
   let size = sizeof(UInt8);
@@ -68,7 +74,7 @@ func readString(fromBytes bytes: Array<UInt8>, startAt start: Int, stopAfterLeng
   return String.init(bytes: bytes[start...(start + length - 1)], encoding: NSUTF8StringEncoding)!;
 }
 
-func decodeString(fromBytes bytes: Array<UInt8>, startIndex start: Int, inout nextIndex position: Int) -> String {
+func decodeString(fromBytes bytes: Array<UInt8>, startIndex start: Int, inout nextIndex position: Int) -> BEncoded {
   position = start;
   
   let lengthStr = readString(fromBytes: bytes, startAt: position, stopBefore: BYTE_COLON);
@@ -78,17 +84,57 @@ func decodeString(fromBytes bytes: Array<UInt8>, startIndex start: Int, inout ne
   let string = readString(fromBytes: bytes, startAt: position, stopAfterLength: length);
   position += getLength(ofString: string);
   
-  return string;
+  return BEncoded.String(string);
 }
 
-func decodeInteger(fromBytes bytes: Array<UInt8>, startIndex start: Int, inout nextIndex position: Int) -> Int {
+func decodeInteger(fromBytes bytes: Array<UInt8>, startIndex start: Int, inout nextIndex position: Int) -> BEncoded {
   position = start + 1;
   
   let integerStr = readString(fromBytes: bytes, startAt: position, stopBefore: BYTE_LC_E);
   let integer = Int.init(integerStr)!;
   position += getLength(ofString: integerStr) + 2;
+  
+  return BEncoded.Integer(integer);
+}
 
-  return integer;
+func decodeList(fromBytes bytes: Array<UInt8>, startIndex start: Int, inout nextIndex position: Int) -> BEncoded {
+  position = start + 1;
+  
+  var list: Array<BEncoded> = [];
+  
+  while true {
+    if bytes[position] == BYTE_LC_E {
+      break;
+    }
+
+    let decoded: BEncoded = decode(bytes, startIndex: position, nextIndex: &position);
+    list.append(decoded);
+  }
+  
+  position += 1;
+
+  return BEncoded.List(list);
+}
+
+func decodeDictionary(fromBytes bytes: Array<UInt8>, startIndex start: Int, inout nextIndex position: Int) -> BEncoded {
+  let dictionary: Dictionary<String, BEncoded> = [:];
+  return BEncoded.Dictionary(dictionary);
+}
+
+func decode(bytes: Array<UInt8>, startIndex start: Int, inout nextIndex position: Int) -> BEncoded {
+  let firstByte = bytes[start];
+  
+  if firstByte >= BYTE_ZERO && firstByte <= BYTE_NINE {
+    return decodeString(fromBytes: bytes, startIndex: start, nextIndex: &position);
+  } else if firstByte == BYTE_LC_I {
+    return decodeInteger(fromBytes: bytes, startIndex: start, nextIndex: &position);
+  } else if firstByte == BYTE_LC_L {
+    return decodeList(fromBytes: bytes, startIndex: start, nextIndex: &position);
+  } else if firstByte == BYTE_LC_D {
+    return decodeDictionary(fromBytes: bytes, startIndex: start, nextIndex: &position);
+  }
+  
+  return BEncoded.String("WTF");
 }
 
 func decode(data: NSData!) -> BEncoded {
@@ -101,10 +147,9 @@ func decode(data: NSData!) -> BEncoded {
   decodeInteger(fromBytes: bytes, startIndex: 473, nextIndex: &nextAt);
   nextAt;
   
-  bytes[4];
-  bytes[5];
-  bytes[8];
-  
+  decodeList(fromBytes: bytes, startIndex: 344, nextIndex: &nextAt);
+  nextAt;
+
   return BEncoded.String("lala");
 }
 

@@ -10,7 +10,7 @@ let BYTE_ZERO: UInt8 = 48;
 let BYTE_NINE: UInt8 = 57;
 let BYTE_LC_I: UInt8 = 105;
 let BYTE_LC_L: UInt8 = 108;
-let BYTE_LC_D: UInt8 = 98;
+let BYTE_LC_D: UInt8 = 100;
 
 extension NSData {
   func getBytes() -> Array<UInt8> {
@@ -43,6 +43,31 @@ enum BEncoded {
     case .Integer(let integerValue): return integerValue;
     case .List(let listValue): return listValue;
     case .Dictionary(let dictionaryValue): return dictionaryValue;
+    }
+  }
+  
+  func pp(level: Int = 0) {
+    let indents = Swift.String.init(count: level * 2, repeatedValue: Character(" "));
+
+    switch(self) {
+    case .String(let stringValue):
+      print(indents + stringValue);
+      break;
+    case .Integer(let integerValue):
+      print(indents + Swift.String.init(integerValue));
+      break;
+    case .List(let listValue):
+      listValue.map({(value: BEncoded) in
+        value.pp(level + 1);
+      });
+      break;
+    case .Dictionary(let dictionaryValue):
+      dictionaryValue.map({(key: Swift.String, value: BEncoded) in
+        print(indents + key);
+        value.pp(level + 1);
+        print();
+      });
+      break;
     }
   }
 }
@@ -92,7 +117,7 @@ func decodeInteger(fromBytes bytes: Array<UInt8>, startIndex start: Int, inout n
   
   let integerStr = readString(fromBytes: bytes, startAt: position, stopBefore: BYTE_LC_E);
   let integer = Int.init(integerStr)!;
-  position += getLength(ofString: integerStr) + 2;
+  position += getLength(ofString: integerStr) + 1;
   
   return BEncoded.Integer(integer);
 }
@@ -117,7 +142,29 @@ func decodeList(fromBytes bytes: Array<UInt8>, startIndex start: Int, inout next
 }
 
 func decodeDictionary(fromBytes bytes: Array<UInt8>, startIndex start: Int, inout nextIndex position: Int) -> BEncoded {
-  let dictionary: Dictionary<String, BEncoded> = [:];
+  position = start + 1;
+  
+  var dictionary: Dictionary<String, BEncoded> = [:];
+  
+  while true {
+    if bytes[position] == BYTE_LC_E {
+      break;
+    }
+    
+    let key = decode(bytes, startIndex: position, nextIndex: &position);
+
+    if key.value as! String == "pieces" {
+      dictionary[key.value as! String] = BEncoded.String("TODO: Read sha hash");
+      position += 3;
+      position += 40;
+    } else {
+      let value = decode(bytes, startIndex: position, nextIndex: &position);
+      dictionary[key.value as! String] = value;
+    }
+  }
+  
+  position += 1;
+  
   return BEncoded.Dictionary(dictionary);
 }
 
@@ -138,29 +185,12 @@ func decode(bytes: Array<UInt8>, startIndex start: Int, inout nextIndex position
 }
 
 func decode(data: NSData!) -> BEncoded {
-  let bytes = data!.getBytes();
-
   var nextAt = 0;
-  decodeString(fromBytes: bytes, startIndex: 11, nextIndex: &nextAt);
-  nextAt;
-  
-  decodeInteger(fromBytes: bytes, startIndex: 473, nextIndex: &nextAt);
-  nextAt;
-  
-  decodeList(fromBytes: bytes, startIndex: 344, nextIndex: &nextAt);
-  nextAt;
-
-  return BEncoded.String("lala");
+  let bytes = data!.getBytes();
+  return decode(bytes, startIndex: 0, nextIndex: &nextAt);
 }
 
 let path = "/Users/billy/Projects/btplayground/test.torrent";
-var encoding: UInt = 0;
-
-// NSASCIIStringEncoding
-// NSUTF8StringEncoding
-
 let data = NSData.init(contentsOfFile: path);
-let str = String.init(data: data!, encoding: NSASCIIStringEncoding);
-print(str!);
-
-decode(data);
+let decoded = decode(data);
+decoded.pp();

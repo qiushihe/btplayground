@@ -46,27 +46,33 @@ enum BEncoded {
     }
   }
   
-  func pp(level: Int = 0) {
-    let indents = Swift.String.init(count: level * 2, repeatedValue: Character(" "));
-
+  func pp(level: Int = 0, noIndent: Bool = false) {
     switch(self) {
     case .String(let stringValue):
-      print(indents + stringValue);
+      let indents = Swift.String.init(count: level * 2, repeatedValue: Character(" "));
+      print(noIndent ? stringValue : indents + stringValue);
       break;
     case .Integer(let integerValue):
-      print(indents + Swift.String.init(integerValue));
+      let indents = Swift.String.init(count: level * 2, repeatedValue: Character(" "));
+      print(noIndent ? Swift.String.init(integerValue) : indents + Swift.String.init(integerValue));
       break;
     case .List(let listValue):
+      let rootIndents = Swift.String.init(count: level * 2, repeatedValue: Character(" "));
+      print(noIndent ? "[" : rootIndents + "[");
       listValue.map({(value: BEncoded) in
         value.pp(level + 1);
       });
+      print(rootIndents + "]");
       break;
     case .Dictionary(let dictionaryValue):
+      let rootIndents = Swift.String.init(count: level * 2, repeatedValue: Character(" "));
+      let valueIndents = Swift.String.init(count:(level + 1) * 2, repeatedValue: Character(" "));
+      print(noIndent ? "{" : rootIndents + "{");
       dictionaryValue.map({(key: Swift.String, value: BEncoded) in
-        print(indents + key);
-        value.pp(level + 1);
-        print();
+        print(valueIndents + key + ": ", terminator: "");
+        value.pp(level + 1, noIndent: true);
       });
+      print(rootIndents + "}");
       break;
     }
   }

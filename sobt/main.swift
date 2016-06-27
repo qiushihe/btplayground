@@ -1,4 +1,10 @@
-//: Playground - noun: a place where people can play
+//
+//  main.swift
+//  sobt
+//
+//  Created by Qiushi (Billy) He on 2016-06-26.
+//  Copyright © 2016 Billy He. All rights reserved.
+//
 
 import Swift;
 import Foundation;
@@ -14,11 +20,11 @@ let BYTE_LC_D: UInt8 = 100;
 
 extension NSData {
   func getBytes() -> Array<UInt8> {
-  let size = sizeof(UInt8);
-  let count = self.length / size;
-  var bytes = Array<UInt8>.init(count: count, repeatedValue: 0);
-  self.getBytes(&bytes, length:count * size);
-  return bytes;
+    let size = sizeof(UInt8);
+    let count = self.length / size;
+    var bytes = Array<UInt8>.init(count: count, repeatedValue: 0);
+    self.getBytes(&bytes, length:count * size);
+    return bytes;
   }
 }
 
@@ -61,19 +67,19 @@ enum BEncoded {
     case .List(let listValue):
       let rootIndents = Swift.String.init(count: level * 2, repeatedValue: Character(" "));
       print(noIndent ? "[" : rootIndents + "[");
-      listValue.map({(value: BEncoded) in
+      for value in listValue {
         value.pp(level + 1);
-      });
+      }
       print(rootIndents + "]");
       break;
     case .Dictionary(let dictionaryValue):
       let rootIndents = Swift.String.init(count: level * 2, repeatedValue: Character(" "));
       let valueIndents = Swift.String.init(count:(level + 1) * 2, repeatedValue: Character(" "));
       print(noIndent ? "{" : rootIndents + "{");
-      dictionaryValue.map({(key: Swift.String, value: BEncoded) in
+      for (key, value) in dictionaryValue {
         print(valueIndents + "\"" + key + "\": ", terminator: "");
         value.pp(level + 1, noIndent: true);
-      });
+      }
       print(rootIndents + "}");
       break;
     }
@@ -139,13 +145,13 @@ func decodeList(fromBytes bytes: Array<UInt8>, startIndex start: Int, inout next
     if bytes[position] == BYTE_LC_E {
       break;
     }
-
+    
     let decoded: BEncoded = decode(bytes, startIndex: position, nextIndex: &position);
     list.append(decoded);
   }
   
   position += 1;
-
+  
   return BEncoded.List(list);
 }
 
@@ -160,7 +166,7 @@ func decodeDictionary(fromBytes bytes: Array<UInt8>, startIndex start: Int, inou
     }
     
     let key = decode(bytes, startIndex: position, nextIndex: &position);
-
+    
     if key.value as! String == "pieces" {
       dictionary[key.value as! String] = BEncoded.String("TODO: Read sha hash");
       position += 3;
@@ -202,3 +208,5 @@ let path = "/Users/billy/Projects/btplayground/test.torrent";
 let data = NSData.init(contentsOfFile: path);
 let decoded = decode(data);
 decoded.pp();
+
+

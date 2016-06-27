@@ -50,11 +50,13 @@ enum BEncoded {
     switch(self) {
     case .String(let stringValue):
       let indents = Swift.String.init(count: level * 2, repeatedValue: Character(" "));
-      print(noIndent ? stringValue : indents + stringValue);
+      let ppString = "\"" + stringValue + "\"";
+      print(noIndent ? ppString : indents + ppString);
       break;
     case .Integer(let integerValue):
       let indents = Swift.String.init(count: level * 2, repeatedValue: Character(" "));
-      print(noIndent ? Swift.String.init(integerValue) : indents + Swift.String.init(integerValue));
+      let ppString = Swift.String.init(integerValue);
+      print(noIndent ? ppString : indents + ppString);
       break;
     case .List(let listValue):
       let rootIndents = Swift.String.init(count: level * 2, repeatedValue: Character(" "));
@@ -69,7 +71,7 @@ enum BEncoded {
       let valueIndents = Swift.String.init(count:(level + 1) * 2, repeatedValue: Character(" "));
       print(noIndent ? "{" : rootIndents + "{");
       dictionaryValue.map({(key: Swift.String, value: BEncoded) in
-        print(valueIndents + key + ": ", terminator: "");
+        print(valueIndents + "\"" + key + "\": ", terminator: "");
         value.pp(level + 1, noIndent: true);
       });
       print(rootIndents + "}");

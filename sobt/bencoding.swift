@@ -58,58 +58,6 @@ enum BEncoded {
     case .Dictionary(let dictionaryValue): return dictionaryValue;
     }
   }
-
-  func indents(level: Int) -> Swift.String {
-    return Swift.String.init(count: level * 2, repeatedValue: Character(" "));
-  }
-  
-  func terminator(withNewLine: Bool) -> Swift.String {
-    return withNewLine ? "\n" : "";
-  }
-
-  func toJsonString(level: Int, _ noIndent: Bool, _ withNewLine: Bool) -> Swift.String {
-    switch self {
-    case .String(let stringValue):
-      return self.indents(noIndent ? 0 : level)
-        + "\"" + stringValue.stringByReplacingOccurrencesOfString("\"", withString: "\\\"") + "\""
-        + self.terminator(withNewLine);
-    case .Integer(let integerValue):
-      return self.indents(noIndent ? 0 : level)
-        + Swift.String.init(integerValue)
-        + self.terminator(withNewLine);
-    case .List(let listValue):
-      if (listValue.isEmpty) {
-        return "[]" + self.terminator(withNewLine);
-      } else {
-        var jsonString = self.indents(noIndent ? 0 : level) + "[\n";
-        for (index, value) in listValue.enumerate() {
-          jsonString += value.toJsonString(level + 1, false, index >= listValue.count - 1);
-          if (index < listValue.count - 1) {
-            jsonString += ",\n";
-          }
-        }
-        return jsonString + self.indents(level) + "]" + self.terminator(withNewLine);
-      }
-    case .Dictionary(let dictionaryValue):
-      if (dictionaryValue.isEmpty) {
-        return "{}" + self.terminator(withNewLine);
-      } else {
-        var jsonString = self.indents(noIndent ? 0 : level) + "{\n";
-        for (index, (key, value)) in dictionaryValue.enumerate() {
-          jsonString += self.indents(level + 1) + "\"" + key + "\": ";
-          jsonString += value.toJsonString(level + 1, true, index >= dictionaryValue.count - 1);
-          if (index < dictionaryValue.count - 1) {
-            jsonString += ",\n";
-          }
-        }
-        return jsonString + self.indents(level) + "}" + self.terminator(withNewLine);
-      }
-    }
-  }
- 
-  func toJsonString() -> Swift.String {
-    return self.toJsonString(0, false, true);
-  }
 }
 
 func getString(byte: UInt8) -> String {

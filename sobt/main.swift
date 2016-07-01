@@ -12,4 +12,4 @@ let path = "/Users/billy/Projects/btplayground/test.torrent";
 let data = NSData.init(contentsOfFile: path);
 let decoded = bDecode(data);
 
-decoded.pp();
+print(decoded.toJsonString());

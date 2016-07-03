@@ -59,3 +59,13 @@ func bEncodedToJsonString(encoded: BEncoded, _ level: Int, _ noIndent: Bool, _ w
 func bEncodedToJsonString(encoded: BEncoded) -> String {
   return bEncodedToJsonString(encoded, 0, false, true);
 }
+
+func bEncodedToJsonObject(encoded: BEncoded) -> NSDictionary? {
+  do {
+    return try NSJSONSerialization.JSONObjectWithData(
+      bEncodedToJsonString(encoded).dataUsingEncoding(NSUTF8StringEncoding)!,
+      options: [.AllowFragments]) as? NSDictionary;
+  } catch _ {
+    return nil;
+  }
+}

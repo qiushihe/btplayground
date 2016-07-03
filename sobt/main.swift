@@ -10,6 +10,9 @@ import Foundation;
 
 let path = "/Users/billy/Projects/btplayground/test.torrent";
 let data = NSData.init(contentsOfFile: path);
-let decoded = bDecode(data);
+let decoder = BEncodingDecoder.init(data: data!);
+let decoded = decoder.decode();
+let jsonObject = bEncodedToJsonObject(decoded);
 
-print(bEncodedToJsonString(decoded));
+print(jsonObject);
+print(Mirror(reflecting: jsonObject).subjectType);

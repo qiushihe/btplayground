@@ -120,15 +120,15 @@ class BEncodingDecoder {
   }
 
   private func decodeInteger() -> BEncoded {
-    let integerStr = self.advanceBeforeAndAfter(block: {() in
+    let integerStr = self.advanceBeforeAndAfter(1) {() in
       return self.readString(BEncodedSeparator.End);
-    }) as! String;
+    } as! String;
     let integer = Int.init(integerStr)!;
     return BEncoded.Integer(integer);
   }
   
   private func decodeList() -> BEncoded {
-    let list = self.advanceBeforeAndAfter(block: {() in
+    let list = self.advanceBeforeAndAfter(1) {() in
       var result: Array<BEncoded> = [];
       
       while true {
@@ -139,13 +139,13 @@ class BEncodingDecoder {
       }
       
       return result;
-    }) as! Array<BEncoded>;
+    } as! Array<BEncoded>;
 
     return BEncoded.List(list);
   }
   
   private func decodeDictionary() -> BEncoded {
-    let dictionary = self.advanceBeforeAndAfter(block: {() in
+    let dictionary = self.advanceBeforeAndAfter(1) {() in
       var result: Dictionary<String, BEncoded> = [:];
       
       while true {
@@ -163,7 +163,7 @@ class BEncodingDecoder {
       }
       
       return result;
-    }) as! Dictionary<String, BEncoded>;
+    } as! Dictionary<String, BEncoded>;
 
     return BEncoded.Dictionary(dictionary);
   }

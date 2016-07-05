@@ -36,6 +36,8 @@ task.resume(); */
 // * http://stackoverflow.com/questions/24977805/socket-server-example-with-swift
 // * http://stackoverflow.com/questions/33727980/basic-tcp-ip-server-in-swift
 // * http://codereview.stackexchange.com/questions/71861/pure-swift-solution-for-socket-programming
+// * https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/NetworkingTopics/Articles/UsingSocketsandSocketStreams.html
+// * https://developer.apple.com/library/mac/samplecode/UDPEcho/Introduction/Intro.html
 
 // Workaround for Swift not having access to the htons, htonl, and other C macros.
 // This is equivalent to casting the value to the desired bitsize and then swapping the endian'ness
@@ -50,18 +52,26 @@ let ntohs = isLittleEndian ? _OSSwapInt16 : { $0 };
 let ntohl = isLittleEndian ? _OSSwapInt32 : { $0 };
 let ntohll = isLittleEndian ? _OSSwapInt64 : { $0 };
 
-let INETADDRESS_ANY = in_addr(s_addr: 0);
+func getSocketAddress(host: String, _ port: __uint16_t) -> sockaddr_in {
+  let ADDRESS_ANY = in_addr(s_addr: 0);
+  
+  var address = sockaddr_in(
+    sin_len:    __uint8_t(sizeof(sockaddr_in)),
+    sin_family: sa_family_t(AF_INET),
+    sin_port:   htons(port),
+    sin_addr:   ADDRESS_ANY,
+    sin_zero:   ( 0, 0, 0, 0, 0, 0, 0, 0 )
+  );
+  
+  // inet_pton turns a text presentable ip to a network/binary representation
+  host.withCString({ cs in inet_pton(AF_INET, cs, &address.sin_addr) });
 
-var sockAddress = sockaddr_in(
-  sin_len:    __uint8_t(sizeof(sockaddr_in)),
-  sin_family: sa_family_t(AF_INET),
-  sin_port:   htons(4242),
-  sin_addr:   INETADDRESS_ANY,
-  sin_zero:   ( 0, 0, 0, 0, 0, 0, 0, 0 )
-);
+  return address;
+}
 
-// inet_pton turns a text presentable ip to a network/binary representation
-"127.0.0.1".withCString({ cs in inet_pton(AF_INET, cs, &sockAddress.sin_addr) });
+// tracker.coppersurfer.tk
+var sockAddress = getSocketAddress("62.138.0.158", 6969);
+// var sockAddress = getSocketAddress("127.0.0.1", 4242);
 
 var responseSource: dispatch_source_t?;
 
@@ -75,7 +85,7 @@ func receiver() -> dispatch_source_t? {
   
   guard sockFd >= 0 else {
     let errmsg = String.fromCString(strerror(errno));
-    print("Error: Could not create socket. \(errmsg)");
+    print("Error: Could not create socket: \(errno) (\(errmsg))!");
     return nil;
   }
   
@@ -86,7 +96,7 @@ func receiver() -> dispatch_source_t? {
   
   guard bindSuccess == 0 else {
     let errmsg = String.fromCString(strerror(errno));
-    print("Error: Could not bind socket! \(errmsg)");
+    print("Error: Could not bind socket: \(errno) (\(errmsg))!");
     return nil;
   }
   

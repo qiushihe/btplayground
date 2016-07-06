@@ -8,7 +8,9 @@
 
 import Foundation
 
-// https://developer.apple.com/library/mac/samplecode/UDPEcho/Introduction/Intro.html
+// Base on:
+// * https://gist.github.com/NeoTeo/b6195efb779d925fd7b8
+// * https://developer.apple.com/library/mac/samplecode/UDPEcho/Introduction/Intro.html
 
 // Workaround for Swift not having access to the htons, htonl, and other C macros.
 // This is equivalent to casting the value to the desired bitsize and then swapping the endian'ness

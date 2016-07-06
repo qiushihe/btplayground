@@ -34,103 +34,57 @@ task.resume();
 
 var responseSource: dispatch_source_t?;
 
-func listener(socket: Int32, isServer: Bool) -> dispatch_source_t? {
-  // Create a GCD thread that can listen for network events.
-  guard let newResponseSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, UInt(socket), 0, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) else {
-    let errmsg = String.fromCString(strerror(errno));
-    print("dispatch_source_create failed. \(errmsg)");
-    close(socket);
-    return nil;
+func handleSocketData(socket: Int32, isServer: Bool) {
+  var inAddress = sockaddr_storage();
+  var inAddressLength = socklen_t(sizeof(sockaddr_storage.self));
+  let buffer = [UInt8](count: 4096, repeatedValue: 0);
+  
+  let bytesRead = withUnsafeMutablePointer(&inAddress) {
+    recvfrom(socket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0, UnsafeMutablePointer($0), &inAddressLength);
   };
   
-  // Register the event handler for cancellation.
-  dispatch_source_set_cancel_handler(newResponseSource) {
-    let errmsg = String.fromCString(strerror(errno));
-    print("Cancel handler \(errmsg)");
-    close(socket);
-  };
-  
-  // Register the event handler for incoming packets.
-  dispatch_source_set_event_handler(newResponseSource) {
-    guard let source = responseSource else { return };
-    
-    var socketAddress = sockaddr_storage();
-    var socketAddressLength = socklen_t(sizeof(sockaddr_storage.self));
-    let response = [UInt8](count: 4096, repeatedValue: 0);
-    let UDPSocket = Int32(dispatch_source_get_handle(source));
-    
-    let bytesRead = withUnsafeMutablePointer(&socketAddress) {
-      recvfrom(UDPSocket, UnsafeMutablePointer<Void>(response), response.count, 0, UnsafeMutablePointer($0), &socketAddressLength);
-    };
-    
-    let dataRead = response[0..<bytesRead];
-    print("read \(bytesRead) bytes: \(dataRead)");
-    if let dataString = String(bytes: dataRead, encoding: NSUTF8StringEncoding) {
-      print("The message was: \(dataString)");
-    }
-    
-    if (isServer) {
-      let outData = Array("Greetings earthling".utf8);
-      let outAddress = getSocketFromStorage(&socketAddress);
-      let outAddressLength = socklen_t(sizeof(sockaddr));
-
-      let sent = sendto(UDPSocket, outData, outData.count, 0, outAddress, outAddressLength);
-      
-      if sent == -1 {
-        let errmsg = String.fromCString(strerror(errno));
-        print("sendto failed: \(errno) \(errmsg)");
-        return;
-      }
-
-      print("Just sent \(sent) bytes as \(outData)");
-    }
+  let dataRead = buffer[0..<bytesRead];
+  if let dataString = String(bytes: dataRead, encoding: NSUTF8StringEncoding) {
+    print("\(isServer ? "Server" : "Client") received message: \(dataString)");
+  } else {
+    print("\(isServer ? "Server" : "Client") received \(bytesRead) bytes: \(dataRead)");
   }
   
-  dispatch_resume(newResponseSource);
-  
-  return newResponseSource;
+  if (isServer) {
+    let replyStr = "Bay Area Men Wakes Up To No New Email!";
+    let replyData = replyStr.dataUsingEncoding(NSUTF8StringEncoding)!;
+    
+    let replySocket = UDPSocket(socket: socket, address: castSocketAddress(&inAddress), addressLength: inAddressLength);
+    replySocket.sendData(replyData);
+    
+    print("Server sent: \(replyStr)");
+  }
 }
 
-func sender(socket: Int32) {
-  guard socket >= 0  else {
-    let errmsg = String.fromCString(strerror(errno));
-    print("Error: Could not create socket. \(errmsg)");
-    return;
-  }
+func startClient(host: String, port: UInt16) {
+  let udpSocket = UDPSocket(port: port, host: host);
   
-  let outData = Array("Greetings earthling".utf8);
+  udpSocket.setListener({(socket: Int32) in
+    handleSocketData(socket, isServer: false);
+  });
   
-  let sent = sendto(socket, outData, outData.count, 0, nil, 0);
-  
-  if sent == -1 {
-    let errmsg = String.fromCString(strerror(errno));
-    print("sendto failed: \(errno) \(errmsg)");
-    return;
-  }
-  
-  print("Just sent \(sent) bytes as \(outData)");
-}
-
-func startClient() {
-  var address = getSocketAddress("127.0.0.1", port: 4242);
-  let socket = getSocket(&address);
-  
-  responseSource = listener(socket, isServer: false);
   print("Client listening...");
   
-  sleep(3);
-  
-  sender(socket);
+  let str = "Holy Shit! Men on the Fucking Moon!";
+  udpSocket.sendData(str.dataUsingEncoding(NSUTF8StringEncoding)!);
+  print("Client sent: \(str)");
   
   // close(sock);
   while true {}
 }
 
-func startServer() {
-  var address = getSocketAddress(port: 4242);
-  let socket = getSocket(&address);
+func startServer(port: UInt16) {
+  let udpSocket = UDPSocket(port: port);
   
-  responseSource = listener(socket, isServer: true);
+  udpSocket.setListener({(socket: Int32) in
+    handleSocketData(socket, isServer: true);
+  });
+  
   print("Server listening...");
   
   while true {}
@@ -138,11 +92,11 @@ func startServer() {
 
 if (Process.arguments.count > 1) {
   if (Process.arguments[1] == "server") {
-    startServer();
+    startServer(4242);
   } else if (Process.arguments[1] == "client") {
-    startClient();
+    startClient("127.0.0.1", port: 4242);
   }
 } else {
-  startServer();
-  // startClient();
+  startServer(4242);
+  // startClient("127.0.0.1", port: 4242);
 }

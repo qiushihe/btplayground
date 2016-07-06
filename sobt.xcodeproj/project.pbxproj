@@ -10,6 +10,7 @@
 		282B44E41D20FD040073C9D1 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282B44E31D20FD040073C9D1 /* main.swift */; };
 		282B44EB1D20FF660073C9D1 /* bencoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282B44EA1D20FF660073C9D1 /* bencoding.swift */; };
 		28B5D74A1D26528900F851B5 /* bencoding-json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B5D7491D26528900F851B5 /* bencoding-json.swift */; };
+		CEE31E471D2C6E89009E2B35 /* udp-socket.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE31E461D2C6E89009E2B35 /* udp-socket.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,6 +30,7 @@
 		282B44E31D20FD040073C9D1 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		282B44EA1D20FF660073C9D1 /* bencoding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = bencoding.swift; sourceTree = "<group>"; };
 		28B5D7491D26528900F851B5 /* bencoding-json.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "bencoding-json.swift"; sourceTree = "<group>"; };
+		CEE31E461D2C6E89009E2B35 /* udp-socket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "udp-socket.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +66,7 @@
 				282B44E31D20FD040073C9D1 /* main.swift */,
 				282B44EA1D20FF660073C9D1 /* bencoding.swift */,
 				28B5D7491D26528900F851B5 /* bencoding-json.swift */,
+				CEE31E461D2C6E89009E2B35 /* udp-socket.swift */,
 			);
 			path = sobt;
 			sourceTree = "<group>";
@@ -126,6 +129,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				282B44E41D20FD040073C9D1 /* main.swift in Sources */,
+				CEE31E471D2C6E89009E2B35 /* udp-socket.swift in Sources */,
 				28B5D74A1D26528900F851B5 /* bencoding-json.swift in Sources */,
 				282B44EB1D20FF660073C9D1 /* bencoding.swift in Sources */,
 			);

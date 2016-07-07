@@ -115,6 +115,10 @@ class UDPSocket {
     }
   }
   
+  func closeSocket() {
+    close(self.udpSocket);
+  }
+
   private func setupAddress() {
     var address: sockaddr_in = sockaddr_in();
     memset(&address, 0, Int(socklen_t(sizeof(sockaddr_in))));

@@ -32,112 +32,27 @@ let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, 
 task.resume();
 */
 
-var responseSource: dispatch_source_t?;
-
-func handleSocketData(socket: Int32, isServer: Bool) {
-  var inAddress = sockaddr_storage();
-  var inAddressLength = socklen_t(sizeof(sockaddr_storage.self));
-  let buffer = [UInt8](count: 4096, repeatedValue: 0);
-  
-  let bytesRead = withUnsafeMutablePointer(&inAddress) {
-    recvfrom(socket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0, UnsafeMutablePointer($0), &inAddressLength);
-  };
-  
-  let dataRead = buffer[0..<bytesRead];
-  if let dataString = String(bytes: dataRead, encoding: NSUTF8StringEncoding) {
-    print("\(isServer ? "Server" : "Client") received message: \(dataString)");
-  } else {
-    print("\(isServer ? "Server" : "Client") received \(bytesRead) bytes: \(dataRead)");
-  }
-  
-  if (isServer) {
-    let replyStr = "Bay Area Men Wakes Up To No New Email!";
-    let replyData = replyStr.dataUsingEncoding(NSUTF8StringEncoding)!;
-    
-    let replySocket = UDPSocket(socket: socket, address: castSocketAddress(&inAddress), addressLength: inAddressLength);
-    replySocket.sendData(replyData);
-    
-    print("Server sent: \(replyStr)");
-  }
-}
-
-func startClient(host: String, port: UInt16) {
-  let udpSocket = UDPSocket(port: port, host: host);
-  
-  udpSocket.setListener({(socket: Int32) in
-    handleSocketData(socket, isServer: false);
-  });
-  
-  print("Client listening...");
-  
-  let str = "Holy Shit! Men on the Fucking Moon!";
-  udpSocket.sendData(str.dataUsingEncoding(NSUTF8StringEncoding)!);
-  print("Client sent: \(str)");
-  
-  // close(sock);
-  // while true {}
-}
-
-func startServer(port: UInt16) {
-  let udpSocket = UDPSocket(port: port);
-  
-  udpSocket.setListener({(socket: Int32) in
-    handleSocketData(socket, isServer: true);
-  });
-  
-  print("Server listening...");
-  
-  // while true {}
-}
+var echo: UDPEcho?;
 
 if (Process.arguments.count > 1) {
-  if (Process.arguments[1] == "server") {
-    startServer(4242);
-  } else if (Process.arguments[1] == "client") {
-    startClient("127.0.0.1", port: 4242);
+  do {
+    echo = try UDPEcho(argv: Process.arguments);
+  } catch UDPEchoError.InvalidArguments {
+    print("UDP Echo Usage:");
+    print("* Server mode: sobt server [port]");
+    print("* Client mode: sobt client [port] [host]");
   }
 } else {
-  startServer(4242);
-  // startClient("127.0.0.1", port: 4242);
+  echo = UDPEcho(port: 4242);
+  // echo = UDPEcho(port: 4242, host: "127.0.0.1");
 }
 
-// =================================================================================================
-
-enum Signal:Int32 {
-  case HUP    = 1
-  case INT    = 2
-  case QUIT   = 3
-  case ABRT   = 6
-  case KILL   = 9
-  case ALRM   = 14
-  case TERM   = 15
+trapSignal(Signal.INT) {(signal) in
+  echo?.stop();
+  exit(0);
 };
 
-typealias SigactionHandler = @convention(c)(Int32) -> Void;
-
-let hupHandler:SigactionHandler = {(signal) in
-  print("Received HUP signal, reread config file")
-};
-
-func trap(signal: Signal, action: @convention(c) Int32 -> ()) {
-  // From Swift, sigaction.init() collides with the Darwin.sigaction() function.
-  // This local typealias allows us to disambiguate them.
-  typealias SignalAction = sigaction
-  
-  var signalAction = SignalAction(__sigaction_u: unsafeBitCast(action, __sigaction_u.self), sa_mask: 0, sa_flags: 0)
-  
-  withUnsafePointer(&signalAction) { actionPointer in
-    sigaction(signal.rawValue, actionPointer, nil)
-  }
+if (echo != nil) {
+  echo!.start();
+  sendSuspendSignal();
 }
-
-// This method works
-trap(.INT) {(signal) in
-  print("Received INT signal: \(signal)")
-  exit(0)
-}
-
-trap(.HUP, action:hupHandler);
-
-// sigsuspend(nil)
-select(0, nil, nil, nil, nil);

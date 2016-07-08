@@ -32,7 +32,9 @@ let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, 
 task.resume();
 */
 
-// http://swiftrien.blogspot.com/2015/10/socket-programming-in-swift-part-1.html
+// https://developer.apple.com/library/mac/documentation/NetworkingInternet/Conceptual/NetworkingTopics/Introduction/Introduction.html
+// http://swiftrien.blogspot.ca/2015/10/socket-programming-in-swift-part-1.html
+// https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/getaddrinfo.3.html
 
 var echo: UDPEcho?;
 

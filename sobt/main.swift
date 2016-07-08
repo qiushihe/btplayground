@@ -32,6 +32,8 @@ let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, 
 task.resume();
 */
 
+// http://swiftrien.blogspot.com/2015/10/socket-programming-in-swift-part-1.html
+
 var echo: UDPEcho?;
 
 if (Process.arguments.count > 1) {

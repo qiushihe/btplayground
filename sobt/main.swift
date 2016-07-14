@@ -92,292 +92,94 @@ func sockaddrDescription(addr: UnsafePointer<sockaddr>) -> (String?, String?) {
   return (host, service);
 }
 
-func fdSet(fd: Int32, inout set: fd_set) {
-  let intOffset = Int(fd / 32)
-  let bitOffset = fd % 32
-  let mask = 1 << bitOffset
-  switch intOffset {
-  case 0: set.fds_bits.0 = set.fds_bits.0 | mask
-  case 1: set.fds_bits.1 = set.fds_bits.1 | mask
-  case 2: set.fds_bits.2 = set.fds_bits.2 | mask
-  case 3: set.fds_bits.3 = set.fds_bits.3 | mask
-  case 4: set.fds_bits.4 = set.fds_bits.4 | mask
-  case 5: set.fds_bits.5 = set.fds_bits.5 | mask
-  case 6: set.fds_bits.6 = set.fds_bits.6 | mask
-  case 7: set.fds_bits.7 = set.fds_bits.7 | mask
-  case 8: set.fds_bits.8 = set.fds_bits.8 | mask
-  case 9: set.fds_bits.9 = set.fds_bits.9 | mask
-  case 10: set.fds_bits.10 = set.fds_bits.10 | mask
-  case 11: set.fds_bits.11 = set.fds_bits.11 | mask
-  case 12: set.fds_bits.12 = set.fds_bits.12 | mask
-  case 13: set.fds_bits.13 = set.fds_bits.13 | mask
-  case 14: set.fds_bits.14 = set.fds_bits.14 | mask
-  case 15: set.fds_bits.15 = set.fds_bits.15 | mask
-  case 16: set.fds_bits.16 = set.fds_bits.16 | mask
-  case 17: set.fds_bits.17 = set.fds_bits.17 | mask
-  case 18: set.fds_bits.18 = set.fds_bits.18 | mask
-  case 19: set.fds_bits.19 = set.fds_bits.19 | mask
-  case 20: set.fds_bits.20 = set.fds_bits.20 | mask
-  case 21: set.fds_bits.21 = set.fds_bits.21 | mask
-  case 22: set.fds_bits.22 = set.fds_bits.22 | mask
-  case 23: set.fds_bits.23 = set.fds_bits.23 | mask
-  case 24: set.fds_bits.24 = set.fds_bits.24 | mask
-  case 25: set.fds_bits.25 = set.fds_bits.25 | mask
-  case 26: set.fds_bits.26 = set.fds_bits.26 | mask
-  case 27: set.fds_bits.27 = set.fds_bits.27 | mask
-  case 28: set.fds_bits.28 = set.fds_bits.28 | mask
-  case 29: set.fds_bits.29 = set.fds_bits.29 | mask
-  case 30: set.fds_bits.30 = set.fds_bits.30 | mask
-  case 31: set.fds_bits.31 = set.fds_bits.31 | mask
-  default: break
-  }
-}
-
-func initServerSocket(servicePortNumber servicePortNumber: String, maxNumberOfConnectionsBeforeAccept: Int32) -> Int32? {
-  var status: Int32 = 0
+func initServerSocket(port port: UInt16, connectionBufferCount: Int32) -> Int32? {
+  var address: sockaddr_in = sockaddr_in();
+  memset(&address, 0, Int(socklen_t(sizeof(sockaddr_in))));
   
-  // ==================================================================
-  // Retrieve the information necessary to create the socket descriptor
-  // ==================================================================
+  address.sin_len = __uint8_t(sizeofValue(address));
+  address.sin_family = sa_family_t(AF_INET);
+  address.sin_port = htons(port);
+  address.sin_addr.s_addr = INADDR_ANY;
   
-  // Protocol configuration, used to retrieve the data needed to create the socket descriptor
-  var hints = addrinfo(
-    ai_flags: AI_PASSIVE,       // Assign the address of the local host to the socket structures
-    ai_family: AF_UNSPEC,       // Either IPv4 or IPv6
-    ai_socktype: SOCK_STREAM,   // TCP
-    ai_protocol: 0,
-    ai_addrlen: 0,
-    ai_canonname: nil,
-    ai_addr: nil,
-    ai_next: nil);
+  let socketAddress = castSocketAddress(&address);
+  let socketAddressLength = UInt32(sizeofValue(address));
   
-  // For the information needed to create a socket (result from the getaddrinfo)
-  var servinfo: UnsafeMutablePointer<addrinfo> = nil;
+  let tcpSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   
-  // Get the info we need to create our socket descriptor
-  status = getaddrinfo(
-    nil,                        // Any interface
-    servicePortNumber,          // The port on which will be listenend
-    &hints,                     // Protocol configuration as per above
-    &servinfo);                 // The created information
-  
-  if status != 0 {
-    let strError = String(UTF8String: gai_strerror(status)) ?? "Unknown error code";
-    let message = "Getaddrinfo Error \(status) (\(strError))";
-    print(message);
-    return nil;
+  guard tcpSocket >= 0 else {
+    assertionFailure("Could not create socket: \(getErrorDescription(errno))!");
+    return -1;
   }
 
-  // Print a list of the found IP addresses
-  if (servinfo != nil) {
-    var info = servinfo;
-    while true {
-      if (info == nil) {
-        break;
-      }
-      
-      let (clientIp, service) = sockaddrDescription(info.memory.ai_addr);
-      let message = "HostIp: " + (clientIp ?? "?") + " at port: " + (service ?? "?");
-      print(message);
-      
-      info = info.memory.ai_next;
-    }
-  }
+  // Server mode socket requires binding
+  let bindErr = bind(
+    tcpSocket,
+    socketAddress,
+    socketAddressLength
+  );
 
-  // ============================
-  // Create the socket descriptor
-  // ============================
-  let socketDescriptor = socket(
-    servinfo.memory.ai_family,      // Use the servinfo created earlier, this makes it IPv4/IPv6 independant
-    servinfo.memory.ai_socktype,    // Use the servinfo created earlier, this makes it IPv4/IPv6 independant
-    servinfo.memory.ai_protocol);   // Use the servinfo created earlier, this makes it IPv4/IPv6 independant
-  
-  print("Socket value: \(socketDescriptor)");
-  
-  if socketDescriptor == -1 {
-    let strError = String(UTF8String: strerror(errno)) ?? "Unknown error code";
-    let message = "Socket creation error \(errno) (\(strError))";
-    print(message);
-    freeaddrinfo(servinfo)
-    return nil;
+  guard bindErr == 0 else {
+    assertionFailure("Could not bind socket: \(getErrorDescription(errno))!");
+    return -1;
   }
   
-  // ========================================================================
-  // Set the socket options (specifically: prevent the "socket in use" error)
-  // ========================================================================
-  var optval: Int = 1; // Use 1 to enable the option, 0 to disable
+  let listenErr = listen(tcpSocket, connectionBufferCount);
   
-  status = setsockopt(
-    socketDescriptor,               // The socket descriptor of the socket on which the option will be set
-    SOL_SOCKET,                     // Type of socket options
-    SO_REUSEADDR,                   // The socket option id
-    &optval,                        // The socket option value
-    socklen_t(sizeof(Int)));        // The size of the socket option value
-  
-  if status == -1 {
-    let strError = String(UTF8String: strerror(errno)) ?? "Unknown error code";
-    let message = "Setsockopt error \(errno) (\(strError))";
-    print(message);
-    freeaddrinfo(servinfo);
-    close(socketDescriptor);        // Ignore possible errors
-    return nil;
+  guard listenErr == 0 else {
+    assertionFailure("Could not listen on socket: \(getErrorDescription(errno))!");
+    return -1;
   }
   
-  // ====================================
-  // Bind the socket descriptor to a port
-  // ====================================
-  
-  status = bind(
-    socketDescriptor,               // The socket descriptor of the socket to bind
-    servinfo.memory.ai_addr,        // Use the servinfo created earlier, this makes it IPv4/IPv6 independant
-    servinfo.memory.ai_addrlen);    // Use the servinfo created earlier, this makes it IPv4/IPv6 independant
-  
-  print("Status from binding: \(status)");
-  
-  if status != 0 {
-    let strError = String(UTF8String: strerror(errno)) ?? "Unknown error code";
-    let message = "Binding error \(errno) (\(strError))";
-    print(message);
-    freeaddrinfo(servinfo);
-    close(socketDescriptor);        // Ignore possible errors
-    return nil;
-  }
-  
-  // ===============================
-  // Don't need the servinfo anymore
-  // ===============================
-  freeaddrinfo(servinfo);
-  
-  // ========================================
-  // Start listening for incoming connections
-  // ========================================
-  status = listen(
-    socketDescriptor,                     // The socket on which to listen
-    maxNumberOfConnectionsBeforeAccept);  // The number of connections that will be allowed before they are accepted
-  
-  print("Status from listen: " + status.description);
-  
-  if status != 0 {
-    let strError = String(UTF8String: strerror(errno)) ?? "Unknown error code";
-    let message = "Listen error \(errno) (\(strError))";
-    print(message);
-    close(socketDescriptor);        // Ignore possible errors
-    return nil;
-  }
-
-  return socketDescriptor;
+  return tcpSocket;
 }
 
 // Client ==========================================================================================
 
-func initClientSocket(address address: String, port: String) -> Int32? {
-  var status: Int32 = 0;
+func initClientSocket(host host: String, port: UInt16) -> Int32? {
+  var address: sockaddr_in = sockaddr_in();
+  memset(&address, 0, Int(socklen_t(sizeof(sockaddr_in))));
   
-  var hints = addrinfo(
-    ai_flags: AI_PASSIVE,       // Assign the address of the local host to the socket structures
-    ai_family: AF_UNSPEC,       // Either IPv4 or IPv6
-    ai_socktype: SOCK_STREAM,   // TCP
-    ai_protocol: 0,
-    ai_addrlen: 0,
-    ai_canonname: nil,
-    ai_addr: nil,
-    ai_next: nil);
+  // For client mode, we need to resolve the host info to obtain the adress data
+  // from the given `host` string, which could be either an domain like "www.apple.ca"
+  // or an IP address like "17.178.96.7".
+  let cfHost = CFHostCreateWithName(nil, host).takeRetainedValue();
+  CFHostStartInfoResolution(cfHost, .Addresses, nil);
   
-  var servinfo: UnsafeMutablePointer<addrinfo> = nil;
+  var success: DarwinBoolean = false;
+  // TODO: Handle when address resolution fails.
+  let addresses = CFHostGetAddressing(cfHost, &success)?.takeUnretainedValue() as NSArray?;
   
-  status = getaddrinfo(
-    address,              // The IP or URL of the server to connect to
-    port,                 // The port to which will be transferred
-    &hints,               // Protocol configuration as per above
-    &servinfo);           // The created information
+  // TODO: Loop through to actually find an usable address instead of alaways taking the
+  // first entry in the array.
+  let data = addresses![0];
   
-  if status != 0 {
-    var strError: String
-    if status == EAI_SYSTEM {
-      strError = String(UTF8String: strerror(errno)) ?? "Unknown error code"
-    } else {
-      strError = String(UTF8String: gai_strerror(status)) ?? "Unknown error code"
-    }
-    print(strError);
-    return nil;
+  data.getBytes(&address, length: data.length);
+  address.sin_port = htons(port);
+  // TODO: Assert for valid address.sin_family
+  
+  let socketAddress = castSocketAddress(&address);
+  let socketAddressLength = UInt32(sizeofValue(address));
+  
+  let tcpSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+  
+  guard tcpSocket >= 0 else {
+    assertionFailure("Could not create socket: \(getErrorDescription(errno))!");
+    return -1;
   }
   
-  var socketDescriptor: Int32?
-  var info = servinfo;
-  while info != nil {
-    socketDescriptor = socket(
-      info.memory.ai_family,      // Use the servinfo created earlier, this makes it IPv4/IPv6 independant
-      info.memory.ai_socktype,    // Use the servinfo created earlier, this makes it IPv4/IPv6 independant
-      info.memory.ai_protocol);   // Use the servinfo created earlier, this makes it IPv4/IPv6 independant
-    
-    if socketDescriptor == -1 {
-      let strError = String(UTF8String: strerror(errno)) ?? "Unknown error code"
-      print(strError);
-      continue;
-    }
-    
-    let (address, service) = sockaddrDescription(info.memory.ai_addr);
-    let laddress = address ?? "nil";
-    let lservice = service ?? "nil";
-    print("Trying to connect to \(laddress) at port \(lservice)");
-    
-    // Attempt to connect
-    status = connect(socketDescriptor!, info.memory.ai_addr, info.memory.ai_addrlen);
-    print("Result of 'connect' is \(status)");
-    
-    // Break if successful, log on failure.
-    if status == 0 {
-      print("Connection established");
-      break
-    } else {
-      let strError = String(UTF8String: strerror(errno)) ?? "Unknown error code"
-      print(strError);
-    }
-    
-    // Close the socket that was opened, the next attempt must create a new socket descriptor because the protocol family may have changed
-    close(socketDescriptor!);
-    socketDescriptor = nil; // Set to nil to prevent a double closing in case the last connect attempt failed
-    
-    // Setup for the next try
-    info = info.memory.ai_next;
+  // Client mode socket requires connection
+  let connectErr = connect(
+    tcpSocket,
+    socketAddress,
+    socketAddressLength
+  );
+  
+  guard connectErr == 0 else {
+    assertionFailure("Could not connect: \(getErrorDescription(errno))");
+    return -1;
   }
   
-  if status != 0 {
-    let strError = String(UTF8String: strerror(errno)) ?? "Unknown error code"
-    freeaddrinfo(servinfo);
-    if socketDescriptor != nil { close(socketDescriptor!) }
-    print(strError);
-    return nil;
-  }
-  
-  if socketDescriptor == nil {
-    let strError = String(UTF8String: strerror(errno)) ?? "Unknown error code"
-    freeaddrinfo(servinfo);
-    print(strError);
-    return nil;
-  }
-  
-  // Don't need the servinfo anymore
-  freeaddrinfo(servinfo)
-  
-  // Set the socket option: prevent SIGPIPE exception
-  var optval = 1;
-  
-  status = setsockopt(
-    socketDescriptor!,
-    SOL_SOCKET,
-    SO_NOSIGPIPE,
-    &optval,
-    socklen_t(sizeof(Int)));
-  
-  if status == -1 {
-    let strError = String(UTF8String: strerror(errno)) ?? "Unknown error code"
-    close(socketDescriptor!);
-    print(strError);
-    return nil;
-  }
-  
-  return socketDescriptor!;
+  return tcpSocket;
 }
 
 // Send data =======================================================================================
@@ -397,13 +199,9 @@ func sendData(data: NSData, socket: Int32, address: UnsafeMutablePointer<sockadd
 // Process socket data =============================================================================
 
 func processSocketData(socket: Int32, isServer: Bool, address: UnsafeMutablePointer<sockaddr> = nil) {
-  var inAddress = sockaddr_storage();
-  var inAddressLength = socklen_t(sizeof(sockaddr_storage.self));
   let buffer = [UInt8](count: 4096, repeatedValue: 0);
   
-  let bytesRead = withUnsafeMutablePointer(&inAddress) {
-    recvfrom(socket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0, UnsafeMutablePointer($0), &inAddressLength);
-  };
+  let bytesRead = recv(socket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0);
   
   let dataRead = buffer[0..<bytesRead];
   if let dataString = String(bytes: dataRead, encoding: NSUTF8StringEncoding) {
@@ -423,54 +221,69 @@ func processSocketData(socket: Int32, isServer: Bool, address: UnsafeMutablePoin
 
 // =================================================================================================
 
-let serverSocket = initServerSocket(
-  servicePortNumber: "4141",
-  maxNumberOfConnectionsBeforeAccept: 10);
+let serverSocket = initServerSocket(port: 4141, connectionBufferCount: 10);
 
 if serverSocket == nil {
   print("serverSocket is nil!!!");
   exit(-1);
 }
 
-let acceptQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
-
-func acceptConnectionRequests(socketDescriptor: Int32, isServer: Bool) {
-  // Incoming connections will be executed in this queue (in parallel)
-  let connectionQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+var dispatchServerSource: dispatch_source_t? = nil;
+func setServerListener(socket: Int32, listener: (Int32) -> ()) {
+  // Create a GCD thread that can listen for network events.
+  dispatchServerSource = dispatch_source_create(
+    DISPATCH_SOURCE_TYPE_READ,
+    UInt(socket),
+    0,
+    dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+  );
   
-  // ========================
-  // Start the "endless" loop
-  // ========================
-  ACCEPT_LOOP: while true {
-    // Wait for an incoming connection request
-    var connectedAddrInfo = sockaddr(sa_len: 0, sa_family: 0, sa_data: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-    var connectedAddrInfoLength = socklen_t(sizeof(sockaddr));
-    let requestDescriptor = accept(socketDescriptor, &connectedAddrInfo, &connectedAddrInfoLength);
-    
-    if requestDescriptor == -1 {
-      let strerr = String(UTF8String: strerror(errno)) ?? "Unknown error code"
-      let message = "Accept error \(errno) " + strerr
-      print(message);
-      continue;
-    }
-    
-    let (ipAddress, servicePort) = sockaddrDescription(&connectedAddrInfo);
-    let message = "Accepted connection from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
-    print(message);
-    
-    // Request processing of the connection request in a different dispatch queue
-    dispatch_async(connectionQueue, {
-      processSocketData(requestDescriptor, isServer: isServer, address: &connectedAddrInfo);
-    });
-  }
+  guard dispatchServerSource != nil else {
+    close(socket);
+    assertionFailure("Can not create dispath source: \(getErrorDescription(errno))");
+    return;
+  };
+  
+  // Register the event handler for cancellation.
+  dispatch_source_set_cancel_handler(dispatchServerSource!) {
+    close(socket);
+    assertionFailure("Event handler cancelled: \(getErrorDescription(errno))");
+  };
+  
+  // Register the event handler for incoming packets.
+  dispatch_source_set_event_handler(dispatchServerSource!) {
+    guard let source = dispatchServerSource else { return };
+    let inSocket = Int32(dispatch_source_get_handle(source));
+    listener(inSocket);
+  };
+  
+  // Start the listener thread
+  dispatch_resume(dispatchServerSource!);
 }
 
-dispatch_async(acceptQueue, { acceptConnectionRequests(serverSocket!, isServer: true) });
+setServerListener(serverSocket!) {(socket: Int32) in
+  // Incoming connections will be executed in this queue (in parallel)
+  let connectionQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+
+  // Wait for an incoming connection request
+  var connectedAddrInfo = sockaddr(sa_len: 0, sa_family: 0, sa_data: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+  var connectedAddrInfoLength = socklen_t(sizeof(sockaddr));
+  let requestDescriptor = accept(socket, &connectedAddrInfo, &connectedAddrInfoLength);
+  
+  let (ipAddress, servicePort) = sockaddrDescription(&connectedAddrInfo);
+  let message = "Accepted connection from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
+  print(message);
+  
+  // Request processing of the connection request in a different dispatch queue
+  dispatch_async(connectionQueue, {
+    processSocketData(requestDescriptor, isServer: true, address: &connectedAddrInfo);
+  });
+};
 
 print("Server listening ...");
 sleep(3);
 
-let clientSocket = initClientSocket(address: "127.0.0.1", port: "4141");
+let clientSocket = initClientSocket(host: "127.0.0.1", port: 4141);
 print("clientSocket: " + String(clientSocket));
 
 var dispatchSource: dispatch_source_t? = nil;

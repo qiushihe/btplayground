@@ -274,71 +274,6 @@ func initServerSocket(servicePortNumber servicePortNumber: String, maxNumberOfCo
   return socketDescriptor;
 }
 
-// General purpose status variable, used to detect error returns from socket functions
-var status: Int32 = 0
-
-// =================================================
-// Initialize the port on which we will be listening
-// =================================================
-let ap_HttpServicePortNumber = "4141";
-let ap_MaxNumberOfHttpConnectionsWaitingToBeAccepted: Int32 = 10;
-
-let httpSocketDescriptor = initServerSocket(
-  servicePortNumber: ap_HttpServicePortNumber,
-  maxNumberOfConnectionsBeforeAccept: ap_MaxNumberOfHttpConnectionsWaitingToBeAccepted);
-
-if httpSocketDescriptor == nil {
-  print("httpSocketDescriptor is nil!!!");
-  exit(-1);
-}
-
-// ===========================================================================
-// Keep on accepting connection requests until a fatal error or a stop request
-// ===========================================================================
-
-let stopAcceptThread = false;
-
-let acceptQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
-
-func acceptConnectionRequests(socketDescriptor: Int32) {
-  // Incoming connections will be executed in this queue (in parallel)
-  let connectionQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-  
-  // ========================
-  // Start the "endless" loop
-  // ========================
-  ACCEPT_LOOP: while true {
-    // Wait for an incoming connection request
-    var connectedAddrInfo = sockaddr(sa_len: 0, sa_family: 0, sa_data: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-    var connectedAddrInfoLength = socklen_t(sizeof(sockaddr));
-    let requestDescriptor = accept(socketDescriptor, &connectedAddrInfo, &connectedAddrInfoLength);
-    
-    if requestDescriptor == -1 {
-      let strerr = String(UTF8String: strerror(errno)) ?? "Unknown error code"
-      let message = "Accept error \(errno) " + strerr
-      print(message);
-      continue;
-    }
-    
-    let (ipAddress, servicePort) = sockaddrDescription(&connectedAddrInfo);
-    let message = "Accepted connection from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
-    print(message);
-    
-    // Request processing of the connection request in a different dispatch queue
-    dispatch_async(connectionQueue, { receiveAndDispatch(requestDescriptor)});
-  }
-}
-
-func receiveAndDispatch(socket: Int32) {
-  // http://swiftrien.blogspot.ca/2015/11/socket-programming-in-swift-part-5.html
-  print("receiveAndDispatch: " + String(socket));
-}
-
-dispatch_async(acceptQueue, { acceptConnectionRequests(httpSocketDescriptor!) });
-
-print("Server listening ...");
-sleep(3);
-
 // Client ==========================================================================================
 
 func initClientSocket(address address: String, port: String) -> Int32? {
@@ -355,7 +290,7 @@ func initClientSocket(address address: String, port: String) -> Int32? {
     ai_next: nil);
   
   var servinfo: UnsafeMutablePointer<addrinfo> = nil;
-
+  
   status = getaddrinfo(
     address,              // The IP or URL of the server to connect to
     port,                 // The port to which will be transferred
@@ -453,9 +388,6 @@ func initClientSocket(address address: String, port: String) -> Int32? {
   return socketDescriptor!;
 }
 
-let clientSocket = initClientSocket(address: "127.0.0.1", port: "4141");
-print("clientSocket: " + String(clientSocket));
-
 func transmit(socket: Int32, buffer: UnsafeBufferPointer<UInt8>, timeout: NSTimeInterval) -> Int {
   // Check if there is data to transmit
   if buffer.count == 0 {
@@ -531,17 +463,208 @@ func transmit(socket: Int32, buffer: UnsafeBufferPointer<UInt8>, timeout: NSTime
     blockCounter += 1;
     bytesTransferred += bytesSend;
   } while (outOffset < buffer.count);
-
+  
   return bytesTransferred;
 }
 
+// General purpose status variable, used to detect error returns from socket functions
+var status: Int32 = 0
+
+// =================================================
+// Initialize the port on which we will be listening
+// =================================================
+let ap_HttpServicePortNumber = "4141";
+let ap_MaxNumberOfHttpConnectionsWaitingToBeAccepted: Int32 = 10;
+
+let httpSocketDescriptor = initServerSocket(
+  servicePortNumber: ap_HttpServicePortNumber,
+  maxNumberOfConnectionsBeforeAccept: ap_MaxNumberOfHttpConnectionsWaitingToBeAccepted);
+
+if httpSocketDescriptor == nil {
+  print("httpSocketDescriptor is nil!!!");
+  exit(-1);
+}
+
+// ===========================================================================
+// Keep on accepting connection requests until a fatal error or a stop request
+// ===========================================================================
+
+let stopAcceptThread = false;
+
+let acceptQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
+
+func acceptConnectionRequests(socketDescriptor: Int32, isServer: Bool) {
+  // Incoming connections will be executed in this queue (in parallel)
+  let connectionQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+  
+  // ========================
+  // Start the "endless" loop
+  // ========================
+  ACCEPT_LOOP: while true {
+    // Wait for an incoming connection request
+    var connectedAddrInfo = sockaddr(sa_len: 0, sa_family: 0, sa_data: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+    var connectedAddrInfoLength = socklen_t(sizeof(sockaddr));
+    let requestDescriptor = accept(socketDescriptor, &connectedAddrInfo, &connectedAddrInfoLength);
+    
+    if requestDescriptor == -1 {
+      let strerr = String(UTF8String: strerror(errno)) ?? "Unknown error code"
+      let message = "Accept error \(errno) " + strerr
+      print(message);
+      continue;
+    }
+    
+    let (ipAddress, servicePort) = sockaddrDescription(&connectedAddrInfo);
+    let message = "Accepted connection from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
+    print(message);
+    
+    // Request processing of the connection request in a different dispatch queue
+    dispatch_async(connectionQueue, { receiveAndDispatch(requestDescriptor, address: &connectedAddrInfo, isServer: isServer)});
+  }
+}
+
+func receiveAndDispatch(socket: Int32, address: UnsafeMutablePointer<sockaddr>, isServer: Bool) {
+  // http://swiftrien.blogspot.ca/2015/11/socket-programming-in-swift-part-5.html
+  print("receiveAndDispatch: " + String(socket));
+  
+  var inAddress = sockaddr_storage();
+  var inAddressLength = socklen_t(sizeof(sockaddr_storage.self));
+  let buffer = [UInt8](count: 4096, repeatedValue: 0);
+  
+  let bytesRead = withUnsafeMutablePointer(&inAddress) {
+    recvfrom(socket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0, UnsafeMutablePointer($0), &inAddressLength);
+  };
+  
+  let dataRead = buffer[0..<bytesRead];
+  if let dataString = String(bytes: dataRead, encoding: NSUTF8StringEncoding) {
+    print("\(isServer ? "Server" : "Client") received message: \(dataString)");
+  } else {
+    print("\(isServer ? "Server" : "Client") received \(bytesRead) bytes: \(dataRead)");
+  }
+  
+  /*
+  var inAddress = sockaddr_storage();
+  var inAddressLength = socklen_t(sizeof(sockaddr_storage.self));
+  let buffer = [UInt8](count: 4096, repeatedValue: 0);
+  
+  let bytesRead = withUnsafeMutablePointer(&inAddress) {
+    recvfrom(socket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0, UnsafeMutablePointer($0), &inAddressLength);
+  };
+  
+  let dataRead = buffer[0..<bytesRead];
+  if let dataString = String(bytes: dataRead, encoding: NSUTF8StringEncoding) {
+    print("\(self.isServer ? "Server" : "Client") received message: \(dataString)");
+  } else {
+    print("\(self.isServer ? "Server" : "Client") received \(bytesRead) bytes: \(dataRead)");
+  }
+  
+  if (self.isServer) {
+    let replyStr = "Bay Area Men Wakes Up To No New Email!";
+    let replyData = replyStr.dataUsingEncoding(NSUTF8StringEncoding)!;
+    
+    let replySocket = UDPSocket(socket: socket, address: castSocketAddress(&inAddress), addressLength: inAddressLength);
+    replySocket.sendData(replyData);
+    
+    print("Server sent: \(replyStr)");
+  }
+  */
+  
+  if (isServer) {
+    let replyString = "{\"Reply\":true}";
+    let replyData = replyString.dataUsingEncoding(NSUTF8StringEncoding)!;
+    
+    let bytesSent = sendto(
+      socket,
+      replyData.bytes, replyData.length,
+      0,
+      address,
+      socklen_t(sizeofValue(address))
+    );
+    
+    print("Reply sent: " + String(bytesSent));
+  }
+  
+  /*
+  let bytesSent = sendto(
+    self.udpSocket,
+    data.bytes, data.length,
+    0,
+    self.isServer ? self.socketAddress : nil,
+    self.isServer ? self.socketAddressLength : 0
+  );
+   
+  guard bytesSent >= 0  else {
+    return assertionFailure("Could not send data: \(getErrorDescription(errno))");
+  }
+  */
+}
+
+dispatch_async(acceptQueue, { acceptConnectionRequests(httpSocketDescriptor!, isServer: true) });
+
+print("Server listening ...");
+sleep(3);
+
+let clientSocket = initClientSocket(address: "127.0.0.1", port: "4141");
+print("clientSocket: " + String(clientSocket));
+
+var dispatchSource: dispatch_source_t? = nil;
+func setListener(socket: Int32) {
+  // Create a GCD thread that can listen for network events.
+  dispatchSource = dispatch_source_create(
+    DISPATCH_SOURCE_TYPE_READ,
+    UInt(socket),
+    0,
+    dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+  );
+  
+  guard dispatchSource != nil else {
+    close(socket);
+    assertionFailure("Can not create dispath source: \(getErrorDescription(errno))");
+    return;
+  };
+  
+  // Register the event handler for cancellation.
+  dispatch_source_set_cancel_handler(dispatchSource!) {
+    close(socket);
+    assertionFailure("Event handler cancelled: \(getErrorDescription(errno))");
+  };
+  
+  // Register the event handler for incoming packets.
+  dispatch_source_set_event_handler(dispatchSource!) {
+    guard let source = dispatchSource else { return };
+    let inSocket = Int32(dispatch_source_get_handle(source));
+    
+    var inAddress = sockaddr_storage();
+    var inAddressLength = socklen_t(sizeof(sockaddr_storage.self));
+    let buffer = [UInt8](count: 4096, repeatedValue: 0);
+    
+    let bytesRead = withUnsafeMutablePointer(&inAddress) {
+      recvfrom(inSocket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0, UnsafeMutablePointer($0), &inAddressLength);
+    };
+
+    let dataRead = buffer[0..<bytesRead];
+    if let dataString = String(bytes: dataRead, encoding: NSUTF8StringEncoding) {
+      print("Client received message: \(dataString)");
+    } else {
+      print("Client received \(bytesRead) bytes: \(dataRead)");
+    }
+  };
+
+  // Start the listener thread
+  dispatch_resume(dispatchSource!);
+}
+
 if (clientSocket != nil) {
+  setListener(clientSocket!);
+  
+  print("Client listening ...");
+  sleep(3);
+
   let transmitString = "{\"Parameter\":true}";
   let transmitData = transmitString.dataUsingEncoding(NSUTF8StringEncoding)!;
   let buffer = UnsafeBufferPointer(start: UnsafePointer<UInt8>(transmitData.bytes), count: transmitData.length);
   
   transmit(clientSocket!, buffer: buffer, timeout: 10.0);
-  close(clientSocket!);
+  // close(clientSocket!);
 }
 
 while true {}

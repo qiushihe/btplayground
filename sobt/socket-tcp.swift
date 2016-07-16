@@ -1,80 +1,27 @@
 //
-//  udp-socket.swift
+//  socket-tcp.swift
 //  sobt
 //
-//  Created by Billy He on 7/5/16.
+//  Created by Billy He on 2016-07-15.
 //  Copyright © 2016 Billy He. All rights reserved.
 //
 
 import Foundation
 
 // Base on:
-// * https://gist.github.com/NeoTeo/b6195efb779d925fd7b8
-// * https://developer.apple.com/library/mac/samplecode/UDPEcho/Introduction/Intro.html
+// * http://swiftrien.blogspot.ca/2015/10/socket-programming-in-swift-part-1.html
+// * https://github.com/Swiftrien/SwifterSockets
 
-// Workaround for Swift not having access to the htons, htonl, and other C macros.
-// This is equivalent to casting the value to the desired bitsize and then swapping the endian'ness
-// of the result if the host platform is little endian. In the case of Mac OS X on Intel it is.
-// So htons casts to UInt16 and then turns into big endian (which is network byte order)
-// https://gist.github.com/NeoTeo/b6195efb779d925fd7b8
-let isLittleEndian = Int(OSHostByteOrder()) == OSLittleEndian;
-let htons = isLittleEndian ? _OSSwapInt16 : { $0 };
-let htonl = isLittleEndian ? _OSSwapInt32 : { $0 };
-let htonll = isLittleEndian ? _OSSwapInt64 : { $0 };
-let ntohs = isLittleEndian ? _OSSwapInt16 : { $0 };
-let ntohl = isLittleEndian ? _OSSwapInt32 : { $0 };
-let ntohll = isLittleEndian ? _OSSwapInt64 : { $0 };
-
-// Polyfill for "any in-address" constant
-let INADDR_ANY = in_addr_t(0);
-
-func getErrorDescription(errorNumber: Int32) -> String {
-  return "\(errorNumber) - \(String.fromCString(strerror(errorNumber)))";
-}
-
-func castSocketAddress(address: UnsafePointer<sockaddr_storage>) -> UnsafePointer<sockaddr> {
-  return UnsafePointer<sockaddr>(address);
-}
-
-func castSocketAddress(address: UnsafePointer<sockaddr_in>) -> UnsafePointer<sockaddr> {
-  return UnsafePointer<sockaddr>(address);
-}
-
-func getSocketHostAndPort(addr: UnsafePointer<sockaddr>) -> (String?, String?) {
-  var host : String?
-  var port : String?
-  
-  var hostBuffer = [CChar](count: Int(NI_MAXHOST), repeatedValue: 0);
-  var portBuffer = [CChar](count: Int(NI_MAXSERV), repeatedValue: 0);
-  
-  let err = getnameinfo(
-    addr,
-    socklen_t(addr.memory.sa_len),
-    &hostBuffer,
-    socklen_t(hostBuffer.count),
-    &portBuffer,
-    socklen_t(portBuffer.count),
-    NI_NUMERICHOST | NI_NUMERICSERV
-  );
-  
-  if err == 0 {
-    host = String.fromCString(hostBuffer);
-    port = String.fromCString(portBuffer);
-  }
-  
-  return (host, port);
-}
-
-class UDPSocket {
+class TCPSocket {
   private let port: UInt16;
   private let host: String?
   private let isServer: Bool;
   
   private var socketAddress: UnsafePointer<sockaddr> = nil;
   private var socketAddressLength: UInt32 = UInt32(sizeof(sockaddr));
-  private var udpSocket: Int32 = -1;
+  private var tcpSocket: Int32 = -1;
   private var dispatchSource: dispatch_source_t? = nil;
-  
+
   init(port: UInt16, host: String? = nil) {
     self.port = port;
     self.host = host;
@@ -89,7 +36,7 @@ class UDPSocket {
     self.host = nil;
     self.isServer = true;
     
-    self.udpSocket = socket;
+    self.tcpSocket = socket;
     self.socketAddress = address;
     self.socketAddressLength = addressLength;
   }
@@ -98,25 +45,25 @@ class UDPSocket {
     // Create a GCD thread that can listen for network events.
     self.dispatchSource = dispatch_source_create(
       DISPATCH_SOURCE_TYPE_READ,
-      UInt(self.udpSocket),
+      UInt(self.tcpSocket),
       0,
       dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
     );
     
     guard self.dispatchSource != nil else {
-      close(self.udpSocket);
+      close(self.tcpSocket);
       assertionFailure("Can not create dispath source: \(getErrorDescription(errno))");
       return;
     };
     
     // Register the event handler for cancellation.
-    dispatch_source_set_cancel_handler(self.dispatchSource!) {
-      close(self.udpSocket);
+    dispatch_source_set_cancel_handler(dispatchSource!) {
+      close(self.tcpSocket);
       assertionFailure("Event handler cancelled: \(getErrorDescription(errno))");
     };
     
     // Register the event handler for incoming packets.
-    dispatch_source_set_event_handler(self.dispatchSource!) {
+    dispatch_source_set_event_handler(dispatchSource!) {
       guard let source = self.dispatchSource else { return };
       let inSocket = Int32(dispatch_source_get_handle(source));
       listener(inSocket);
@@ -125,10 +72,10 @@ class UDPSocket {
     // Start the listener thread
     dispatch_resume(self.dispatchSource!);
   }
-  
+
   func sendData(data: NSData) {
     let bytesSent = sendto(
-      self.udpSocket,
+      self.tcpSocket,
       data.bytes, data.length,
       0,
       self.isServer ? self.socketAddress : nil,
@@ -141,29 +88,29 @@ class UDPSocket {
   }
   
   func closeSocket() {
-    close(self.udpSocket);
+    close(self.tcpSocket);
   }
-
-  private func setupAddress() {
+  
+  func setupAddress() {
     var address: sockaddr_in = sockaddr_in();
     memset(&address, 0, Int(socklen_t(sizeof(sockaddr_in))));
-    
+
     if (self.isServer) {
       // For server mode there is no `host`.
       address.sin_len = __uint8_t(sizeofValue(address));
       address.sin_family = sa_family_t(AF_INET);
-      address.sin_port = htons(self.port);
+      address.sin_port = htons(port);
       address.sin_addr.s_addr = INADDR_ANY;
     } else {
       // For client mode, we need to resolve the host info to obtain the adress data
       // from the given `host` string, which could be either an domain like "www.apple.ca"
       // or an IP address like "17.178.96.7".
-      let host = CFHostCreateWithName(nil, self.host!).takeRetainedValue();
-      CFHostStartInfoResolution(host, .Addresses, nil);
+      let cfHost = CFHostCreateWithName(nil, self.host!).takeRetainedValue();
+      CFHostStartInfoResolution(cfHost, .Addresses, nil);
       
       var success: DarwinBoolean = false;
       // TODO: Handle when address resolution fails.
-      let addresses = CFHostGetAddressing(host, &success)?.takeUnretainedValue() as NSArray?;
+      let addresses = CFHostGetAddressing(cfHost, &success)?.takeUnretainedValue() as NSArray?;
       
       // TODO: Loop through to actually find an usable address instead of alaways taking the
       // first entry in the array.
@@ -173,22 +120,22 @@ class UDPSocket {
       address.sin_port = htons(port);
       // TODO: Assert for valid address.sin_family
     }
-    
+
     self.socketAddress = castSocketAddress(&address);
     self.socketAddressLength = UInt32(sizeofValue(address));
   }
   
-  private func setupSocket() {
-    self.udpSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+  func setupSocket() {
+    self.tcpSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     
-    guard self.udpSocket >= 0 else {
+    guard self.tcpSocket >= 0 else {
       return assertionFailure("Could not create socket: \(getErrorDescription(errno))!");
     }
     
     if (self.isServer) {
-      // Server mode socket requires binding
+      // Server mode socket requires binding and listening
       let bindErr = bind(
-        self.udpSocket,
+        self.tcpSocket,
         self.socketAddress,
         self.socketAddressLength
       );
@@ -196,10 +143,17 @@ class UDPSocket {
       guard bindErr == 0 else {
         return assertionFailure("Could not bind socket: \(getErrorDescription(errno))!");
       }
+      
+      let connectionBufferCount: Int32 = 10; // TODO: Move this to a variable
+      let listenErr = listen(tcpSocket, connectionBufferCount);
+
+      guard listenErr == 0 else {
+        return assertionFailure("Could not listen on socket: \(getErrorDescription(errno))!");
+      }
     } else {
       // Client mode socket requires connection
       let connectErr = connect(
-        self.udpSocket,
+        self.tcpSocket,
         self.socketAddress,
         self.socketAddressLength
       );

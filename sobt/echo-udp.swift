@@ -59,6 +59,12 @@ class UDPEcho {
       let str = "Holy Shit! Men on the Fucking Moon!";
       self.udpSocket!.sendData(str.dataUsingEncoding(NSUTF8StringEncoding)!);
       print("Client sent: \(str)");
+      
+      sleep(3);
+      
+      let str2 = "Holy Shit! Men on the Fucking Moon! Again!";
+      self.udpSocket!.sendData(str2.dataUsingEncoding(NSUTF8StringEncoding)!);
+      print("Client sent: \(str2)");
     }
   }
   
@@ -74,6 +80,10 @@ class UDPEcho {
     let bytesRead = withUnsafeMutablePointer(&inAddress) {
       recvfrom(socket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0, UnsafeMutablePointer($0), &inAddressLength);
     };
+    
+    let (ipAddress, servicePort) = Socket.GetSocketHostAndPort(Socket.CastSocketAddress(&inAddress));
+    let message = "Got data from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
+    print(message);
     
     let dataRead = buffer[0..<bytesRead];
     if let dataString = String(bytes: dataRead, encoding: NSUTF8StringEncoding) {

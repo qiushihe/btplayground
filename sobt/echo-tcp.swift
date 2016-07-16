@@ -51,9 +51,6 @@ class TCPEcho {
     
     self.tcpSocket!.setListener({(socket: Int32) in
       if (self.isServer) {
-        // Incoming connections will be executed in this queue (in parallel)
-        let connectionQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-        
         // Wait for an incoming connection request
         var connectedAddrInfo = sockaddr(sa_len: 0, sa_family: 0, sa_data: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
         var connectedAddrInfoLength = socklen_t(sizeof(sockaddr));
@@ -62,11 +59,12 @@ class TCPEcho {
         let (ipAddress, servicePort) = Socket.GetSocketHostAndPort(&connectedAddrInfo);
         let message = "Accepted connection from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
         print(message);
-        
-        // Request processing of the connection request in a different dispatch queue
-        dispatch_async(connectionQueue, {
+
+        // Set data listener for individual connections
+        let requestSocket = TCPSocket.init(socket: requestDescriptor, address: &connectedAddrInfo, addressLength: connectedAddrInfoLength);
+        requestSocket.setListener() {(_) in
           self.handleSocketData(requestDescriptor, address: &connectedAddrInfo);
-        });
+        };
       } else {
         self.handleSocketData(socket);
       }
@@ -78,6 +76,12 @@ class TCPEcho {
       let str = "Holy Shit! Men on the Fucking Moon!";
       self.tcpSocket!.sendData(str.dataUsingEncoding(NSUTF8StringEncoding)!);
       print("Client sent: \(str)");
+      
+      sleep(3);
+      
+      let str2 = "Holy Shit! Men on the Fucking Moon! Again!";
+      self.tcpSocket!.sendData(str2.dataUsingEncoding(NSUTF8StringEncoding)!);
+      print("Client sent: \(str2)");
     }
   }
   

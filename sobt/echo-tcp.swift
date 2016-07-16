@@ -59,7 +59,7 @@ class TCPEcho {
         var connectedAddrInfoLength = socklen_t(sizeof(sockaddr));
         let requestDescriptor = accept(socket, &connectedAddrInfo, &connectedAddrInfoLength);
         
-        let (ipAddress, servicePort) = getSocketHostAndPort(&connectedAddrInfo);
+        let (ipAddress, servicePort) = Socket.GetSocketHostAndPort(&connectedAddrInfo);
         let message = "Accepted connection from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
         print(message);
         

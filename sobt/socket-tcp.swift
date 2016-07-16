@@ -12,7 +12,7 @@ import Foundation
 // * http://swiftrien.blogspot.ca/2015/10/socket-programming-in-swift-part-1.html
 // * https://github.com/Swiftrien/SwifterSockets
 
-class TCPSocket {
+class TCPSocket: Socket {
   private let port: UInt16;
   private let host: String?
   private let isServer: Bool;
@@ -26,6 +26,8 @@ class TCPSocket {
     self.port = port;
     self.host = host;
     self.isServer = self.host == nil;
+    
+    super.init();
     
     self.setupAddress();
     self.setupSocket();
@@ -52,14 +54,14 @@ class TCPSocket {
     
     guard self.dispatchSource != nil else {
       close(self.tcpSocket);
-      assertionFailure("Can not create dispath source: \(getErrorDescription(errno))");
+      assertionFailure("Can not create dispath source: \(self.getErrorDescription(errno))");
       return;
     };
     
     // Register the event handler for cancellation.
     dispatch_source_set_cancel_handler(dispatchSource!) {
       close(self.tcpSocket);
-      assertionFailure("Event handler cancelled: \(getErrorDescription(errno))");
+      assertionFailure("Event handler cancelled: \(self.getErrorDescription(errno))");
     };
     
     // Register the event handler for incoming packets.
@@ -121,7 +123,7 @@ class TCPSocket {
       // TODO: Assert for valid address.sin_family
     }
 
-    self.socketAddress = castSocketAddress(&address);
+    self.socketAddress = Socket.CastSocketAddress(&address);
     self.socketAddressLength = UInt32(sizeofValue(address));
   }
   

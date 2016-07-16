@@ -86,7 +86,7 @@ class UDPEcho {
       let replyStr = "Bay Area Men Wakes Up To No New Email!";
       let replyData = replyStr.dataUsingEncoding(NSUTF8StringEncoding)!;
       
-      let replySocket = UDPSocket.init(socket: socket, address: castSocketAddress(&inAddress), addressLength: inAddressLength);
+      let replySocket = UDPSocket.init(socket: socket, address: Socket.CastSocketAddress(&inAddress), addressLength: inAddressLength);
       replySocket.sendData(replyData);
       
       print("Server sent: \(replyStr)");

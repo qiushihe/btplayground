@@ -12,60 +12,7 @@ import Foundation
 // * https://gist.github.com/NeoTeo/b6195efb779d925fd7b8
 // * https://developer.apple.com/library/mac/samplecode/UDPEcho/Introduction/Intro.html
 
-// Workaround for Swift not having access to the htons, htonl, and other C macros.
-// This is equivalent to casting the value to the desired bitsize and then swapping the endian'ness
-// of the result if the host platform is little endian. In the case of Mac OS X on Intel it is.
-// So htons casts to UInt16 and then turns into big endian (which is network byte order)
-// https://gist.github.com/NeoTeo/b6195efb779d925fd7b8
-let isLittleEndian = Int(OSHostByteOrder()) == OSLittleEndian;
-let htons = isLittleEndian ? _OSSwapInt16 : { $0 };
-let htonl = isLittleEndian ? _OSSwapInt32 : { $0 };
-let htonll = isLittleEndian ? _OSSwapInt64 : { $0 };
-let ntohs = isLittleEndian ? _OSSwapInt16 : { $0 };
-let ntohl = isLittleEndian ? _OSSwapInt32 : { $0 };
-let ntohll = isLittleEndian ? _OSSwapInt64 : { $0 };
-
-// Polyfill for "any in-address" constant
-let INADDR_ANY = in_addr_t(0);
-
-func getErrorDescription(errorNumber: Int32) -> String {
-  return "\(errorNumber) - \(String.fromCString(strerror(errorNumber)))";
-}
-
-func castSocketAddress(address: UnsafePointer<sockaddr_storage>) -> UnsafePointer<sockaddr> {
-  return UnsafePointer<sockaddr>(address);
-}
-
-func castSocketAddress(address: UnsafePointer<sockaddr_in>) -> UnsafePointer<sockaddr> {
-  return UnsafePointer<sockaddr>(address);
-}
-
-func getSocketHostAndPort(addr: UnsafePointer<sockaddr>) -> (String?, String?) {
-  var host : String?
-  var port : String?
-  
-  var hostBuffer = [CChar](count: Int(NI_MAXHOST), repeatedValue: 0);
-  var portBuffer = [CChar](count: Int(NI_MAXSERV), repeatedValue: 0);
-  
-  let err = getnameinfo(
-    addr,
-    socklen_t(addr.memory.sa_len),
-    &hostBuffer,
-    socklen_t(hostBuffer.count),
-    &portBuffer,
-    socklen_t(portBuffer.count),
-    NI_NUMERICHOST | NI_NUMERICSERV
-  );
-  
-  if err == 0 {
-    host = String.fromCString(hostBuffer);
-    port = String.fromCString(portBuffer);
-  }
-  
-  return (host, port);
-}
-
-class UDPSocket {
+class UDPSocket: Socket {
   private let port: UInt16;
   private let host: String?
   private let isServer: Bool;
@@ -79,6 +26,8 @@ class UDPSocket {
     self.port = port;
     self.host = host;
     self.isServer = self.host == nil;
+    
+    super.init();
     
     self.setupAddress();
     self.setupSocket();
@@ -105,14 +54,14 @@ class UDPSocket {
     
     guard self.dispatchSource != nil else {
       close(self.udpSocket);
-      assertionFailure("Can not create dispath source: \(getErrorDescription(errno))");
+      assertionFailure("Can not create dispath source: \(self.getErrorDescription(errno))");
       return;
     };
     
     // Register the event handler for cancellation.
     dispatch_source_set_cancel_handler(self.dispatchSource!) {
       close(self.udpSocket);
-      assertionFailure("Event handler cancelled: \(getErrorDescription(errno))");
+      assertionFailure("Event handler cancelled: \(self.getErrorDescription(errno))");
     };
     
     // Register the event handler for incoming packets.
@@ -174,7 +123,7 @@ class UDPSocket {
       // TODO: Assert for valid address.sin_family
     }
     
-    self.socketAddress = castSocketAddress(&address);
+    self.socketAddress = Socket.CastSocketAddress(&address);
     self.socketAddressLength = UInt32(sizeofValue(address));
   }
   

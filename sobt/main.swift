@@ -59,7 +59,6 @@ if (echo != nil) {
 }
 */
 
-// /*
 var echo: TCPEcho?;
 
 if (Process.arguments.count > 1) {
@@ -84,4 +83,3 @@ if (echo != nil) {
   echo!.start();
   sendSuspendSignal();
 }
-// */

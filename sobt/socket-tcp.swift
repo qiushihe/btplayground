@@ -13,37 +13,39 @@ import Foundation
 // * https://github.com/Swiftrien/SwifterSockets
 
 class TCPSocket: Socket {
-  private let port: UInt16;
-  private let host: String?
-  private let isServer: Bool;
+  private let type: SocketType;
   
-  private var socketAddress: UnsafePointer<sockaddr> = nil;
+  private var socketAddress: sockaddr? = nil;
   private var socketAddressLength: UInt32 = UInt32(sizeof(sockaddr));
   private var tcpSocket: Int32 = -1;
   private var dispatchSource: dispatch_source_t? = nil;
+  
+  private var onReady: ((Socket) -> ())? = nil;
+  private var onClose: ((Socket) -> ())? = nil;
 
-  init(port: UInt16, host: String? = nil) {
-    self.port = port;
-    self.host = host;
-    self.isServer = self.host == nil;
-    
-    super.init();
-    
-    self.setupAddress();
-    self.setupSocket();
+  init(options: SocketOptions) {
+    self.onReady = options.onReady;
+    self.onClose = options.onClose;
+    self.type = options.type!;
+
+    if (options.descriptor != nil && options.address != nil) {
+      self.tcpSocket = options.descriptor!;
+      self.socketAddress = options.address!;
+      self.socketAddressLength = socklen_t(sizeofValue(options.address!));
+      
+      super.init();
+    } else {
+      super.init();
+      
+      var address = Socket.GetSocketAddress(options.port == nil ? 0 : options.port!, host: options.host);
+      self.socketAddress = Socket.CastSocketAddress(&address).memory;
+      self.socketAddressLength = UInt32(sizeofValue(address));
+      
+      self.setupSocket(options.host == nil);
+    }
   }
   
-  init(socket: Int32, address: UnsafePointer<sockaddr>, addressLength: UInt32) {
-    self.port = 0;
-    self.host = nil;
-    self.isServer = true;
-    
-    self.tcpSocket = socket;
-    self.socketAddress = address;
-    self.socketAddressLength = addressLength;
-  }
-  
-  func setListener(listener: (Int32) -> ()) {
+  func setListener(listener: (TCPSocket) -> ()) {
     // Create a GCD thread that can listen for network events.
     self.dispatchSource = dispatch_source_create(
       DISPATCH_SOURCE_TYPE_READ,
@@ -68,21 +70,69 @@ class TCPSocket: Socket {
     dispatch_source_set_event_handler(dispatchSource!) {
       guard let source = self.dispatchSource else { return };
       let inSocket = Int32(dispatch_source_get_handle(source));
-      listener(inSocket);
+      
+      if (self.type == SocketType.Server) {
+        // Wait for an incoming connection request
+        var requestAddress = sockaddr(sa_len: 0, sa_family: 0, sa_data: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+        var requestAddressLength = socklen_t(sizeof(sockaddr));
+        let requestDescriptor = accept(inSocket, &requestAddress, &requestAddressLength);
+        
+        let (ipAddress, servicePort) = Socket.GetSocketHostAndPort(&requestAddress);
+        let message = "Accepted connection from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
+        print(message);
+        
+        // Set data listener for individual connections
+        var requestSocketOptions = SocketOptions.init();
+        requestSocketOptions.descriptor = requestDescriptor;
+        requestSocketOptions.address = requestAddress;
+        requestSocketOptions.type = SocketType.Reply;
+        
+        // Set listener on the request socket
+        let requestSocket = TCPSocket.init(options: requestSocketOptions);
+        requestSocket.setListener(listener);
+      } else {
+        listener(self);
+      }
     };
     
     // Start the listener thread
     dispatch_resume(self.dispatchSource!);
   }
+  
+  func readData() -> NSData {
+    let buffer = [UInt8](count: 4096, repeatedValue: 0);
+    
+    let bytesRead = recv(self.tcpSocket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0);
+    
+    if (bytesRead <= 0) {
+      print("TODO: Socket closed!");
+    }
+    
+    let dataRead = Array<UInt8>.init(buffer[0..<bytesRead]);
+    
+    return NSData.init(bytes: dataRead, length: bytesRead);
+  }
 
   func sendData(data: NSData) {
-    let bytesSent = sendto(
-      self.tcpSocket,
-      data.bytes, data.length,
-      0,
-      self.isServer ? self.socketAddress : nil,
-      self.isServer ? self.socketAddressLength : 0
-    );
+    var bytesSent = 0;
+    
+    if (self.type == SocketType.Server || self.type == SocketType.Reply) {
+      bytesSent = sendto(
+        self.tcpSocket,
+        data.bytes, data.length,
+        0,
+        &self.socketAddress!,
+        self.socketAddressLength
+      );
+    } else {
+      bytesSent = sendto(
+        self.tcpSocket,
+        data.bytes, data.length,
+        0,
+        nil,
+        0
+      );
+    }
     
     guard bytesSent >= 0  else {
       return assertionFailure("Could not send data: \(getErrorDescription(errno))");
@@ -91,54 +141,24 @@ class TCPSocket: Socket {
   
   func closeSocket() {
     close(self.tcpSocket);
-  }
-  
-  func setupAddress() {
-    var address: sockaddr_in = sockaddr_in();
-    memset(&address, 0, Int(socklen_t(sizeof(sockaddr_in))));
-
-    if (self.isServer) {
-      // For server mode there is no `host`.
-      address.sin_len = __uint8_t(sizeofValue(address));
-      address.sin_family = sa_family_t(AF_INET);
-      address.sin_port = htons(port);
-      address.sin_addr.s_addr = INADDR_ANY;
-    } else {
-      // For client mode, we need to resolve the host info to obtain the adress data
-      // from the given `host` string, which could be either an domain like "www.apple.ca"
-      // or an IP address like "17.178.96.7".
-      let cfHost = CFHostCreateWithName(nil, self.host!).takeRetainedValue();
-      CFHostStartInfoResolution(cfHost, .Addresses, nil);
-      
-      var success: DarwinBoolean = false;
-      // TODO: Handle when address resolution fails.
-      let addresses = CFHostGetAddressing(cfHost, &success)?.takeUnretainedValue() as NSArray?;
-      
-      // TODO: Loop through to actually find an usable address instead of alaways taking the
-      // first entry in the array.
-      let data = addresses![0];
-      
-      data.getBytes(&address, length: data.length);
-      address.sin_port = htons(port);
-      // TODO: Assert for valid address.sin_family
+    
+    if (self.onClose != nil) {
+      self.onClose!(self);
     }
-
-    self.socketAddress = Socket.CastSocketAddress(&address);
-    self.socketAddressLength = UInt32(sizeofValue(address));
   }
   
-  func setupSocket() {
+  private func setupSocket(bindAndListen: Bool) {
     self.tcpSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     
     guard self.tcpSocket >= 0 else {
       return assertionFailure("Could not create socket: \(getErrorDescription(errno))!");
     }
-    
-    if (self.isServer) {
+
+    if (bindAndListen) {
       // Server mode socket requires binding and listening
       let bindErr = bind(
         self.tcpSocket,
-        self.socketAddress,
+        &self.socketAddress!,
         self.socketAddressLength
       );
       
@@ -156,13 +176,17 @@ class TCPSocket: Socket {
       // Client mode socket requires connection
       let connectErr = connect(
         self.tcpSocket,
-        self.socketAddress,
+        &self.socketAddress!,
         self.socketAddressLength
       );
       
       guard connectErr == 0 else {
         return assertionFailure("Could not connect: \(getErrorDescription(errno))");
       }
+    }
+    
+    if (self.onReady != nil) {
+      self.onReady!(self);
     }
   }
 }

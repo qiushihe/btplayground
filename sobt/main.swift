@@ -37,15 +37,15 @@ var echo: UDPEcho?;
 
 if (Process.arguments.count > 1) {
   do {
-    echo = try UDPEcho(argv: Process.arguments);
+    echo = try UDPEcho.init(argv: Process.arguments);
   } catch UDPEchoError.InvalidArguments {
     print("UDP Echo Usage:");
     print("* Server mode: sobt server [port]");
     print("* Client mode: sobt client [port] [host]");
   }
 } else {
-  echo = UDPEcho(port: 4242);
-  // echo = UDPEcho(port: 4242, host: "127.0.0.1");
+  echo = UDPEcho.init(port: 4242);
+  // echo = UDPEcho.init(port: 4242, host: "127.0.0.1");
 }
 
 trapSignal(Signal.INT) {(signal) in
@@ -63,15 +63,15 @@ var echo: TCPEcho?;
 
 if (Process.arguments.count > 1) {
   do {
-    echo = try TCPEcho(argv: Process.arguments);
+    echo = try TCPEcho.init(argv: Process.arguments);
   } catch TCPEchoError.InvalidArguments {
     print("TCP Echo Usage:");
     print("* Server mode: sobt server [port]");
     print("* Client mode: sobt client [port] [host]");
   }
 } else {
-  echo = TCPEcho(port: 4141);
-  // echo = TCPEcho(port: 4141, host: "127.0.0.1");
+  echo = TCPEcho.init(port: 4141);
+  // echo = TCPEcho.init(port: 4141, host: "127.0.0.1");
 }
 
 trapSignal(Signal.INT) {(signal) in

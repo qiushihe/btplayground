@@ -59,12 +59,6 @@ class UDPEcho {
       let str = "Holy Shit! Men on the Fucking Moon!";
       self.udpSocket!.sendData(str.dataUsingEncoding(NSUTF8StringEncoding)!);
       print("Client sent: \(str)");
-      
-      sleep(3);
-      
-      let str2 = "Holy Shit! Men on the Fucking Moon! Again!";
-      self.udpSocket!.sendData(str2.dataUsingEncoding(NSUTF8StringEncoding)!);
-      print("Client sent: \(str2)");
     }
   }
   

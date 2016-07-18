@@ -47,66 +47,41 @@ class TCPEcho {
   }
   
   func start() {
-    self.tcpSocket = TCPSocket.init(port: self.port, host: self.host);
+    var tcpSocketOptions = SocketOptions.init();
+    tcpSocketOptions.port = self.port;
+    tcpSocketOptions.host = self.host;
+    tcpSocketOptions.type = self.host == nil ? SocketType.Server : SocketType.Client;
     
-    self.tcpSocket!.setListener({(socket: Int32) in
-      if (self.isServer) {
-        // Wait for an incoming connection request
-        var connectedAddrInfo = sockaddr(sa_len: 0, sa_family: 0, sa_data: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-        var connectedAddrInfoLength = socklen_t(sizeof(sockaddr));
-        let requestDescriptor = accept(socket, &connectedAddrInfo, &connectedAddrInfoLength);
-        
-        let (ipAddress, servicePort) = Socket.GetSocketHostAndPort(&connectedAddrInfo);
-        let message = "Accepted connection from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
-        print(message);
-
-        // Set data listener for individual connections
-        let requestSocket = TCPSocket.init(socket: requestDescriptor, address: &connectedAddrInfo, addressLength: connectedAddrInfoLength);
-        requestSocket.setListener() {(_) in
-          self.handleSocketData(requestDescriptor, address: &connectedAddrInfo);
-        };
-      } else {
-        self.handleSocketData(socket);
-      }
-    });
-
+    self.tcpSocket = TCPSocket.init(options: tcpSocketOptions);
+    self.tcpSocket!.setListener(self.handleSocketData);
+    
     print("\(self.isServer ? "Server" : "Client") listening ...");
     
     if (!self.isServer) {
       let str = "Holy Shit! Men on the Fucking Moon!";
       self.tcpSocket!.sendData(str.dataUsingEncoding(NSUTF8StringEncoding)!);
       print("Client sent: \(str)");
-      
-      sleep(3);
-      
-      let str2 = "Holy Shit! Men on the Fucking Moon! Again!";
-      self.tcpSocket!.sendData(str2.dataUsingEncoding(NSUTF8StringEncoding)!);
-      print("Client sent: \(str2)");
     }
   }
   
   func stop() {
     self.tcpSocket?.closeSocket();
   }
-  
-  private func handleSocketData(socket: Int32, address: UnsafeMutablePointer<sockaddr> = nil) {
-    let buffer = [UInt8](count: 4096, repeatedValue: 0);
+
+  private func handleSocketData(dataSocket: TCPSocket) {
+    let dataRead = dataSocket.readData();
     
-    let bytesRead = recv(socket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0);
-    
-    let dataRead = buffer[0..<bytesRead];
-    if let dataString = String(bytes: dataRead, encoding: NSUTF8StringEncoding) {
+    if let dataString = String.init(data: dataRead, encoding: NSUTF8StringEncoding) {
       print("\(self.isServer ? "Server" : "Client") received message: \(dataString)");
     } else {
-      print("\(self.isServer ? "Server" : "Client") received \(bytesRead) bytes: \(dataRead)");
+      print("\(self.isServer ? "Server" : "Client") received \(dataRead.length) bytes: \(dataRead.bytes)");
     }
     
     if (self.isServer) {
       let replyStr = "Bay Area Men Wakes Up To No New Email!";
       let replyData = replyStr.dataUsingEncoding(NSUTF8StringEncoding)!;
-      
-      let replySocket = TCPSocket.init(socket: socket, address: address, addressLength: UInt32(sizeofValue(address)));
-      replySocket.sendData(replyData);
+
+      dataSocket.sendData(replyData);
      
       print("Server sent: \(replyStr)");
     }

@@ -107,19 +107,19 @@ class UDPSocket: Socket {
       // For client mode, we need to resolve the host info to obtain the adress data
       // from the given `host` string, which could be either an domain like "www.apple.ca"
       // or an IP address like "17.178.96.7".
-      let host = CFHostCreateWithName(nil, self.host!).takeRetainedValue();
-      CFHostStartInfoResolution(host, .Addresses, nil);
+      let cfHost = CFHostCreateWithName(nil, self.host!).takeRetainedValue();
+      CFHostStartInfoResolution(cfHost, .Addresses, nil);
       
       var success: DarwinBoolean = false;
       // TODO: Handle when address resolution fails.
-      let addresses = CFHostGetAddressing(host, &success)?.takeUnretainedValue() as NSArray?;
+      let addresses = CFHostGetAddressing(cfHost, &success)?.takeUnretainedValue() as NSArray?;
       
       // TODO: Loop through to actually find an usable address instead of alaways taking the
       // first entry in the array.
       let data = addresses![0];
       
       data.getBytes(&address, length: data.length);
-      address.sin_port = htons(port);
+      address.sin_port = htons(self.port);
       // TODO: Assert for valid address.sin_family
     }
     

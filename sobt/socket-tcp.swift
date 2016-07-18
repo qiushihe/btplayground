@@ -72,7 +72,7 @@ class TCPSocket: Socket {
       let inSocket = Int32(dispatch_source_get_handle(source));
       
       if (self.type == SocketType.Server) {
-        // Wait for an incoming connection request
+        // Accept the incoming connection
         var requestAddress = sockaddr(sa_len: 0, sa_family: 0, sa_data: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
         var requestAddressLength = socklen_t(sizeof(sockaddr));
         let requestDescriptor = accept(inSocket, &requestAddress, &requestAddressLength);
@@ -81,13 +81,13 @@ class TCPSocket: Socket {
         let message = "Accepted connection from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
         print(message);
         
-        // Set data listener for individual connections
+        // Create a reply socket for the incoming connection
         var requestSocketOptions = SocketOptions.init();
         requestSocketOptions.descriptor = requestDescriptor;
         requestSocketOptions.address = requestAddress;
         requestSocketOptions.type = SocketType.Reply;
-        
-        // Set listener on the request socket
+
+        // Set listener on the reply socket
         let requestSocket = TCPSocket.init(options: requestSocketOptions);
         requestSocket.setListener(listener);
       } else {

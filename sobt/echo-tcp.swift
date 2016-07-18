@@ -79,10 +79,7 @@ class TCPEcho {
     
     if (self.isServer) {
       let replyStr = "Bay Area Men Wakes Up To No New Email!";
-      let replyData = replyStr.dataUsingEncoding(NSUTF8StringEncoding)!;
-
-      dataSocket.sendData(replyData);
-     
+      dataSocket.sendData(replyStr.dataUsingEncoding(NSUTF8StringEncoding)!);
       print("Server sent: \(replyStr)");
     }
   }

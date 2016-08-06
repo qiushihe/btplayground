@@ -82,13 +82,13 @@ class TCPSocket: Socket {
         print(message);
         
         // Create a reply socket for the incoming connection
-        var requestSocketOptions = SocketOptions.init();
+        var requestSocketOptions = SocketOptions();
         requestSocketOptions.descriptor = requestDescriptor;
         requestSocketOptions.address = requestAddress;
         requestSocketOptions.type = SocketType.Reply;
 
         // Set listener on the reply socket
-        let requestSocket = TCPSocket.init(options: requestSocketOptions);
+        let requestSocket = TCPSocket(options: requestSocketOptions);
         requestSocket.setListener(listener);
       } else {
         listener(self);
@@ -108,9 +108,9 @@ class TCPSocket: Socket {
       print("TODO: Socket closed!");
     }
     
-    let dataRead = Array<UInt8>.init(buffer[0..<bytesRead]);
+    let dataRead = Array<UInt8>(buffer[0..<bytesRead]);
     
-    return NSData.init(bytes: dataRead, length: bytesRead);
+    return NSData(bytes: dataRead, length: bytesRead);
   }
 
   func sendData(data: NSData) {

@@ -64,7 +64,7 @@ class BEncodingReader {
   convenience init(data: NSData) {
     let size = sizeof(UInt8);
     let count = data.length / size;
-    var _bytes = Array<UInt8>.init(count: count, repeatedValue: 0);
+    var _bytes = Array<UInt8>(count: count, repeatedValue: 0);
     data.getBytes(&_bytes, length:count * size);
     self.init(bytes: _bytes);
   }
@@ -74,7 +74,7 @@ class BEncodingReader {
     if (endPosition <= self.bytesCount - 1) {
       let bytesRange = self.bytes[self.position...endPosition];
       self.position = endPosition + 1;
-      return Array<UInt8>.init(bytesRange);
+      return Array<UInt8>(bytesRange);
     } else {
       return [];
     }
@@ -93,7 +93,7 @@ class BEncodingReader {
   }
   
   func getRange(start: Int, _ end: Int) -> Array<UInt8> {
-    return Array<UInt8>.init(self.bytes[start...end]);
+    return Array<UInt8>(self.bytes[start...end]);
   }
 }
 
@@ -106,7 +106,7 @@ class BEncodingDecoder {
 
   init(data: NSData) {
     self.data = data;
-    self.reader = BEncodingReader.init(data: data);
+    self.reader = BEncodingReader(data: data);
   }
 
   func decode() -> BEncoded {
@@ -125,19 +125,19 @@ class BEncodingDecoder {
   
   func getInfoValue() -> NSData {
     var range: Array<UInt8> = self.reader.getRange(self.infoValueStart, self.infoValueEnd);
-    return NSData.init(bytes: &range, length: range.count);
+    return NSData(bytes: &range, length: range.count);
   }
 
   func getInfoValue() -> String {
     var range: Array<UInt8> = self.reader.getRange(self.infoValueStart, self.infoValueEnd);
-    let data = NSData.init(bytes: &range, length: range.count);
-    let str = String.init(data: data, encoding: NSASCIIStringEncoding);
+    let data = NSData(bytes: &range, length: range.count);
+    let str = String(data: data, encoding: NSASCIIStringEncoding);
     return str != nil ? str! : "";
   }
   
   private func decodeString() -> BEncoded {
     let lengthStr = self.readString(BEncodedSeparator.Colon, andAdvance: 1);
-    let length = Int.init(lengthStr)!;
+    let length = Int(lengthStr)!;
     let string = self.readString(length);
     return BEncoded.String(string);
   }
@@ -146,7 +146,7 @@ class BEncodingDecoder {
     let integerStr = self.advanceBeforeAndAfter(1) {() in
       return self.readString(BEncodedSeparator.End);
     } as! String;
-    let integer = Int.init(integerStr)!;
+    let integer = Int(integerStr)!;
     return BEncoded.Integer(integer);
   }
   
@@ -202,7 +202,7 @@ class BEncodingDecoder {
   
   private func decodePieces() -> BEncoded {
     let lengthStr = self.readString(BEncodedSeparator.Colon, andAdvance: 1);
-    let length = Int.init(lengthStr)!;
+    let length = Int(lengthStr)!;
     let pieces = self.readPieces(20, pieceCount: length / 20);
 
     return BEncoded.List(pieces.map({(piece: String)
@@ -227,7 +227,7 @@ class BEncodingDecoder {
   }
 
   private func readString(length: Int, andAdvance: Int = 0) -> String {
-    let bytesStr = String.init(bytes: self.reader.read(length), encoding: NSUTF8StringEncoding);
+    let bytesStr = String(bytes: self.reader.read(length), encoding: NSUTF8StringEncoding);
     self.reader.advance(andAdvance);
     return bytesStr != nil ? bytesStr! : "";
   }
@@ -240,7 +240,7 @@ class BEncodingDecoder {
         break;
       }
 
-      let byteStr = String.init(bytes: self.reader.read(), encoding: NSUTF8StringEncoding);
+      let byteStr = String(bytes: self.reader.read(), encoding: NSUTF8StringEncoding);
       str += byteStr != nil ? byteStr! : "";
     }
     

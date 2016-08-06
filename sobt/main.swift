@@ -9,8 +9,8 @@
 import Foundation;
 
 let path = "/Users/billy/Projects/btplayground/test.torrent";
-let data = NSData.init(contentsOfFile: path);
-let decoder = BEncodingDecoder.init(data: data!);
+let data = NSData(contentsOfFile: path);
+let decoder = BEncodingDecoder(data: data!);
 let decoded = decoder.decode();
 let jsonObject = bEncodedToJsonObject(decoded);
 
@@ -39,13 +39,13 @@ func handleData(socket: Int32) {
   print("Received \(bytesRead) bytes: \(dataRead)");
 }
 
-let udpSocket = UDPSocket.init(port: 6969, host: "tracker.coppersurfer.tk");
+let udpSocket = UDPSocket(port: 6969, host: "tracker.coppersurfer.tk");
 
 udpSocket.setListener({(socket: Int32) in
   handleData(socket);
 });
 
-let connectData = NSMutableData.init();
+let connectData = NSMutableData();
 var connectConnectionId = htonll(0x41727101980 as UInt64); // Magic number 0x41727101980
 var connectAction = htonl(0 as UInt32);
 var connectTransactionId = htonl(arc4random() as UInt32);
@@ -68,6 +68,9 @@ print(infoValue);
 let infoData: NSData = decoder.getInfoValue();
 print(Sobt.Crypto.SHA1(infoData) as String);
 
+let trackerClient = Sobt.TrackerClient();
+trackerClient.addManifest(fromPath: "/Users/billy/Projects/btplayground/test.torrent");
+
 // =================================================================================================
 // http://stackoverflow.com/a/24016254
 /*
@@ -87,15 +90,15 @@ var echo: UDPEcho?;
 
 if (Process.arguments.count > 1) {
   do {
-    echo = try UDPEcho.init(argv: Process.arguments);
+    echo = try UDPEcho(argv: Process.arguments);
   } catch UDPEchoError.InvalidArguments {
     print("UDP Echo Usage:");
     print("* Server mode: sobt server [port]");
     print("* Client mode: sobt client [port] [host]");
   }
 } else {
-  echo = UDPEcho.init(port: 4242);
-  // echo = UDPEcho.init(port: 4242, host: "127.0.0.1");
+  echo = UDPEcho(port: 4242);
+  // echo = UDPEcho(port: 4242, host: "127.0.0.1");
 }
 
 trapSignal(Signal.INT) {(signal) in
@@ -113,15 +116,15 @@ if (echo != nil) {
 
 if (Process.arguments.count > 1) {
   do {
-    echo = try TCPEcho.init(argv: Process.arguments);
+    echo = try TCPEcho(argv: Process.arguments);
   } catch TCPEchoError.InvalidArguments {
     print("TCP Echo Usage:");
     print("* Server mode: sobt server [port]");
     print("* Client mode: sobt client [port] [host]");
   }
 } else {
-  echo = TCPEcho.init(port: 4141);
-  // echo = TCPEcho.init(port: 4141, host: "127.0.0.1");
+  echo = TCPEcho(port: 4141);
+  // echo = TCPEcho(port: 4141, host: "127.0.0.1");
 }
 
 trapSignal(Signal.INT) {(signal) in

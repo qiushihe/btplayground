@@ -14,7 +14,7 @@ extension Sobt {
       let size = sizeof(UInt8);
       let count = data.length / size;
       
-      var _bytes = Array<UInt8>.init(count: count, repeatedValue: 0);
+      var _bytes = Array<UInt8>(count: count, repeatedValue: 0);
       data.getBytes(&_bytes, length:count * size);
       
       return _bytes;

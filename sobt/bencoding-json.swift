@@ -20,7 +20,7 @@ func bEncodedToJsonString(encoded: BEncoded, _ level: Int, _ noIndent: Bool, _ w
       + (withNewLine ? "\n" : "");
   case .Integer(let integerValue):
     return indentsWithSpace(noIndent ? 0 : level)
-      + Swift.String.init(integerValue)
+      + Swift.String(integerValue)
       + (withNewLine ? "\n" : "");
   case .List(let listValue):
     if (listValue.isEmpty) {

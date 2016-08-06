@@ -18,6 +18,7 @@
 		28E3BD2E1D55C07E0005622E /* sobt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E3BD2D1D55C07E0005622E /* sobt.swift */; };
 		28E3BD301D55C0CC0005622E /* crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E3BD2F1D55C0CC0005622E /* crypto.swift */; };
 		28E3BD321D55C2240005622E /* util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E3BD311D55C2230005622E /* util.swift */; };
+		28EE19351D5683B0004E2A3A /* tracker-client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28EE19341D5683B0004E2A3A /* tracker-client.swift */; };
 		CEE31E471D2C6E89009E2B35 /* socket-udp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE31E461D2C6E89009E2B35 /* socket-udp.swift */; };
 /* End PBXBuildFile section */
 
@@ -47,6 +48,7 @@
 		28E3BD2D1D55C07E0005622E /* sobt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = sobt.swift; sourceTree = "<group>"; };
 		28E3BD2F1D55C0CC0005622E /* crypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = crypto.swift; sourceTree = "<group>"; };
 		28E3BD311D55C2230005622E /* util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = util.swift; sourceTree = "<group>"; };
+		28EE19341D5683B0004E2A3A /* tracker-client.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "tracker-client.swift"; sourceTree = "<group>"; };
 		CEE31E461D2C6E89009E2B35 /* socket-udp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "socket-udp.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -86,6 +88,7 @@
 				282B17531D3A037200FCFF33 /* echo-tcp.swift */,
 				28413FC01D2E342D001E1DCE /* echo-udp.swift */,
 				282B44E31D20FD040073C9D1 /* main.swift */,
+				28EE19341D5683B0004E2A3A /* tracker-client.swift */,
 				28E3BD2D1D55C07E0005622E /* sobt.swift */,
 				28413FBE1D2E268C001E1DCE /* signal.swift */,
 				282B17511D39F58300FCFF33 /* socket-tcp.swift */,
@@ -162,6 +165,7 @@
 				28B5D74A1D26528900F851B5 /* bencoding-json.swift in Sources */,
 				28413FBF1D2E268C001E1DCE /* signal.swift in Sources */,
 				282B17541D3A037200FCFF33 /* echo-tcp.swift in Sources */,
+				28EE19351D5683B0004E2A3A /* tracker-client.swift in Sources */,
 				28E3BD301D55C0CC0005622E /* crypto.swift in Sources */,
 				28413FC11D2E342D001E1DCE /* echo-udp.swift in Sources */,
 				282B17521D39F58300FCFF33 /* socket-tcp.swift in Sources */,

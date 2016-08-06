@@ -47,12 +47,12 @@ class TCPEcho {
   }
   
   func start() {
-    var tcpSocketOptions = SocketOptions.init();
+    var tcpSocketOptions = SocketOptions();
     tcpSocketOptions.port = self.port;
     tcpSocketOptions.host = self.host;
     tcpSocketOptions.type = self.host == nil ? SocketType.Server : SocketType.Client;
     
-    self.tcpSocket = TCPSocket.init(options: tcpSocketOptions);
+    self.tcpSocket = TCPSocket(options: tcpSocketOptions);
     self.tcpSocket!.setListener(self.handleSocketData);
     
     print("\(self.isServer ? "Server" : "Client") listening ...");
@@ -71,7 +71,7 @@ class TCPEcho {
   private func handleSocketData(dataSocket: TCPSocket) {
     let dataRead = dataSocket.readData();
     
-    if let dataString = String.init(data: dataRead, encoding: NSUTF8StringEncoding) {
+    if let dataString = String(data: dataRead, encoding: NSUTF8StringEncoding) {
       print("\(self.isServer ? "Server" : "Client") received message: \(dataString)");
     } else {
       print("\(self.isServer ? "Server" : "Client") received \(dataRead.length) bytes: \(dataRead.bytes)");

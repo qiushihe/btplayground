@@ -47,7 +47,7 @@ class UDPEcho {
   }
 
   func start() {
-    self.udpSocket = UDPSocket.init(port: self.port, host: self.host);
+    self.udpSocket = UDPSocket(port: self.port, host: self.host);
 
     self.udpSocket!.setListener({(socket: Int32) in
       self.handleSocketData(socket);
@@ -90,7 +90,7 @@ class UDPEcho {
       let replyStr = "Bay Area Men Wakes Up To No New Email!";
       let replyData = replyStr.dataUsingEncoding(NSUTF8StringEncoding)!;
       
-      let replySocket = UDPSocket.init(socket: socket, address: Socket.CastSocketAddress(&inAddress), addressLength: inAddressLength);
+      let replySocket = UDPSocket(socket: socket, address: Socket.CastSocketAddress(&inAddress), addressLength: inAddressLength);
       replySocket.sendData(replyData);
       
       print("Server sent: \(replyStr)");

@@ -11,7 +11,7 @@ import Foundation
 extension Sobt {
   class Crypto {
     class func SHA1(data: NSData) -> Array<UInt8> {
-      var digest = Array<UInt8>.init(count:Int(CC_SHA1_DIGEST_LENGTH), repeatedValue: 0);
+      var digest = Array<UInt8>(count:Int(CC_SHA1_DIGEST_LENGTH), repeatedValue: 0);
       CC_SHA1(data.bytes, CC_LONG(data.length), &digest);
       return digest;
     }

@@ -19,7 +19,7 @@ enum Signal:Int32 {
 };
 
 func trapSignal(signal: Signal, action: @convention(c) Int32 -> ()) {
-  var signalAction = sigaction.init(
+  var signalAction = sigaction(
     __sigaction_u: unsafeBitCast(action, __sigaction_u.self),
     sa_mask: 0,
     sa_flags: 0

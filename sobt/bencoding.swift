@@ -87,12 +87,23 @@ class BEncodingReader {
   func advance(count: Int = 1) {
     self.position += count;
   }
+  
+  func getPosition() -> Int {
+    return self.position;
+  }
+  
+  func getRange(start: Int, _ end: Int) -> Array<UInt8> {
+    return Array<UInt8>.init(self.bytes[start...end]);
+  }
 }
 
 class BEncodingDecoder {
   private let data: NSData;
   private let reader: BEncodingReader;
   
+  private var infoValueStart: Int = -1;
+  private var infoValueEnd: Int = -1;
+
   init(data: NSData) {
     self.data = data;
     self.reader = BEncodingReader.init(data: data);
@@ -110,6 +121,18 @@ class BEncodingDecoder {
     case BEncodedDataType.Dictionary:
       return self.decodeDictionary();
     }
+  }
+  
+  func getInfoValue() -> NSData {
+    var range: Array<UInt8> = self.reader.getRange(self.infoValueStart, self.infoValueEnd);
+    return NSData.init(bytes: &range, length: range.count);
+  }
+
+  func getInfoValue() -> String {
+    var range: Array<UInt8> = self.reader.getRange(self.infoValueStart, self.infoValueEnd);
+    let data = NSData.init(bytes: &range, length: range.count);
+    let str = String.init(data: data, encoding: NSASCIIStringEncoding);
+    return str != nil ? str! : "";
   }
   
   private func decodeString() -> BEncoded {
@@ -154,14 +177,23 @@ class BEncodingDecoder {
         }
         
         let key = self.decode();
-        
-        if key.value as! String == "pieces" {
+        let keyString = key.value as! String;
+
+        if keyString == "info" {
+          self.infoValueStart = self.reader.getPosition();
+        }
+
+        if keyString == "pieces" {
           result[key.value as! String] = self.decodePieces();
         } else {
           result[key.value as! String] = self.decode();
         }
+        
+        if keyString == "info" {
+          self.infoValueEnd = self.reader.getPosition() - 1;
+        }
       }
-      
+
       return result;
     } as! Dictionary<String, BEncoded>;
 

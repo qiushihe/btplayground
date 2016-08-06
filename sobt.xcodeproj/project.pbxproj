@@ -40,6 +40,7 @@
 		28413FBE1D2E268C001E1DCE /* signal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = signal.swift; sourceTree = "<group>"; };
 		28413FC01D2E342D001E1DCE /* echo-udp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "echo-udp.swift"; sourceTree = "<group>"; };
 		28B5D7491D26528900F851B5 /* bencoding-json.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "bencoding-json.swift"; sourceTree = "<group>"; };
+		28E3BD2C1D55A74E0005622E /* sobt-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "sobt-Bridging-Header.h"; sourceTree = "<group>"; };
 		CEE31E461D2C6E89009E2B35 /* socket-udp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "socket-udp.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -73,6 +74,7 @@
 		282B44E21D20FD040073C9D1 /* sobt */ = {
 			isa = PBXGroup;
 			children = (
+				28E3BD2C1D55A74E0005622E /* sobt-Bridging-Header.h */,
 				28B5D7491D26528900F851B5 /* bencoding-json.swift */,
 				282B44EA1D20FF660073C9D1 /* bencoding.swift */,
 				282B17531D3A037200FCFF33 /* echo-tcp.swift */,
@@ -199,6 +201,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				"SWIFT_OBJC_BRIDGING_HEADER[arch=*]" = "sobt/sobt-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -237,6 +240,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
+				"SWIFT_OBJC_BRIDGING_HEADER[arch=*]" = "sobt/sobt-Bridging-Header.h";
 			};
 			name = Release;
 		};

@@ -8,15 +8,87 @@
 
 import Foundation;
 
-/*
 let path = "/Users/billy/Projects/btplayground/test.torrent";
 let data = NSData.init(contentsOfFile: path);
 let decoder = BEncodingDecoder.init(data: data!);
 let decoded = decoder.decode();
 let jsonObject = bEncodedToJsonObject(decoded);
 
-print(jsonObject);
-*/
+// print(jsonObject);
+
+// =================================================================================================
+// http://www.bittorrent.org/beps/bep_0003.html
+// http://www.bittorrent.org/beps/bep_0015.html
+// http://www.rasterbar.com/products/libtorrent/udp_tracker_protocol.html
+// udp://tracker.coppersurfer.tk:6969
+
+func dataToArray(data: NSData) -> Array<UInt8> {
+  let size = sizeof(UInt8);
+  let count = data.length / size;
+  
+  var _bytes = Array<UInt8>.init(count: count, repeatedValue: 0);
+  data.getBytes(&_bytes, length:count * size);
+  
+  return _bytes;
+}
+
+func handleData(socket: Int32) {
+  var inAddress = sockaddr_storage();
+  var inAddressLength = socklen_t(sizeof(sockaddr_storage.self));
+  let buffer = [UInt8](count: 4096, repeatedValue: 0);
+  
+  let bytesRead = withUnsafeMutablePointer(&inAddress) {
+    recvfrom(socket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0, UnsafeMutablePointer($0), &inAddressLength);
+  };
+  
+  let (ipAddress, servicePort) = Socket.GetSocketHostAndPort(Socket.CastSocketAddress(&inAddress));
+  let message = "Got data from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
+  print(message);
+  
+  let dataRead = buffer[0..<bytesRead];
+  print("Received \(bytesRead) bytes: \(dataRead)");
+}
+
+let udpSocket = UDPSocket.init(port: 6969, host: "tracker.coppersurfer.tk");
+
+udpSocket.setListener({(socket: Int32) in
+  handleData(socket);
+});
+
+let connectData = NSMutableData.init();
+var connectConnectionId = htonll(0x41727101980 as UInt64); // Magic number 0x41727101980
+var connectAction = htonl(0 as UInt32);
+var connectTransactionId = htonl(arc4random() as UInt32);
+
+connectData.appendBytes(&connectConnectionId, length: 8);
+connectData.appendBytes(&connectAction, length: 4);
+connectData.appendBytes(&connectTransactionId, length: 4);
+
+print("Connect Data \(connectData.length) bytes: \(dataToArray(connectData))");
+// udpSocket.sendData(connectData);
+// while (true) {}
+
+// Connect Data 16 bytes: [0, 0, 4, 23, 39, 16, 25, 128, 0, 0, 0, 0, 46, 58, 70, 9]
+// Got data from: 62.138.0.158, from port:6969
+// Received 16 bytes: [0, 0, 0, 0, 46, 58, 70, 9, 219, 71, 130, 124, 190, 98, 121, 245]
+
+func sha1(data: NSData) -> String {
+  var digest = [UInt8](count:Int(CC_SHA1_DIGEST_LENGTH), repeatedValue: 0);
+  CC_SHA1(data.bytes, CC_LONG(data.length), &digest);
+  
+  let output = NSMutableString(capacity: Int(CC_SHA1_DIGEST_LENGTH));
+  for byte in digest {
+    output.appendFormat("%02x", byte);
+  }
+  
+  return output as String;
+}
+
+let infoValue: String = decoder.getInfoValue();
+print(infoValue);
+
+let infoData: NSData = decoder.getInfoValue();
+print(sha1(infoData));
 
 // =================================================================================================
 // http://stackoverflow.com/a/24016254
@@ -59,7 +131,7 @@ if (echo != nil) {
 }
 */
 
-var echo: TCPEcho?;
+/*var echo: TCPEcho?;
 
 if (Process.arguments.count > 1) {
   do {
@@ -83,3 +155,4 @@ if (echo != nil) {
   echo!.start();
   sendSuspendSignal();
 }
+*/

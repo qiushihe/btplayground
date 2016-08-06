@@ -22,16 +22,6 @@ let jsonObject = bEncodedToJsonObject(decoded);
 // http://www.rasterbar.com/products/libtorrent/udp_tracker_protocol.html
 // udp://tracker.coppersurfer.tk:6969
 
-func dataToArray(data: NSData) -> Array<UInt8> {
-  let size = sizeof(UInt8);
-  let count = data.length / size;
-  
-  var _bytes = Array<UInt8>.init(count: count, repeatedValue: 0);
-  data.getBytes(&_bytes, length:count * size);
-  
-  return _bytes;
-}
-
 func handleData(socket: Int32) {
   var inAddress = sockaddr_storage();
   var inAddressLength = socklen_t(sizeof(sockaddr_storage.self));
@@ -64,7 +54,7 @@ connectData.appendBytes(&connectConnectionId, length: 8);
 connectData.appendBytes(&connectAction, length: 4);
 connectData.appendBytes(&connectTransactionId, length: 4);
 
-print("Connect Data \(connectData.length) bytes: \(dataToArray(connectData))");
+print("Connect Data \(connectData.length) bytes: \(Sobt.Util.NSDataToArray(connectData))");
 // udpSocket.sendData(connectData);
 // while (true) {}
 
@@ -72,23 +62,11 @@ print("Connect Data \(connectData.length) bytes: \(dataToArray(connectData))");
 // Got data from: 62.138.0.158, from port:6969
 // Received 16 bytes: [0, 0, 0, 0, 46, 58, 70, 9, 219, 71, 130, 124, 190, 98, 121, 245]
 
-func sha1(data: NSData) -> String {
-  var digest = [UInt8](count:Int(CC_SHA1_DIGEST_LENGTH), repeatedValue: 0);
-  CC_SHA1(data.bytes, CC_LONG(data.length), &digest);
-  
-  let output = NSMutableString(capacity: Int(CC_SHA1_DIGEST_LENGTH));
-  for byte in digest {
-    output.appendFormat("%02x", byte);
-  }
-  
-  return output as String;
-}
-
 let infoValue: String = decoder.getInfoValue();
 print(infoValue);
 
 let infoData: NSData = decoder.getInfoValue();
-print(sha1(infoData));
+print(Sobt.Crypto.SHA1(infoData) as String);
 
 // =================================================================================================
 // http://stackoverflow.com/a/24016254

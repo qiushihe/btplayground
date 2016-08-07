@@ -22,6 +22,7 @@ let jsonObject = bEncodedToJsonObject(decoded);
 // http://www.rasterbar.com/products/libtorrent/udp_tracker_protocol.html
 // udp://tracker.coppersurfer.tk:6969
 
+/*
 func handleData(socket: Int32) {
   var inAddress = sockaddr_storage();
   var inAddressLength = socklen_t(sizeof(sockaddr_storage.self));
@@ -48,7 +49,7 @@ udpSocket.setListener({(socket: Int32) in
 let connectData = NSMutableData();
 var connectConnectionId = htonll(0x41727101980 as UInt64); // Magic number 0x41727101980
 var connectAction = htonl(0 as UInt32);
-var connectTransactionId = htonl(arc4random() as UInt32);
+var connectTransactionId = htonl(Sobt.Util.GetRandomNumber());
 
 connectData.appendBytes(&connectConnectionId, length: 8);
 connectData.appendBytes(&connectAction, length: 4);
@@ -67,9 +68,11 @@ print(infoValue);
 
 let infoData: NSData = decoder.getInfoValue();
 print(Sobt.Crypto.SHA1(infoData) as String);
+*/
 
 let trackerClient = Sobt.TrackerClient();
 trackerClient.addManifest(fromPath: "/Users/billy/Projects/btplayground/test.torrent");
+trackerClient.update();
 
 // =================================================================================================
 // http://stackoverflow.com/a/24016254

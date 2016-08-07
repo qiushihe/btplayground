@@ -19,5 +19,9 @@ extension Sobt {
       
       return _bytes;
     }
+    
+    class func GetRandomNumber() -> UInt32 {
+      return arc4random() as UInt32;
+    }
   }
 }

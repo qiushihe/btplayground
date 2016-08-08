@@ -73,6 +73,7 @@ print(Sobt.Crypto.SHA1(infoData) as String);
 let trackerClient = Sobt.TrackerClient();
 trackerClient.addManifest(fromPath: "/Users/billy/Projects/btplayground/test.torrent");
 trackerClient.update();
+while (true) {}
 
 // =================================================================================================
 // http://stackoverflow.com/a/24016254

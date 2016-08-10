@@ -18,6 +18,7 @@
 		28E3BD2E1D55C07E0005622E /* sobt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E3BD2D1D55C07E0005622E /* sobt.swift */; };
 		28E3BD301D55C0CC0005622E /* crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E3BD2F1D55C0CC0005622E /* crypto.swift */; };
 		28E3BD321D55C2240005622E /* util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E3BD311D55C2230005622E /* util.swift */; };
+		28E691FC1D5AF5FD003803E2 /* network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E691FB1D5AF5FD003803E2 /* network.swift */; };
 		28EE19351D5683B0004E2A3A /* tracker-client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28EE19341D5683B0004E2A3A /* tracker-client.swift */; };
 		CEE31E471D2C6E89009E2B35 /* socket-udp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE31E461D2C6E89009E2B35 /* socket-udp.swift */; };
 /* End PBXBuildFile section */
@@ -48,6 +49,7 @@
 		28E3BD2D1D55C07E0005622E /* sobt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = sobt.swift; sourceTree = "<group>"; };
 		28E3BD2F1D55C0CC0005622E /* crypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = crypto.swift; sourceTree = "<group>"; };
 		28E3BD311D55C2230005622E /* util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = util.swift; sourceTree = "<group>"; };
+		28E691FB1D5AF5FD003803E2 /* network.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = network.swift; sourceTree = "<group>"; };
 		28EE19341D5683B0004E2A3A /* tracker-client.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "tracker-client.swift"; sourceTree = "<group>"; };
 		CEE31E461D2C6E89009E2B35 /* socket-udp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "socket-udp.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -82,6 +84,7 @@
 		282B44E21D20FD040073C9D1 /* sobt */ = {
 			isa = PBXGroup;
 			children = (
+				28E691FA1D5AF5DB003803E2 /* helper */,
 				28E3BD2C1D55A74E0005622E /* sobt-Bridging-Header.h */,
 				28B5D7491D26528900F851B5 /* bencoding-json.swift */,
 				282B44EA1D20FF660073C9D1 /* bencoding.swift */,
@@ -98,6 +101,14 @@
 				28E3BD311D55C2230005622E /* util.swift */,
 			);
 			path = sobt;
+			sourceTree = "<group>";
+		};
+		28E691FA1D5AF5DB003803E2 /* helper */ = {
+			isa = PBXGroup;
+			children = (
+				28E691FB1D5AF5FD003803E2 /* network.swift */,
+			);
+			path = helper;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -163,6 +174,7 @@
 				28E3BD321D55C2240005622E /* util.swift in Sources */,
 				282B17561D3A06A400FCFF33 /* socket.swift in Sources */,
 				28B5D74A1D26528900F851B5 /* bencoding-json.swift in Sources */,
+				28E691FC1D5AF5FD003803E2 /* network.swift in Sources */,
 				28413FBF1D2E268C001E1DCE /* signal.swift in Sources */,
 				282B17541D3A037200FCFF33 /* echo-tcp.swift in Sources */,
 				28EE19351D5683B0004E2A3A /* tracker-client.swift in Sources */,

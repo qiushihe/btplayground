@@ -9,8 +9,8 @@
 import Foundation
 
 extension Sobt {
-  class Util {
-    class func NSDataToArray(data: NSData) -> Array<UInt8> {
+  struct Util {
+    static func NSDataToArray(data: NSData) -> Array<UInt8> {
       let size = sizeof(UInt8);
       let count = data.length / size;
       
@@ -20,8 +20,9 @@ extension Sobt {
       return _bytes;
     }
     
-    class func GetRandomNumber() -> UInt32 {
-      return arc4random() as UInt32;
+    static func GetRandomNumber() -> UInt32 {
+      let num = arc4random() as UInt32;
+      return num;
     }
   }
 }

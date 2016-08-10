@@ -64,7 +64,9 @@ extension Sobt {
         connectionData.transactionId = Sobt.Util.GetRandomNumber();
         
         let payload = NSMutableData();
-        var payloadConnectionId = htonll(0x41727101980 as UInt64); // Magic number 0x41727101980
+        
+        // Magic number 0x41727101980
+        var payloadConnectionId = Sobt.Helper.Network.HostToNetwork(0x41727101980 as UInt64);
         var payloadAction = htonl(0 as UInt32); // 0 for connect
         var payloadTransactionId = htonl(connectionData.transactionId);
         
@@ -73,12 +75,14 @@ extension Sobt {
         payload.appendBytes(&payloadTransactionId, length: 4);
         
         print("Payload \(payload.length) bytes: \(Sobt.Util.NSDataToArray(payload))");
-        // connectionData.udpSocket!.sendData(payload);
+        connectionData.udpSocket!.sendData(payload);
         
         // Payload 16 bytes: [0, 0, 4, 23, 39, 16, 25, 128, 0, 0, 0, 0, 24, 219, 4, 229]
         // Received 16 bytes: [0, 0, 0, 0, 24, 219, 4, 229, 219, 71, 130, 124, 190, 98, 121, 245]
-        let dummyData = Array<UInt8>([0, 0, 0, 0, 24, 219, 4, 229, 219, 71, 130, 124, 190, 98, 121, 245]);
-        self.handleSocketData(dummyData);
+        // let dummyData = Array<UInt8>([0, 0, 0, 0, 24, 219, 4, 229, 219, 71, 130, 124, 190, 98, 121, 245]);
+        // self.handleSocketData(dummyData);
+        
+        self.connections[connectionUUID] = connectionData;
       }
     }
     
@@ -126,9 +130,26 @@ extension Sobt {
     
     private func handleSocketData(data: Array<UInt8>) {
       print("Handle \(data.count) bytes of data: \(data)");
-      print(data[0...3]);
-      print(data[4...7]);
-      print(data[8...15]);
+
+      let action: UInt32 = Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[0...3]));
+      if (action == 0) {
+        let transactionId: UInt32 = Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[4...7]));
+        
+        let result = self.connections.filter({(_, connection) in
+          return connection.transactionId == transactionId;
+        });
+        
+        print(result);
+        
+        if (!result.isEmpty) {
+          var (uuid, connectionData) = result.first!;
+          connectionData.connectionId = Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[8...15]));
+          self.connections[uuid] = connectionData;
+          print("connectionData: \(connectionData)");
+        }
+      } else {
+        print("action: \(action)");
+      }
     }
 
     struct ManifestData {

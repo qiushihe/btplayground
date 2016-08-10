@@ -9,14 +9,14 @@
 import Foundation
 
 extension Sobt {
-  class Crypto {
-    class func SHA1(data: NSData) -> Array<UInt8> {
+  struct Crypto {
+    static func SHA1(data: NSData) -> Array<UInt8> {
       var digest = Array<UInt8>(count:Int(CC_SHA1_DIGEST_LENGTH), repeatedValue: 0);
       CC_SHA1(data.bytes, CC_LONG(data.length), &digest);
       return digest;
     }
 
-    class func SHA1(data: NSData) -> String {
+    static func SHA1(data: NSData) -> String {
       let digest: Array<UInt8> = self.SHA1(data);
       let output = NSMutableString(capacity: Int(CC_SHA1_DIGEST_LENGTH));
 

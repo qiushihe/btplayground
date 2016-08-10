@@ -8,4 +8,6 @@
 
 import Foundation
 
-struct Sobt { }
+struct Sobt {
+  struct Helper {}
+}

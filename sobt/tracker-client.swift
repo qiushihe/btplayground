@@ -40,7 +40,10 @@ extension Sobt {
       
       // Activate idle connections
       for (_, (uuid, data)) in self.connections.enumerate() {
-        if (data.status == ConnectionStatus.Idle) {
+        let isIdle = data.status == ConnectionStatus.Idle;
+        let hasConnected = data.connectionId <= 0;
+
+        if (isIdle && hasConnected) {
           self.establishConnection(uuid);
         }
       }
@@ -67,7 +70,7 @@ extension Sobt {
         
         // Magic number 0x41727101980
         var payloadConnectionId = Sobt.Helper.Network.HostToNetwork(0x41727101980 as UInt64);
-        var payloadAction = htonl(0 as UInt32); // 0 for connect
+        var payloadAction = htonl(TrackerAction.Connect.rawValue);
         var payloadTransactionId = htonl(connectionData.transactionId);
         
         payload.appendBytes(&payloadConnectionId, length: 8);
@@ -75,14 +78,11 @@ extension Sobt {
         payload.appendBytes(&payloadTransactionId, length: 4);
         
         print("Payload \(payload.length) bytes: \(Sobt.Util.NSDataToArray(payload))");
-        connectionData.udpSocket!.sendData(payload);
         
-        // Payload 16 bytes: [0, 0, 4, 23, 39, 16, 25, 128, 0, 0, 0, 0, 24, 219, 4, 229]
-        // Received 16 bytes: [0, 0, 0, 0, 24, 219, 4, 229, 219, 71, 130, 124, 190, 98, 121, 245]
-        // let dummyData = Array<UInt8>([0, 0, 0, 0, 24, 219, 4, 229, 219, 71, 130, 124, 190, 98, 121, 245]);
-        // self.handleSocketData(dummyData);
-        
+        connectionData.status = ConnectionStatus.Active;
         self.connections[connectionUUID] = connectionData;
+
+        connectionData.udpSocket!.sendData(payload);
       }
     }
     
@@ -131,8 +131,9 @@ extension Sobt {
     private func handleSocketData(data: Array<UInt8>) {
       print("Handle \(data.count) bytes of data: \(data)");
 
-      let action: UInt32 = Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[0...3]));
-      if (action == 0) {
+      let action = TrackerAction(rawValue: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[0...3])));
+      
+      if (action == TrackerAction.Connect) {
         let transactionId: UInt32 = Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[4...7]));
         
         let result = self.connections.filter({(_, connection) in
@@ -143,7 +144,10 @@ extension Sobt {
         
         if (!result.isEmpty) {
           var (uuid, connectionData) = result.first!;
+
           connectionData.connectionId = Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[8...15]));
+          connectionData.status = ConnectionStatus.Idle;
+
           self.connections[uuid] = connectionData;
           print("connectionData: \(connectionData)");
         }
@@ -152,7 +156,7 @@ extension Sobt {
       }
     }
 
-    struct ManifestData {
+    private struct ManifestData {
       let uuid: String;
       var path: String? = nil;
       var sourceData: NSData? = nil;
@@ -166,7 +170,7 @@ extension Sobt {
       }
     }
 
-    struct ConnectionData {
+    private struct ConnectionData {
       let uuid: String;
       let url: String;
       var status: ConnectionStatus = ConnectionStatus.Idle;
@@ -180,10 +184,17 @@ extension Sobt {
       }
     }
     
-    enum ConnectionStatus {
+    private enum ConnectionStatus {
       case Idle;
       case Active;
       case Stale;
+    }
+    
+    private enum TrackerAction: UInt32 {
+      case Connect = 0;
+      case Announce = 1;
+      case Scrape = 2;
+      case Error = 3;
     }
   }
 }

@@ -12,6 +12,7 @@ extension Sobt {
   class TrackerClient {
     private var manifests = Dictionary<String, ManifestData>();
     private var connections = Dictionary<String, ConnectionData>();
+    private var updating = false;
     
     func addManifest(fromPath path: String) {
       var manifest = ManifestData();
@@ -28,6 +29,12 @@ extension Sobt {
     }
     
     func update() {
+      if (self.updating) {
+        return;
+      } else {
+        self.updating = true;
+      }
+
       // Queue connections
       for (_, (uuid, _)) in self.manifests.enumerate() {
         for (_, url) in self.getTrackers(uuid).enumerate() {
@@ -47,6 +54,8 @@ extension Sobt {
           self.establishConnection(uuid);
         }
       }
+      
+      self.updating = false;
     }
     
     private func establishConnection(connectionUUID: String) {

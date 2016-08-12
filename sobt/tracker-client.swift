@@ -27,7 +27,7 @@ extension Sobt {
       manifest.infoHash = Sobt.Crypto.SHA1(manifest.infoData!);
       
       self.manifests[manifest.uuid] = manifest;
-      print("Added manifest \(manifest.uuid) from \(path)");
+      print("Added manifest from \(path)");
     }
 
     func autoUpdate(interval: Double) {
@@ -84,12 +84,12 @@ extension Sobt {
 
       if (url.host == "tracker.coppersurfer.tk") {
         connectionData.udpSocket = UDPSocket(port: UInt16(url.port!.integerValue), host: url.host);
-        
-        connectionData.udpSocket!.setListener({(socket: Int32) in
-          self.onSocketData(socket);
-        });
+        connectionData.udpSocket!.setListener({(data: Array<UInt8>) in
+          self.handleSocketData(data);
+        })
         
         connectionData.transactionId = Sobt.Util.GetRandomNumber();
+        connectionData.status = ConnectionStatus.Active;
         
         let payload = NSMutableData();
         
@@ -102,10 +102,9 @@ extension Sobt {
         payload.appendBytes(&payloadAction, length: 4);
         payload.appendBytes(&payloadTransactionId, length: 4);
         
-        connectionData.status = ConnectionStatus.Active;
         self.connections[connectionUUID] = connectionData;
 
-        print("Connecting to \(connectionData.url) with \(payload.length) bytes of data \(Sobt.Util.NSDataToArray(payload))");
+        print("Connecting to \(connectionData.url)");
         connectionData.udpSocket!.sendData(payload);
       }
     }
@@ -135,30 +134,11 @@ extension Sobt {
       return trackers;
     }
     
-    private func onSocketData(socket: Int32) {
-      var inAddress = sockaddr_storage();
-      var inAddressLength = socklen_t(sizeof(sockaddr_storage.self));
-      let buffer = [UInt8](count: 4096, repeatedValue: 0);
-      
-      let bytesRead = withUnsafeMutablePointer(&inAddress) {
-        recvfrom(socket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0, UnsafeMutablePointer($0), &inAddressLength);
-      };
-      
-      let (ipAddress, servicePort) = Socket.GetSocketHostAndPort(Socket.CastSocketAddress(&inAddress));
-      let dataRead = buffer[0..<bytesRead];
-      let dataArray = Array<UInt8>(dataRead);
-
-      print("Received \(dataArray.count) bytes of data from \(ipAddress):\(servicePort) \(dataArray)");
-      self.handleSocketData(dataArray);
-    }
-    
     private func handleSocketData(data: Array<UInt8>) {
       let action = TrackerAction(rawValue: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[0...3])));
       
       if (action == TrackerAction.Connect) {
         let transactionId: UInt32 = Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[4...7]));
-        print("Handle connect action for transaction \(transactionId)");
-        
         let result = self.connections.filter({(_, connection) in
           return connection.transactionId == transactionId;
         });
@@ -170,12 +150,12 @@ extension Sobt {
           connectionData.status = ConnectionStatus.Idle;
           
           self.connections[uuid] = connectionData;
-          print("Got connection ID \(connectionData.connectionId) for connection \(connectionData.uuid)");
+          print("Got connection ID \(connectionData.connectionId) for transaction \(transactionId) for connection \(connectionData.uuid)");
         } else {
           print("No connection found for transaction \(transactionId)");
         }
       } else {
-        print("action: \(action)");
+        print("Unhandled action: \(action)");
       }
     }
 

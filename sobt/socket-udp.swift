@@ -75,6 +75,27 @@ class UDPSocket: Socket {
     dispatch_resume(self.dispatchSource!);
   }
   
+  func setListener(listener: (Array<UInt8>) -> ()) {
+    self.setListener({(socket: Int32) in
+      var inAddress = sockaddr_storage();
+      var inAddressLength = socklen_t(sizeof(sockaddr_storage.self));
+      let readBuffer = [UInt8](count: 65536, repeatedValue: 0);
+      
+      let bytesRead = withUnsafeMutablePointer(&inAddress) {
+        recvfrom(
+          socket,
+          UnsafeMutablePointer<Void>(readBuffer),
+          readBuffer.count,
+          0,
+          UnsafeMutablePointer($0),
+          &inAddressLength
+        );
+      };
+
+      listener(Array<UInt8>(readBuffer[0..<bytesRead]));
+    });
+  }
+  
   func sendData(data: NSData) {
     let bytesSent = sendto(
       self.udpSocket,

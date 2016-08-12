@@ -9,10 +9,11 @@
 import Foundation
 
 extension Sobt {
-  class TrackerClient {
+  class TrackerClient : NSObject {
     private var manifests = Dictionary<String, ManifestData>();
     private var connections = Dictionary<String, ConnectionData>();
     private var updating = false;
+    private var updateTimer: NSTimer? = nil;
     
     func addManifest(fromPath path: String) {
       var manifest = ManifestData();
@@ -26,6 +27,22 @@ extension Sobt {
       manifest.infoHash = Sobt.Crypto.SHA1(manifest.infoData!);
       
       self.manifests[manifest.uuid] = manifest;
+      print("Added manifest \(manifest.uuid) from \(path)");
+    }
+
+    func autoUpdate(interval: Double) {
+      self.stopAutoUpdate();
+      self.updateTimer = NSTimer.scheduledTimerWithTimeInterval(
+        interval,
+        target: self,
+        selector: #selector(TrackerClient.update),
+        userInfo: nil,
+        repeats: true
+      );
+    }
+    
+    func stopAutoUpdate() {
+      self.updateTimer?.invalidate();
     }
     
     func update() {
@@ -38,9 +55,9 @@ extension Sobt {
       // Queue connections
       for (_, (uuid, _)) in self.manifests.enumerate() {
         for (_, url) in self.getTrackers(uuid).enumerate() {
-          let connectionKey = uuid + "@" + url;
-          if (self.connections[connectionKey] == nil) {
-            self.connections[connectionKey] = ConnectionData(uuid, url);
+          let connectionUUID = uuid + "@" + url;
+          if (self.connections[connectionUUID] == nil) {
+            self.connections[connectionUUID] = ConnectionData(connectionUUID, url);
           }
         }
       }
@@ -48,9 +65,12 @@ extension Sobt {
       // Activate idle connections
       for (_, (uuid, data)) in self.connections.enumerate() {
         let isIdle = data.status == ConnectionStatus.Idle;
-        let hasConnected = data.connectionId <= 0;
+        let hasConnected = data.connectionId > 0;
+        
+        // TODO: If no response to a request is received within 15 seconds, resend the request.
+        // TODO: If no reply has been received after 60 seconds, stop retrying.
 
-        if (isIdle && hasConnected) {
+        if (isIdle && !hasConnected) {
           self.establishConnection(uuid);
         }
       }
@@ -63,10 +83,6 @@ extension Sobt {
       let url = NSURL(string: connectionData.url)!;
 
       if (url.host == "tracker.coppersurfer.tk") {
-        print(url);
-        print(url.host);
-        print(url.port);
-        
         connectionData.udpSocket = UDPSocket(port: UInt16(url.port!.integerValue), host: url.host);
         
         connectionData.udpSocket!.setListener({(socket: Int32) in
@@ -86,11 +102,10 @@ extension Sobt {
         payload.appendBytes(&payloadAction, length: 4);
         payload.appendBytes(&payloadTransactionId, length: 4);
         
-        print("Payload \(payload.length) bytes: \(Sobt.Util.NSDataToArray(payload))");
-        
         connectionData.status = ConnectionStatus.Active;
         self.connections[connectionUUID] = connectionData;
 
+        print("Connecting to \(connectionData.url) with \(payload.length) bytes of data \(Sobt.Util.NSDataToArray(payload))");
         connectionData.udpSocket!.sendData(payload);
       }
     }
@@ -130,35 +145,34 @@ extension Sobt {
       };
       
       let (ipAddress, servicePort) = Socket.GetSocketHostAndPort(Socket.CastSocketAddress(&inAddress));
-      let message = "Got data from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
-      print(message);
-
       let dataRead = buffer[0..<bytesRead];
-      self.handleSocketData(Array<UInt8>(dataRead));
+      let dataArray = Array<UInt8>(dataRead);
+
+      print("Received \(dataArray.count) bytes of data from \(ipAddress):\(servicePort) \(dataArray)");
+      self.handleSocketData(dataArray);
     }
     
     private func handleSocketData(data: Array<UInt8>) {
-      print("Handle \(data.count) bytes of data: \(data)");
-
       let action = TrackerAction(rawValue: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[0...3])));
       
       if (action == TrackerAction.Connect) {
         let transactionId: UInt32 = Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[4...7]));
+        print("Handle connect action for transaction \(transactionId)");
         
         let result = self.connections.filter({(_, connection) in
           return connection.transactionId == transactionId;
         });
         
-        print(result);
-        
         if (!result.isEmpty) {
           var (uuid, connectionData) = result.first!;
-
+          
           connectionData.connectionId = Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[8...15]));
           connectionData.status = ConnectionStatus.Idle;
-
+          
           self.connections[uuid] = connectionData;
-          print("connectionData: \(connectionData)");
+          print("Got connection ID \(connectionData.connectionId) for connection \(connectionData.uuid)");
+        } else {
+          print("No connection found for transaction \(transactionId)");
         }
       } else {
         print("action: \(action)");

@@ -8,27 +8,18 @@
 
 import Foundation;
 
+/*
 let path = "/Users/billy/Projects/btplayground/test.torrent";
 let data = NSData(contentsOfFile: path);
 let decoder = BEncodingDecoder(data: data!);
 let decoded = decoder.decode();
 let jsonObject = bEncodedToJsonObject(decoded);
+print(jsonObject);
+*/
 
-// print(jsonObject);
-
-// =================================================================================================
 // http://www.bittorrent.org/beps/bep_0003.html
 // http://www.bittorrent.org/beps/bep_0015.html
 // http://www.rasterbar.com/products/libtorrent/udp_tracker_protocol.html
-// udp://tracker.coppersurfer.tk:6969
-
-/*
-let infoValue: String = decoder.getInfoValue();
-print(infoValue);
-
-let infoData: NSData = decoder.getInfoValue();
-print(Sobt.Crypto.SHA1(infoData) as String);
-*/
 
 let trackerClient = Sobt.TrackerClient();
 trackerClient.addManifest(fromPath: "/Users/billy/Projects/btplayground/test.torrent");

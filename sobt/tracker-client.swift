@@ -57,7 +57,7 @@ extension Sobt {
         for (_, url) in self.getTrackers(uuid).enumerate() {
           let connectionUUID = uuid + "@" + url;
           if (self.connections[connectionUUID] == nil) {
-            self.connections[connectionUUID] = ConnectionData(connectionUUID, url);
+            self.connections[connectionUUID] = ConnectionData(connectionUUID, uuid, url);
           }
         }
       }
@@ -69,13 +69,72 @@ extension Sobt {
         
         // TODO: If no response to a request is received within 15 seconds, resend the request.
         // TODO: If no reply has been received after 60 seconds, stop retrying.
-
+        
         if (isIdle && !hasConnected) {
           self.establishConnection(uuid);
         }
       }
       
+      // Accounce
+      for (_, (uuid, data)) in self.connections.enumerate() {
+        let isIdle = data.status == ConnectionStatus.Idle;
+        let hasConnected = data.connectionId > 0;
+        let hasAnnounced = data.announced;
+        
+        // TODO: If no response to a request is received within 15 seconds, resend the request.
+        // TODO: If no reply has been received after 60 seconds, stop retrying.
+
+        if (isIdle && hasConnected && !hasAnnounced) {
+          self.announceToTracker(uuid);
+        }
+      }
+      
       self.updating = false;
+    }
+    
+    private func announceToTracker(connectionUUID: String) {
+      var connectionData = self.connections[connectionUUID]!;
+      let manifest = self.manifests[connectionData.manifestUUID]!;
+      
+      connectionData.transactionId = Sobt.Util.GetRandomNumber();
+      connectionData.status = ConnectionStatus.Active;
+      
+      let payload = NSMutableData();
+      
+      var payloadConnectionId = Sobt.Helper.Network.HostToNetwork(connectionData.connectionId);
+      var payloadAction = Sobt.Helper.Network.HostToNetwork(TrackerAction.Announce.rawValue as UInt32);
+      var payloadTransactionId = Sobt.Helper.Network.HostToNetwork(connectionData.transactionId as UInt32);
+      var payloadInfoHash = manifest.infoHash!;
+      var payloadPeerId = "12345678901234567890";
+      var payloadDownloaded = Sobt.Helper.Network.HostToNetwork(0 as UInt64);
+      var payloadLeft = Sobt.Helper.Network.HostToNetwork(0 as UInt64);
+      var payloadUploaded = Sobt.Helper.Network.HostToNetwork(0 as UInt64);
+      var payloadEvent = Sobt.Helper.Network.HostToNetwork(0 as UInt32);
+      var payloadIp = Sobt.Helper.Network.HostToNetwork(0 as UInt32);
+      var payloadKey = Sobt.Helper.Network.HostToNetwork(Sobt.Util.GetRandomNumber());
+      var payloadNumWant = Sobt.Helper.Network.HostToNetwork(999 as UInt32);
+      var payloadPort = Sobt.Helper.Network.HostToNetwork(4321 as UInt16);
+      var payloadExtensions = Sobt.Helper.Network.HostToNetwork(0 as UInt16);
+      
+      payload.appendBytes(&payloadConnectionId, length: 8);
+      payload.appendBytes(&payloadAction, length: 4);
+      payload.appendBytes(&payloadTransactionId, length: 4);
+      payload.appendBytes(&payloadInfoHash, length: 20);
+      payload.appendBytes(&payloadPeerId, length: 20);
+      payload.appendBytes(&payloadDownloaded, length: 8);
+      payload.appendBytes(&payloadLeft, length: 8);
+      payload.appendBytes(&payloadUploaded, length: 8);
+      payload.appendBytes(&payloadEvent, length: 4);
+      payload.appendBytes(&payloadIp, length: 4);
+      payload.appendBytes(&payloadKey, length: 4);
+      payload.appendBytes(&payloadNumWant, length: 4);
+      payload.appendBytes(&payloadPort, length: 2);
+      payload.appendBytes(&payloadExtensions, length: 2);
+      
+      self.connections[connectionUUID] = connectionData;
+
+      print("Accounce to \(connectionData.url)");
+      connectionData.udpSocket!.sendData(payload);
     }
     
     private func establishConnection(connectionUUID: String) {
@@ -95,8 +154,8 @@ extension Sobt {
         
         // Magic number 0x41727101980
         var payloadConnectionId = Sobt.Helper.Network.HostToNetwork(0x41727101980 as UInt64);
-        var payloadAction = htonl(TrackerAction.Connect.rawValue);
-        var payloadTransactionId = htonl(connectionData.transactionId);
+        var payloadAction = Sobt.Helper.Network.HostToNetwork(TrackerAction.Connect.rawValue as UInt32);
+        var payloadTransactionId = Sobt.Helper.Network.HostToNetwork(connectionData.transactionId as UInt32);
         
         payload.appendBytes(&payloadConnectionId, length: 8);
         payload.appendBytes(&payloadAction, length: 4);
@@ -154,8 +213,27 @@ extension Sobt {
         } else {
           print("No connection found for transaction \(transactionId)");
         }
+      } else if (action == TrackerAction.Announce) {
+        let transactionId: UInt32 = Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[4...7]));
+        let result = self.connections.filter({(_, connection) in
+          return connection.transactionId == transactionId;
+        });
+        
+        if (!result.isEmpty) {
+          var (uuid, connectionData) = result.first!;
+          
+          print("Accounce data \(data)");
+          
+          connectionData.status = ConnectionStatus.Idle;
+          connectionData.announced = true;
+
+          self.connections[uuid] = connectionData;
+          // print("Got connection ID \(connectionData.connectionId) for transaction \(transactionId) for connection \(connectionData.uuid)");
+        } else {
+          print("No connection found for transaction \(transactionId)");
+        }
       } else {
-        print("Unhandled action: \(action)");
+        print("Unhandled action: \(action) with data: \(data)");
       }
     }
 
@@ -175,14 +253,17 @@ extension Sobt {
 
     private struct ConnectionData {
       let uuid: String;
+      let manifestUUID: String;
       let url: String;
       var status: ConnectionStatus = ConnectionStatus.Idle;
       var udpSocket: UDPSocket? = nil;
       var connectionId: UInt64 = 0;
       var transactionId: UInt32 = 0;
+      var announced = false;
 
-      init(_ uuid: String, _ url: String) {
+      init(_ uuid: String, _ manifestUUID: String, _ url: String) {
         self.uuid = uuid;
+        self.manifestUUID = manifestUUID;
         self.url = url;
       }
     }

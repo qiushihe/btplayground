@@ -223,7 +223,17 @@ extension Sobt {
           var (uuid, connectionData) = result.first!;
           
           print("Accounce data \(data)");
-          
+          /* [
+           0, 0, 0, 1,        // action
+           64, 169, 213, 224, // transaction_id
+           0, 0, 6, 128,      // interval
+           0, 0, 0, 0,        // leechers
+           0, 0, 0, 1,        // seeders
+           
+           24, 108, 9, 247,   // ip
+           16, 225            // port
+          ] */
+
           connectionData.status = ConnectionStatus.Idle;
           connectionData.announced = true;
 

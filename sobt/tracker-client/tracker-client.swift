@@ -233,7 +233,8 @@ extension Sobt {
            24, 108, 9, 247,   // ip
            16, 225            // port
           ] */
-
+          
+          connectionData.announceInterval = Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[8...11]));
           connectionData.status = ConnectionStatus.Idle;
           connectionData.announced = true;
 
@@ -269,6 +270,7 @@ extension Sobt {
       var udpSocket: UDPSocket? = nil;
       var connectionId: UInt64 = 0;
       var transactionId: UInt32 = 0;
+      var announceInterval: UInt32 = 0;
       var announced = false;
 
       init(_ uuid: String, _ manifestUUID: String, _ url: String) {

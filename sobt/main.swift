@@ -21,7 +21,7 @@ print(jsonObject);
 // http://www.bittorrent.org/beps/bep_0015.html
 // http://www.rasterbar.com/products/libtorrent/udp_tracker_protocol.html
 
-let trackerClient = Sobt.TrackerClient();
+let trackerClient = Sobt.TrackerClient.TrackerClient();
 trackerClient.addManifest(fromPath: "/Users/billy/Projects/btplayground/test.torrent");
 trackerClient.autoUpdate(2);
 

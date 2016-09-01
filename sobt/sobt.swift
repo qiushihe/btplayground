@@ -10,4 +10,5 @@ import Foundation
 
 struct Sobt {
   struct Helper {}
+  struct TrackerClient {}
 }

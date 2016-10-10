@@ -122,8 +122,8 @@ class UDPSocket: Socket {
       // For server mode there is no `host`.
       address.sin_len = __uint8_t(sizeofValue(address));
       address.sin_family = sa_family_t(AF_INET);
-      address.sin_port = htons(self.port);
-      address.sin_addr.s_addr = INADDR_ANY;
+      address.sin_port = Sobt.Helper.Network.HostToNetwork(self.port);
+      address.sin_addr.s_addr = in_addr_t(0);
     } else {
       // For client mode, we need to resolve the host info to obtain the adress data
       // from the given `host` string, which could be either an domain like "www.apple.ca"
@@ -140,7 +140,7 @@ class UDPSocket: Socket {
       let data = addresses![0];
       
       data.getBytes(&address, length: data.length);
-      address.sin_port = htons(self.port);
+      address.sin_port = Sobt.Helper.Network.HostToNetwork(self.port);
       // TODO: Assert for valid address.sin_family
     }
     

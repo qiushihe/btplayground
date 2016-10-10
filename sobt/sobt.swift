@@ -10,5 +10,6 @@ import Foundation
 
 struct Sobt {
   struct Helper {}
+  struct Bencoding {}
   struct TrackerClient {}
 }

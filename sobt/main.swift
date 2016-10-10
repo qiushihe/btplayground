@@ -13,7 +13,7 @@ let path = "/Users/billy/Projects/btplayground/test.torrent";
 let data = NSData(contentsOfFile: path);
 let decoder = BEncodingDecoder(data: data!);
 let decoded = decoder.decode();
-let jsonObject = bEncodedToJsonObject(decoded);
+let jsonObject = Sobt.Bencoding.Json.bEncodedToJsonObject(decoded);
 print(jsonObject);
 */
 

@@ -21,11 +21,11 @@ extension Sobt.TrackerClient {
       manifest.path = path;
       manifest.sourceData = NSData(contentsOfFile: path);
       
-      let decoder = BEncodingDecoder(data: manifest.sourceData!);
+      let decoder = Sobt.Bencoding.BEncodingDecoder(data: manifest.sourceData!);
       manifest.decodedData = decoder.decode();
       manifest.infoData = decoder.getInfoValue();
       manifest.infoValue = decoder.getInfoValue();
-      manifest.infoHash = Sobt.Crypto.SHA1(manifest.infoData!);
+      manifest.infoHash = Sobt.Helper.Crypto.SHA1(manifest.infoData!);
       
       self.manifests[manifest.uuid] = manifest;
       print("Added manifest from \(path)");
@@ -97,7 +97,7 @@ extension Sobt.TrackerClient {
       var connectionData = self.connections[connectionUUID]!;
       let manifest = self.manifests[connectionData.manifestUUID]!;
       
-      connectionData.transactionId = Sobt.Util.GetRandomNumber();
+      connectionData.transactionId = Sobt.Helper.Number.GetRandomNumber();
       connectionData.status = ConnectionStatus.Active;
       
       self.connections[connectionUUID] = connectionData;
@@ -123,7 +123,7 @@ extension Sobt.TrackerClient {
           self.handleSocketData(data);
         });
         
-        connectionData.transactionId = Sobt.Util.GetRandomNumber();
+        connectionData.transactionId = Sobt.Helper.Number.GetRandomNumber();
         connectionData.status = ConnectionStatus.Active;
         
         self.connections[connectionUUID] = connectionData;
@@ -136,7 +136,7 @@ extension Sobt.TrackerClient {
 
     private func getTrackers(uuid: String) -> Array<String> {
       let data = self.manifests[uuid]!;
-      let manifest = data.decodedData!.value as! Dictionary<String, BEncoded>;
+      let manifest = data.decodedData!.value as! Dictionary<String, Sobt.Bencoding.BEncoded>;
       
       var trackers = Array<String>();
       
@@ -147,8 +147,8 @@ extension Sobt.TrackerClient {
       
       let announceList = manifest["announce-list"];
       if (announceList != nil) {
-        for (_, tier) in (announceList!.value as! Array<BEncoded>).enumerate() {
-          for (_, url) in (tier.value as! Array<BEncoded>).enumerate() {
+        for (_, tier) in (announceList!.value as! Array<Sobt.Bencoding.BEncoded>).enumerate() {
+          for (_, url) in (tier.value as! Array<Sobt.Bencoding.BEncoded>).enumerate() {
             if (trackers.indexOf(url.value as! String) == nil) {
               trackers.append(url.value as! String);
             }
@@ -206,7 +206,7 @@ extension Sobt.TrackerClient {
       let uuid: String;
       var path: String? = nil;
       var sourceData: NSData? = nil;
-      var decodedData: BEncoded? = nil;
+      var decodedData: Sobt.Bencoding.BEncoded? = nil;
       var infoData: NSData? = nil;
       var infoValue: String? = nil;
       var infoHash: String? = nil;

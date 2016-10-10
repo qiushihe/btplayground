@@ -37,7 +37,7 @@ extension Sobt.TrackerClient {
       var payloadUploaded = Sobt.Helper.Network.HostToNetwork(0 as UInt64);
       var payloadEvent = Sobt.Helper.Network.HostToNetwork(0 as UInt32);
       var payloadIp = Sobt.Helper.Network.HostToNetwork(0 as UInt32);
-      var payloadKey = Sobt.Helper.Network.HostToNetwork(Sobt.Util.GetRandomNumber());
+      var payloadKey = Sobt.Helper.Network.HostToNetwork(Sobt.Helper.Number.GetRandomNumber());
       var payloadNumWant = Sobt.Helper.Network.HostToNetwork(9999 as UInt32);
       var payloadPort = Sobt.Helper.Network.HostToNetwork(self.port);
       var payloadExtensions = Sobt.Helper.Network.HostToNetwork(0 as UInt16);

@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension Sobt {
+extension Sobt.Helper {
   struct Crypto {
     static func SHA1(data: NSData) -> Array<UInt8> {
       var digest = Array<UInt8>(count:Int(CC_SHA1_DIGEST_LENGTH), repeatedValue: 0);
@@ -16,7 +16,7 @@ extension Sobt {
       return digest;
     }
 
-    static func SHA1(data: NSData) -> String {
+    static func SHA1(data: NSData) -> Swift.String {
       let digest: Array<UInt8> = self.SHA1(data);
       let output = NSMutableString(capacity: Int(CC_SHA1_DIGEST_LENGTH));
 
@@ -24,7 +24,7 @@ extension Sobt {
         output.appendFormat("%02x", byte);
       }
       
-      return output as String;
+      return output as Swift.String;
     }
   }
 }

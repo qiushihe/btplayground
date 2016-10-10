@@ -8,19 +8,6 @@
 
 import Foundation
 
-// Polyfill for some missing C macros and constants in Swift
-// https://gist.github.com/NeoTeo/b6195efb779d925fd7b8
-
-let isLittleEndian = Int(OSHostByteOrder()) == OSLittleEndian;
-let htons = isLittleEndian ? _OSSwapInt16 : { $0 };
-let htonl = isLittleEndian ? _OSSwapInt32 : { $0 };
-let htonll = isLittleEndian ? _OSSwapInt64 : { $0 };
-let ntohs = isLittleEndian ? _OSSwapInt16 : { $0 };
-let ntohl = isLittleEndian ? _OSSwapInt32 : { $0 };
-let ntohll = isLittleEndian ? _OSSwapInt64 : { $0 };
-
-let INADDR_ANY = in_addr_t(0);
-
 enum SocketType {
   case Client, Server, Reply
 }
@@ -79,8 +66,8 @@ class Socket {
       // For server mode there is no `host`.
       address.sin_len = __uint8_t(sizeofValue(address));
       address.sin_family = sa_family_t(AF_INET);
-      address.sin_port = htons(port);
-      address.sin_addr.s_addr = INADDR_ANY;
+      address.sin_port = Sobt.Helper.Network.HostToNetwork(port);
+      address.sin_addr.s_addr = in_addr_t(0);
     } else {
       // For client mode, we need to resolve the host info to obtain the adress data
       // from the given `host` string, which could be either an domain like "www.apple.ca"
@@ -97,7 +84,7 @@ class Socket {
       let data = addresses![0];
       
       data.getBytes(&address, length: data.length);
-      address.sin_port = htons(port);
+      address.sin_port = Sobt.Helper.Network.HostToNetwork(port);
       // TODO: Assert for valid address.sin_family
     }
     

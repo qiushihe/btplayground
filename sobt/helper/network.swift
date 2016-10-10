@@ -10,6 +10,9 @@ import Foundation
 
 extension Sobt.Helper {
   struct Network {
+    // Polyfill for some missing C macros and constants in Swift
+    // https://gist.github.com/NeoTeo/b6195efb779d925fd7b8
+
     private static let isLittleEndian = Int(OSHostByteOrder()) == OSLittleEndian;
     
     static func HostToNetwork(integer: UInt16) -> UInt16 {

@@ -14,7 +14,7 @@ extension Sobt.TrackerClient {
     private var connections = Dictionary<String, ConnectionData>();
     private var updating = false;
     private var updateTimer: NSTimer? = nil;
-    private let peerId: String = Sobt.Helper.String.RandomStringWithLength(20);
+    private let peerId: String = "M4-20-8-" + Sobt.Helper.String.RandomStringWithLength(12);
     private var port: UInt16? = nil;
     
     func setPort(port: UInt16) {

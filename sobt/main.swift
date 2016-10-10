@@ -23,7 +23,8 @@ print(jsonObject);
 
 let trackerClient = Sobt.TrackerClient.TrackerClient();
 trackerClient.addManifest(fromPath: "/Users/billy/Projects/btplayground/test.torrent");
-trackerClient.autoUpdate(2);
+trackerClient.setPort(4321);
+trackerClient.autoUpdate(5);
 
 // Use CFRunLoopStop(CFRunLoopGetCurrent()) to stop
 CFRunLoopRun();

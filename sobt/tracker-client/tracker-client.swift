@@ -15,6 +15,11 @@ extension Sobt.TrackerClient {
     private var updating = false;
     private var updateTimer: NSTimer? = nil;
     private let peerId: String = Sobt.Helper.String.RandomStringWithLength(20);
+    private var port: UInt16? = nil;
+    
+    func setPort(port: UInt16) {
+      self.port = port;
+    }
     
     func addManifest(fromPath path: String) {
       var manifest = ManifestData();
@@ -108,7 +113,7 @@ extension Sobt.TrackerClient {
         transactionId: connectionData.transactionId,
         infoHash: manifest.infoHash!,
         peerId: self.peerId,
-        port: 4321
+        port: self.port!
       );
       connectionData.udpSocket!.sendData(request.getPayload());
     }

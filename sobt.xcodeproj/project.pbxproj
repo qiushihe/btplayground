@@ -20,6 +20,10 @@
 		28E3BD301D55C0CC0005622E /* crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E3BD2F1D55C0CC0005622E /* crypto.swift */; };
 		28E691FC1D5AF5FD003803E2 /* network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E691FB1D5AF5FD003803E2 /* network.swift */; };
 		28EE19351D5683B0004E2A3A /* tracker-client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28EE19341D5683B0004E2A3A /* tracker-client.swift */; };
+		CE26CDC91DB04FAD00CE06B7 /* bencoding-json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B5D7491D26528900F851B5 /* bencoding-json.swift */; };
+		CE26CDCA1DB04FAD00CE06B7 /* bencoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282B44EA1D20FF660073C9D1 /* bencoding.swift */; };
+		CE26CDCB1DB04FCA00CE06B7 /* sobt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E3BD2D1D55C07E0005622E /* sobt.swift */; };
+		CE26CDCC1DB04FE500CE06B7 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE26CDC11DB04EC600CE06B7 /* main.swift */; };
 		CE29D7151D779BF5006160E7 /* connect.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29D7141D779BF5006160E7 /* connect.swift */; };
 		CE29D7171D779CBD006160E7 /* action.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29D7161D779CBD006160E7 /* action.swift */; };
 		CE29D7191D77A4D9006160E7 /* announce.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29D7181D77A4D9006160E7 /* announce.swift */; };
@@ -29,6 +33,15 @@
 
 /* Begin PBXCopyFilesBuildPhase section */
 		282B44DE1D20FD040073C9D1 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		CE26CDBD1DB04EC600CE06B7 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -55,6 +68,8 @@
 		28E3BD2F1D55C0CC0005622E /* crypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = crypto.swift; path = ../crypto.swift; sourceTree = "<group>"; };
 		28E691FB1D5AF5FD003803E2 /* network.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = network.swift; sourceTree = "<group>"; };
 		28EE19341D5683B0004E2A3A /* tracker-client.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "tracker-client.swift"; path = "sobt/tracker-client/tracker-client.swift"; sourceTree = SOURCE_ROOT; };
+		CE26CDBF1DB04EC600CE06B7 /* sobt-tracker */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "sobt-tracker"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE26CDC11DB04EC600CE06B7 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		CE29D7141D779BF5006160E7 /* connect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = connect.swift; sourceTree = "<group>"; };
 		CE29D7161D779CBD006160E7 /* action.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = action.swift; sourceTree = "<group>"; };
 		CE29D7181D77A4D9006160E7 /* announce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = announce.swift; sourceTree = "<group>"; };
@@ -70,6 +85,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CE26CDBC1DB04EC600CE06B7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -78,6 +100,7 @@
 			children = (
 				282B44E11D20FD040073C9D1 /* Products */,
 				282B44E21D20FD040073C9D1 /* sobt */,
+				CE26CDC01DB04EC600CE06B7 /* sobt-tracker */,
 			);
 			sourceTree = "<group>";
 		};
@@ -85,6 +108,7 @@
 			isa = PBXGroup;
 			children = (
 				282B44E01D20FD040073C9D1 /* sobt */,
+				CE26CDBF1DB04EC600CE06B7 /* sobt-tracker */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -147,6 +171,14 @@
 			path = helper;
 			sourceTree = "<group>";
 		};
+		CE26CDC01DB04EC600CE06B7 /* sobt-tracker */ = {
+			isa = PBXGroup;
+			children = (
+				CE26CDC11DB04EC600CE06B7 /* main.swift */,
+			);
+			path = "sobt-tracker";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -167,19 +199,40 @@
 			productReference = 282B44E01D20FD040073C9D1 /* sobt */;
 			productType = "com.apple.product-type.tool";
 		};
+		CE26CDBE1DB04EC600CE06B7 /* sobt-tracker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CE26CDC51DB04EC600CE06B7 /* Build configuration list for PBXNativeTarget "sobt-tracker" */;
+			buildPhases = (
+				CE26CDBB1DB04EC600CE06B7 /* Sources */,
+				CE26CDBC1DB04EC600CE06B7 /* Frameworks */,
+				CE26CDBD1DB04EC600CE06B7 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "sobt-tracker";
+			productName = "sobt-tracker";
+			productReference = CE26CDBF1DB04EC600CE06B7 /* sobt-tracker */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		282B44D81D20FD040073C9D1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0730;
+				LastSwiftUpdateCheck = 0800;
 				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Billy He";
 				TargetAttributes = {
 					282B44DF1D20FD040073C9D1 = {
 						CreatedOnToolsVersion = 7.3.1;
 						LastSwiftMigration = 0800;
+					};
+					CE26CDBE1DB04EC600CE06B7 = {
+						CreatedOnToolsVersion = 8.0;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -196,6 +249,7 @@
 			projectRoot = "";
 			targets = (
 				282B44DF1D20FD040073C9D1 /* sobt */,
+				CE26CDBE1DB04EC600CE06B7 /* sobt-tracker */,
 			);
 		};
 /* End PBXProject section */
@@ -223,6 +277,17 @@
 				282B17521D39F58300FCFF33 /* socket-tcp.swift in Sources */,
 				CE29D71B1D77A55A006160E7 /* string.swift in Sources */,
 				282B44EB1D20FF660073C9D1 /* bencoding.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE26CDBB1DB04EC600CE06B7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE26CDCC1DB04FE500CE06B7 /* main.swift in Sources */,
+				CE26CDCB1DB04FCA00CE06B7 /* sobt.swift in Sources */,
+				CE26CDC91DB04FAD00CE06B7 /* bencoding-json.swift in Sources */,
+				CE26CDCA1DB04FAD00CE06B7 /* bencoding.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -334,6 +399,28 @@
 			};
 			name = Release;
 		};
+		CE26CDC31DB04EC600CE06B7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 2.3;
+			};
+			name = Debug;
+		};
+		CE26CDC41DB04EC600CE06B7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 2.3;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -354,6 +441,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		CE26CDC51DB04EC600CE06B7 /* Build configuration list for PBXNativeTarget "sobt-tracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE26CDC31DB04EC600CE06B7 /* Debug */,
+				CE26CDC41DB04EC600CE06B7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

@@ -7,28 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		282B17521D39F58300FCFF33 /* socket-tcp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282B17511D39F58300FCFF33 /* socket-tcp.swift */; };
 		282B17541D3A037200FCFF33 /* echo-tcp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282B17531D3A037200FCFF33 /* echo-tcp.swift */; };
-		282B17561D3A06A400FCFF33 /* socket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282B17551D3A06A400FCFF33 /* socket.swift */; };
 		282B44E41D20FD040073C9D1 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282B44E31D20FD040073C9D1 /* main.swift */; };
-		282B44EB1D20FF660073C9D1 /* bencoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282B44EA1D20FF660073C9D1 /* bencoding.swift */; };
 		28413FBF1D2E268C001E1DCE /* signal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28413FBE1D2E268C001E1DCE /* signal.swift */; };
 		28413FC11D2E342D001E1DCE /* echo-udp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28413FC01D2E342D001E1DCE /* echo-udp.swift */; };
-		28B5D74A1D26528900F851B5 /* bencoding-json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B5D7491D26528900F851B5 /* bencoding-json.swift */; };
-		28DC99661DAB353E003FE143 /* number.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28DC99651DAB353E003FE143 /* number.swift */; };
-		28E3BD2E1D55C07E0005622E /* sobt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E3BD2D1D55C07E0005622E /* sobt.swift */; };
-		28E3BD301D55C0CC0005622E /* crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E3BD2F1D55C0CC0005622E /* crypto.swift */; };
-		28E691FC1D5AF5FD003803E2 /* network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E691FB1D5AF5FD003803E2 /* network.swift */; };
 		28EE19351D5683B0004E2A3A /* tracker-client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28EE19341D5683B0004E2A3A /* tracker-client.swift */; };
-		CE26CDC91DB04FAD00CE06B7 /* bencoding-json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B5D7491D26528900F851B5 /* bencoding-json.swift */; };
-		CE26CDCA1DB04FAD00CE06B7 /* bencoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282B44EA1D20FF660073C9D1 /* bencoding.swift */; };
-		CE26CDCB1DB04FCA00CE06B7 /* sobt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E3BD2D1D55C07E0005622E /* sobt.swift */; };
+		28FFC17E1DB2DCCA006D7430 /* bencoding-json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC17C1DB2DCAB006D7430 /* bencoding-json.swift */; };
+		28FFC17F1DB2DCCA006D7430 /* bencoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC17D1DB2DCAB006D7430 /* bencoding.swift */; };
+		28FFC1801DB2DCCF006D7430 /* bencoding-json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC17C1DB2DCAB006D7430 /* bencoding-json.swift */; };
+		28FFC1811DB2DCCF006D7430 /* bencoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC17D1DB2DCAB006D7430 /* bencoding.swift */; };
+		28FFC1831DB2DD41006D7430 /* sobt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1821DB2DD2A006D7430 /* sobt.swift */; };
+		28FFC1841DB2DD4B006D7430 /* sobt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1821DB2DD2A006D7430 /* sobt.swift */; };
+		28FFC1891DB2DD8C006D7430 /* socket-tcp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1861DB2DD77006D7430 /* socket-tcp.swift */; };
+		28FFC18A1DB2DD8C006D7430 /* socket-udp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1871DB2DD77006D7430 /* socket-udp.swift */; };
+		28FFC18B1DB2DD8C006D7430 /* socket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1881DB2DD77006D7430 /* socket.swift */; };
+		28FFC1921DB2DE70006D7430 /* crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC18D1DB2DE04006D7430 /* crypto.swift */; };
+		28FFC1931DB2DE70006D7430 /* network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC18E1DB2DE04006D7430 /* network.swift */; };
+		28FFC1941DB2DE70006D7430 /* number.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC18F1DB2DE04006D7430 /* number.swift */; };
+		28FFC1951DB2DE70006D7430 /* string.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1911DB2DE04006D7430 /* string.swift */; };
 		CE26CDCC1DB04FE500CE06B7 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE26CDC11DB04EC600CE06B7 /* main.swift */; };
 		CE29D7151D779BF5006160E7 /* connect.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29D7141D779BF5006160E7 /* connect.swift */; };
 		CE29D7171D779CBD006160E7 /* action.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29D7161D779CBD006160E7 /* action.swift */; };
 		CE29D7191D77A4D9006160E7 /* announce.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29D7181D77A4D9006160E7 /* announce.swift */; };
-		CE29D71B1D77A55A006160E7 /* string.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29D71A1D77A55A006160E7 /* string.swift */; };
-		CEE31E471D2C6E89009E2B35 /* socket-udp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE31E461D2C6E89009E2B35 /* socket-udp.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -53,28 +53,28 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		282B17511D39F58300FCFF33 /* socket-tcp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "socket-tcp.swift"; path = "sobt/socket-tcp.swift"; sourceTree = SOURCE_ROOT; };
 		282B17531D3A037200FCFF33 /* echo-tcp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "echo-tcp.swift"; sourceTree = "<group>"; };
-		282B17551D3A06A400FCFF33 /* socket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = socket.swift; path = sobt/socket.swift; sourceTree = SOURCE_ROOT; };
 		282B44E01D20FD040073C9D1 /* sobt */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sobt; sourceTree = BUILT_PRODUCTS_DIR; };
 		282B44E31D20FD040073C9D1 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		282B44EA1D20FF660073C9D1 /* bencoding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = bencoding.swift; path = sobt/bencoding.swift; sourceTree = SOURCE_ROOT; };
 		28413FBE1D2E268C001E1DCE /* signal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = signal.swift; sourceTree = "<group>"; };
 		28413FC01D2E342D001E1DCE /* echo-udp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "echo-udp.swift"; sourceTree = "<group>"; };
-		28B5D7491D26528900F851B5 /* bencoding-json.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "bencoding-json.swift"; path = "sobt/bencoding-json.swift"; sourceTree = SOURCE_ROOT; };
-		28DC99651DAB353E003FE143 /* number.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = number.swift; sourceTree = "<group>"; };
-		28E3BD2C1D55A74E0005622E /* sobt-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "sobt-Bridging-Header.h"; path = "../sobt-Bridging-Header.h"; sourceTree = "<group>"; };
-		28E3BD2D1D55C07E0005622E /* sobt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = sobt.swift; sourceTree = "<group>"; };
-		28E3BD2F1D55C0CC0005622E /* crypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = crypto.swift; path = ../crypto.swift; sourceTree = "<group>"; };
-		28E691FB1D5AF5FD003803E2 /* network.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = network.swift; sourceTree = "<group>"; };
 		28EE19341D5683B0004E2A3A /* tracker-client.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "tracker-client.swift"; path = "sobt/tracker-client/tracker-client.swift"; sourceTree = SOURCE_ROOT; };
+		28FFC17C1DB2DCAB006D7430 /* bencoding-json.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "bencoding-json.swift"; path = "sobt-lib/bencoding/bencoding-json.swift"; sourceTree = "<group>"; };
+		28FFC17D1DB2DCAB006D7430 /* bencoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = bencoding.swift; path = "sobt-lib/bencoding/bencoding.swift"; sourceTree = "<group>"; };
+		28FFC1821DB2DD2A006D7430 /* sobt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = sobt.swift; path = "sobt-lib/sobt.swift"; sourceTree = "<group>"; };
+		28FFC1861DB2DD77006D7430 /* socket-tcp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "socket-tcp.swift"; path = "sobt-lib/socket/socket-tcp.swift"; sourceTree = "<group>"; };
+		28FFC1871DB2DD77006D7430 /* socket-udp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "socket-udp.swift"; path = "sobt-lib/socket/socket-udp.swift"; sourceTree = "<group>"; };
+		28FFC1881DB2DD77006D7430 /* socket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = socket.swift; path = "sobt-lib/socket/socket.swift"; sourceTree = "<group>"; };
+		28FFC18D1DB2DE04006D7430 /* crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = crypto.swift; path = "sobt-lib/helper/crypto.swift"; sourceTree = "<group>"; };
+		28FFC18E1DB2DE04006D7430 /* network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = network.swift; path = "sobt-lib/helper/network.swift"; sourceTree = "<group>"; };
+		28FFC18F1DB2DE04006D7430 /* number.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = number.swift; path = "sobt-lib/helper/number.swift"; sourceTree = "<group>"; };
+		28FFC1901DB2DE04006D7430 /* sobt-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "sobt-Bridging-Header.h"; path = "sobt-lib/helper/sobt-Bridging-Header.h"; sourceTree = "<group>"; };
+		28FFC1911DB2DE04006D7430 /* string.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = string.swift; path = "sobt-lib/helper/string.swift"; sourceTree = "<group>"; };
 		CE26CDBF1DB04EC600CE06B7 /* sobt-tracker */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "sobt-tracker"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26CDC11DB04EC600CE06B7 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		CE29D7141D779BF5006160E7 /* connect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = connect.swift; sourceTree = "<group>"; };
 		CE29D7161D779CBD006160E7 /* action.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = action.swift; sourceTree = "<group>"; };
 		CE29D7181D77A4D9006160E7 /* announce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = announce.swift; sourceTree = "<group>"; };
-		CE29D71A1D77A55A006160E7 /* string.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = string.swift; sourceTree = "<group>"; };
-		CEE31E461D2C6E89009E2B35 /* socket-udp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "socket-udp.swift"; path = "sobt/socket-udp.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +100,7 @@
 			children = (
 				282B44E11D20FD040073C9D1 /* Products */,
 				282B44E21D20FD040073C9D1 /* sobt */,
+				28FFC17A1DB2DC80006D7430 /* sobt-lib */,
 				CE26CDC01DB04EC600CE06B7 /* sobt-tracker */,
 			);
 			sourceTree = "<group>";
@@ -116,14 +117,10 @@
 		282B44E21D20FD040073C9D1 /* sobt */ = {
 			isa = PBXGroup;
 			children = (
-				28DC99671DAB3621003FE143 /* socket */,
-				28DC99641DAB3477003FE143 /* bencoding */,
 				282B17531D3A037200FCFF33 /* echo-tcp.swift */,
 				28413FC01D2E342D001E1DCE /* echo-udp.swift */,
-				28E691FA1D5AF5DB003803E2 /* helper */,
 				282B44E31D20FD040073C9D1 /* main.swift */,
 				28413FBE1D2E268C001E1DCE /* signal.swift */,
-				28E3BD2D1D55C07E0005622E /* sobt.swift */,
 				285A3F501D76B66700276184 /* tracker-client */,
 			);
 			path = sobt;
@@ -140,35 +137,46 @@
 			path = "tracker-client";
 			sourceTree = "<group>";
 		};
-		28DC99641DAB3477003FE143 /* bencoding */ = {
+		28FFC17A1DB2DC80006D7430 /* sobt-lib */ = {
 			isa = PBXGroup;
 			children = (
-				28B5D7491D26528900F851B5 /* bencoding-json.swift */,
-				282B44EA1D20FF660073C9D1 /* bencoding.swift */,
+				28FFC18C1DB2DDAC006D7430 /* helper */,
+				28FFC1851DB2DD6D006D7430 /* socket */,
+				28FFC1821DB2DD2A006D7430 /* sobt.swift */,
+				28FFC17B1DB2DC97006D7430 /* bencoding */,
 			);
-			path = bencoding;
+			name = "sobt-lib";
 			sourceTree = "<group>";
 		};
-		28DC99671DAB3621003FE143 /* socket */ = {
+		28FFC17B1DB2DC97006D7430 /* bencoding */ = {
 			isa = PBXGroup;
 			children = (
-				282B17511D39F58300FCFF33 /* socket-tcp.swift */,
-				CEE31E461D2C6E89009E2B35 /* socket-udp.swift */,
-				282B17551D3A06A400FCFF33 /* socket.swift */,
+				28FFC17C1DB2DCAB006D7430 /* bencoding-json.swift */,
+				28FFC17D1DB2DCAB006D7430 /* bencoding.swift */,
 			);
-			path = socket;
+			name = bencoding;
 			sourceTree = "<group>";
 		};
-		28E691FA1D5AF5DB003803E2 /* helper */ = {
+		28FFC1851DB2DD6D006D7430 /* socket */ = {
 			isa = PBXGroup;
 			children = (
-				28E3BD2C1D55A74E0005622E /* sobt-Bridging-Header.h */,
-				28E3BD2F1D55C0CC0005622E /* crypto.swift */,
-				28E691FB1D5AF5FD003803E2 /* network.swift */,
-				CE29D71A1D77A55A006160E7 /* string.swift */,
-				28DC99651DAB353E003FE143 /* number.swift */,
+				28FFC1861DB2DD77006D7430 /* socket-tcp.swift */,
+				28FFC1871DB2DD77006D7430 /* socket-udp.swift */,
+				28FFC1881DB2DD77006D7430 /* socket.swift */,
 			);
-			path = helper;
+			name = socket;
+			sourceTree = "<group>";
+		};
+		28FFC18C1DB2DDAC006D7430 /* helper */ = {
+			isa = PBXGroup;
+			children = (
+				28FFC18D1DB2DE04006D7430 /* crypto.swift */,
+				28FFC18E1DB2DE04006D7430 /* network.swift */,
+				28FFC18F1DB2DE04006D7430 /* number.swift */,
+				28FFC1901DB2DE04006D7430 /* sobt-Bridging-Header.h */,
+				28FFC1911DB2DE04006D7430 /* string.swift */,
+			);
+			name = helper;
 			sourceTree = "<group>";
 		};
 		CE26CDC01DB04EC600CE06B7 /* sobt-tracker */ = {
@@ -259,24 +267,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				28FFC1921DB2DE70006D7430 /* crypto.swift in Sources */,
+				28FFC1931DB2DE70006D7430 /* network.swift in Sources */,
+				28FFC1941DB2DE70006D7430 /* number.swift in Sources */,
+				28FFC1951DB2DE70006D7430 /* string.swift in Sources */,
+				28FFC1891DB2DD8C006D7430 /* socket-tcp.swift in Sources */,
+				28FFC18A1DB2DD8C006D7430 /* socket-udp.swift in Sources */,
+				28FFC18B1DB2DD8C006D7430 /* socket.swift in Sources */,
+				28FFC1841DB2DD4B006D7430 /* sobt.swift in Sources */,
+				28FFC17E1DB2DCCA006D7430 /* bencoding-json.swift in Sources */,
+				28FFC17F1DB2DCCA006D7430 /* bencoding.swift in Sources */,
 				282B44E41D20FD040073C9D1 /* main.swift in Sources */,
 				CE29D7191D77A4D9006160E7 /* announce.swift in Sources */,
 				CE29D7151D779BF5006160E7 /* connect.swift in Sources */,
-				28E3BD2E1D55C07E0005622E /* sobt.swift in Sources */,
-				CEE31E471D2C6E89009E2B35 /* socket-udp.swift in Sources */,
 				CE29D7171D779CBD006160E7 /* action.swift in Sources */,
-				282B17561D3A06A400FCFF33 /* socket.swift in Sources */,
-				28B5D74A1D26528900F851B5 /* bencoding-json.swift in Sources */,
-				28E691FC1D5AF5FD003803E2 /* network.swift in Sources */,
-				28DC99661DAB353E003FE143 /* number.swift in Sources */,
 				28413FBF1D2E268C001E1DCE /* signal.swift in Sources */,
 				282B17541D3A037200FCFF33 /* echo-tcp.swift in Sources */,
 				28EE19351D5683B0004E2A3A /* tracker-client.swift in Sources */,
-				28E3BD301D55C0CC0005622E /* crypto.swift in Sources */,
 				28413FC11D2E342D001E1DCE /* echo-udp.swift in Sources */,
-				282B17521D39F58300FCFF33 /* socket-tcp.swift in Sources */,
-				CE29D71B1D77A55A006160E7 /* string.swift in Sources */,
-				282B44EB1D20FF660073C9D1 /* bencoding.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -284,10 +292,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				28FFC1831DB2DD41006D7430 /* sobt.swift in Sources */,
+				28FFC1801DB2DCCF006D7430 /* bencoding-json.swift in Sources */,
+				28FFC1811DB2DCCF006D7430 /* bencoding.swift in Sources */,
 				CE26CDCC1DB04FE500CE06B7 /* main.swift in Sources */,
-				CE26CDCB1DB04FCA00CE06B7 /* sobt.swift in Sources */,
-				CE26CDC91DB04FAD00CE06B7 /* bencoding-json.swift in Sources */,
-				CE26CDCA1DB04FAD00CE06B7 /* bencoding.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -337,7 +345,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
-				"SWIFT_OBJC_BRIDGING_HEADER[arch=*]" = "sobt/sobt-Bridging-Header.h";
+				"SWIFT_OBJC_BRIDGING_HEADER[arch=*]" = "sobt-lib/helper/sobt-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -378,7 +386,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
-				"SWIFT_OBJC_BRIDGING_HEADER[arch=*]" = "sobt/sobt-Bridging-Header.h";
+				"SWIFT_OBJC_BRIDGING_HEADER[arch=*]" = "sobt-lib/helper/sobt-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 			};
 			name = Release;
@@ -449,6 +457,7 @@
 				CE26CDC41DB04EC600CE06B7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

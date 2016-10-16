@@ -22,18 +22,31 @@ extension Sobt.TrackerClient {
     }
     
     func addManifest(fromPath path: String) {
-      var manifest = ManifestData();
-      manifest.path = path;
-      manifest.sourceData = NSData(contentsOfFile: path);
+      print("Adding manifest from \(path)");
+
+      let sourceData: NSData? = NSData(contentsOfFile: path);
+      let decoder = Sobt.Bencoding.BEncodingDecoder(data: sourceData!);
+      let decodedData: Sobt.Bencoding.BEncoded = decoder.decode();
+      let infoData: NSData = decoder.getInfoValue();
       
-      let decoder = Sobt.Bencoding.BEncodingDecoder(data: manifest.sourceData!);
-      manifest.decodedData = decoder.decode();
-      manifest.infoData = decoder.getInfoValue();
-      manifest.infoValue = decoder.getInfoValue();
-      manifest.infoHash = Sobt.Helper.Crypto.SHA1(manifest.infoData!);
+      self.addManifest(infoHash: Sobt.Helper.Crypto.SHA1(infoData), trackers: self.getTrackers(decodedData));
+    }
+    
+    func addManifest(infoHash infoHash: String, tracker: String) {
+      self.addManifest(infoHash: infoHash, trackers: Array<String>(arrayLiteral: tracker));
+    }
+    
+    func addManifest(infoHash infoHash: String, trackers: Array<String>) {
+      var manifest = ManifestData();
+
+      manifest.infoHash = infoHash;
+      manifest.trackers = trackers;
       
       self.manifests[manifest.uuid] = manifest;
-      print("Added manifest from \(path)");
+
+      print("Added manifest:");
+      print("* Info hash: \(manifest.infoHash)");
+      print("* Trackers: \(manifest.trackers)");
     }
 
     func autoUpdate(interval: Double) {
@@ -59,8 +72,8 @@ extension Sobt.TrackerClient {
       }
 
       // Queue connections
-      for (_, (uuid, _)) in self.manifests.enumerate() {
-        for (_, url) in self.getTrackers(uuid).enumerate() {
+      for (_, (uuid, manifest)) in self.manifests.enumerate() {
+        for (url) in manifest.trackers! {
           let connectionUUID = uuid + "@" + url;
           if (self.connections[connectionUUID] == nil) {
             self.connections[connectionUUID] = ConnectionData(connectionUUID, uuid, url);
@@ -139,9 +152,8 @@ extension Sobt.TrackerClient {
       }
     }
 
-    private func getTrackers(uuid: String) -> Array<String> {
-      let data = self.manifests[uuid]!;
-      let manifest = data.decodedData!.value as! Dictionary<String, Sobt.Bencoding.BEncoded>;
+    private func getTrackers(data: Sobt.Bencoding.BEncoded) -> Array<String> {
+      let manifest = data.value as! Dictionary<String, Sobt.Bencoding.BEncoded>;
       
       var trackers = Array<String>();
       
@@ -209,12 +221,8 @@ extension Sobt.TrackerClient {
 
     private struct ManifestData {
       let uuid: String;
-      var path: String? = nil;
-      var sourceData: NSData? = nil;
-      var decodedData: Sobt.Bencoding.BEncoded? = nil;
-      var infoData: NSData? = nil;
-      var infoValue: String? = nil;
       var infoHash: String? = nil;
+      var trackers: Array<String>? = nil;
 
       init() {
         self.uuid = NSUUID().UUIDString;

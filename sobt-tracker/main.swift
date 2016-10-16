@@ -8,11 +8,13 @@
 
 import Foundation
 
-print("Hello, World!")
+let server = UDPServer(port: 4242);
 
-let path = "/Users/billy/Projects/btplayground/test.torrent";
-let data = NSData(contentsOfFile: path);
-let decoder = Sobt.Bencoding.BEncodingDecoder(data: data!);
-let decoded = decoder.decode();
-let jsonObject = Sobt.Bencoding.Json.bEncodedToJsonObject(decoded);
-print(jsonObject);
+Sobt.Helper.RunLoop.StartRunLoopWithTrap(
+  before: {() in
+    server.start();
+  },
+  after: {() in
+    server.stop();
+  }
+);

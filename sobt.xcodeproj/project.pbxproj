@@ -25,6 +25,16 @@
 		28FFC1931DB2DE70006D7430 /* network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC18E1DB2DE04006D7430 /* network.swift */; };
 		28FFC1941DB2DE70006D7430 /* number.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC18F1DB2DE04006D7430 /* number.swift */; };
 		28FFC1951DB2DE70006D7430 /* string.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1911DB2DE04006D7430 /* string.swift */; };
+		28FFC1971DB30118006D7430 /* udp-server.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1961DB30118006D7430 /* udp-server.swift */; };
+		28FFC1981DB310BB006D7430 /* crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC18D1DB2DE04006D7430 /* crypto.swift */; };
+		28FFC1991DB310BB006D7430 /* network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC18E1DB2DE04006D7430 /* network.swift */; };
+		28FFC19A1DB310BB006D7430 /* number.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC18F1DB2DE04006D7430 /* number.swift */; };
+		28FFC19B1DB310BB006D7430 /* string.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1911DB2DE04006D7430 /* string.swift */; };
+		28FFC19C1DB310BB006D7430 /* socket-tcp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1861DB2DD77006D7430 /* socket-tcp.swift */; };
+		28FFC19D1DB310BB006D7430 /* socket-udp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1871DB2DD77006D7430 /* socket-udp.swift */; };
+		28FFC19E1DB310BB006D7430 /* socket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1881DB2DD77006D7430 /* socket.swift */; };
+		28FFC1A01DB314F6006D7430 /* signal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC19F1DB314F6006D7430 /* signal.swift */; };
+		28FFC1A21DB31678006D7430 /* run-loop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1A11DB31678006D7430 /* run-loop.swift */; };
 		CE26CDCC1DB04FE500CE06B7 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE26CDC11DB04EC600CE06B7 /* main.swift */; };
 		CE29D7151D779BF5006160E7 /* connect.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29D7141D779BF5006160E7 /* connect.swift */; };
 		CE29D7171D779CBD006160E7 /* action.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29D7161D779CBD006160E7 /* action.swift */; };
@@ -70,6 +80,9 @@
 		28FFC18F1DB2DE04006D7430 /* number.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = number.swift; path = "sobt-lib/helper/number.swift"; sourceTree = "<group>"; };
 		28FFC1901DB2DE04006D7430 /* sobt-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "sobt-Bridging-Header.h"; path = "sobt-lib/helper/sobt-Bridging-Header.h"; sourceTree = "<group>"; };
 		28FFC1911DB2DE04006D7430 /* string.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = string.swift; path = "sobt-lib/helper/string.swift"; sourceTree = "<group>"; };
+		28FFC1961DB30118006D7430 /* udp-server.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "udp-server.swift"; sourceTree = "<group>"; };
+		28FFC19F1DB314F6006D7430 /* signal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = signal.swift; sourceTree = "<group>"; };
+		28FFC1A11DB31678006D7430 /* run-loop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "run-loop.swift"; sourceTree = "<group>"; };
 		CE26CDBF1DB04EC600CE06B7 /* sobt-tracker */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "sobt-tracker"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26CDC11DB04EC600CE06B7 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		CE29D7141D779BF5006160E7 /* connect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = connect.swift; sourceTree = "<group>"; };
@@ -175,6 +188,8 @@
 				28FFC18F1DB2DE04006D7430 /* number.swift */,
 				28FFC1901DB2DE04006D7430 /* sobt-Bridging-Header.h */,
 				28FFC1911DB2DE04006D7430 /* string.swift */,
+				28FFC19F1DB314F6006D7430 /* signal.swift */,
+				28FFC1A11DB31678006D7430 /* run-loop.swift */,
 			);
 			name = helper;
 			sourceTree = "<group>";
@@ -183,6 +198,7 @@
 			isa = PBXGroup;
 			children = (
 				CE26CDC11DB04EC600CE06B7 /* main.swift */,
+				28FFC1961DB30118006D7430 /* udp-server.swift */,
 			);
 			path = "sobt-tracker";
 			sourceTree = "<group>";
@@ -292,8 +308,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				28FFC1981DB310BB006D7430 /* crypto.swift in Sources */,
+				28FFC1991DB310BB006D7430 /* network.swift in Sources */,
+				28FFC19A1DB310BB006D7430 /* number.swift in Sources */,
+				28FFC19B1DB310BB006D7430 /* string.swift in Sources */,
+				28FFC19C1DB310BB006D7430 /* socket-tcp.swift in Sources */,
+				28FFC1A21DB31678006D7430 /* run-loop.swift in Sources */,
+				28FFC19D1DB310BB006D7430 /* socket-udp.swift in Sources */,
+				28FFC1A01DB314F6006D7430 /* signal.swift in Sources */,
+				28FFC19E1DB310BB006D7430 /* socket.swift in Sources */,
 				28FFC1831DB2DD41006D7430 /* sobt.swift in Sources */,
 				28FFC1801DB2DCCF006D7430 /* bencoding-json.swift in Sources */,
+				28FFC1971DB30118006D7430 /* udp-server.swift in Sources */,
 				28FFC1811DB2DCCF006D7430 /* bencoding.swift in Sources */,
 				CE26CDCC1DB04FE500CE06B7 /* main.swift in Sources */,
 			);

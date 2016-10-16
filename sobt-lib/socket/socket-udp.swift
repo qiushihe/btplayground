@@ -13,6 +13,9 @@ import Foundation
 // * https://developer.apple.com/library/mac/samplecode/UDPEcho/Introduction/Intro.html
 
 class UDPSocket: Socket {
+  // 65535 - 8 byte UDP header − 20 byte IP header
+  static let MAX_PACKET_SIZE = 65507;
+  
   private let port: UInt16;
   private let host: String?
   private let isServer: Bool;
@@ -79,7 +82,7 @@ class UDPSocket: Socket {
     self.setListener({(socket: Int32) in
       var inAddress = sockaddr_storage();
       var inAddressLength = socklen_t(sizeof(sockaddr_storage.self));
-      let readBuffer = [UInt8](count: 65536, repeatedValue: 0);
+      let readBuffer = [UInt8](count: UDPSocket.MAX_PACKET_SIZE, repeatedValue: 0);
       
       let bytesRead = withUnsafeMutablePointer(&inAddress) {
         recvfrom(

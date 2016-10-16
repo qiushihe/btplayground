@@ -21,11 +21,10 @@ print(jsonObject);
 // http://www.bittorrent.org/beps/bep_0015.html
 // http://www.rasterbar.com/products/libtorrent/udp_tracker_protocol.html
 
-// magnet:?xt=urn:btih:<info-hash>&dn=<name>&tr=<tracker-url>&x.pe=<peer-address>
-// magnet:?xt=urn:btih:f36ccb2248d556663e18490d679b5d914a7e8f63&tr=udp://127.0.0.1:4242
-
+let urlString = "magnet:?xt=urn:btih:f36ccb2248d556663e18490d679b5d914a7e8f63&tr=udp://127.0.0.1:4242";
 let trackerClient = Sobt.TrackerClient.TrackerClient();
-trackerClient.addManifest(fromPath: "/Users/billy/Projects/btplayground/test.torrent");
+// trackerClient.addManifest(fromPath: "/Users/billy/Projects/btplayground/test.torrent");
+trackerClient.addManifest(fromMegnetLink: urlString);
 trackerClient.setPort(4321);
 trackerClient.autoUpdate(5);
 

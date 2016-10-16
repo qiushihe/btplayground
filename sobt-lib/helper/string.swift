@@ -22,5 +22,21 @@ extension Sobt.Helper {
       
       return string;
     }
+    
+    // http://stackoverflow.com/a/40040472
+    static func MatchingStrings(string: Swift.String, regex: Swift.String) -> Array<Array<Swift.String>> {
+      guard let regex = try? NSRegularExpression(pattern: regex, options: []) else { return []; }
+      
+      let nsString = string as NSString;
+      let results  = regex.matchesInString(string, options: [], range: NSMakeRange(0, nsString.length));
+      
+      return results.map {(result) in
+        return (0..<result.numberOfRanges).map {
+          return result.rangeAtIndex($0).location != NSNotFound
+            ? nsString.substringWithRange(result.rangeAtIndex($0))
+            : "";
+        };
+      }
+    }
   }
 }

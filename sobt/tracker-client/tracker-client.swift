@@ -32,6 +32,13 @@ extension Sobt.TrackerClient {
       self.addManifest(infoHash: Sobt.Helper.Crypto.SHA1(infoData), trackers: self.getTrackers(decodedData));
     }
     
+    func addManifest(fromMegnetLink link: String) {
+      let matches = Array(Sobt.Helper.String.MatchingStrings(link, regex: "^magnet:(\\?[^\\?&]*)?(&[^&]*)*").flatten());
+      if (matches.count > 1) {
+        print(matches[1...(matches.count - 1)]);
+      }
+    }
+    
     func addManifest(infoHash infoHash: String, tracker: String) {
       self.addManifest(infoHash: infoHash, trackers: Array<String>(arrayLiteral: tracker));
     }

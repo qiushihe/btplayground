@@ -39,6 +39,7 @@
 		CE29D7151D779BF5006160E7 /* connect.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29D7141D779BF5006160E7 /* connect.swift */; };
 		CE29D7171D779CBD006160E7 /* action.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29D7161D779CBD006160E7 /* action.swift */; };
 		CE29D7191D77A4D9006160E7 /* announce.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29D7181D77A4D9006160E7 /* announce.swift */; };
+		CEA709061DC7C4F20095A46D /* magnet-link.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA709051DC7C4F20095A46D /* magnet-link.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -88,6 +89,7 @@
 		CE29D7141D779BF5006160E7 /* connect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = connect.swift; sourceTree = "<group>"; };
 		CE29D7161D779CBD006160E7 /* action.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = action.swift; sourceTree = "<group>"; };
 		CE29D7181D77A4D9006160E7 /* announce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = announce.swift; sourceTree = "<group>"; };
+		CEA709051DC7C4F20095A46D /* magnet-link.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "magnet-link.swift"; path = "sobt-lib/helper/magnet-link.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,6 +192,7 @@
 				28FFC1911DB2DE04006D7430 /* string.swift */,
 				28FFC19F1DB314F6006D7430 /* signal.swift */,
 				28FFC1A11DB31678006D7430 /* run-loop.swift */,
+				CEA709051DC7C4F20095A46D /* magnet-link.swift */,
 			);
 			name = helper;
 			sourceTree = "<group>";
@@ -289,6 +292,7 @@
 				28FFC1951DB2DE70006D7430 /* string.swift in Sources */,
 				28FFC1891DB2DD8C006D7430 /* socket-tcp.swift in Sources */,
 				28FFC18A1DB2DD8C006D7430 /* socket-udp.swift in Sources */,
+				CEA709061DC7C4F20095A46D /* magnet-link.swift in Sources */,
 				28FFC18B1DB2DD8C006D7430 /* socket.swift in Sources */,
 				28FFC1841DB2DD4B006D7430 /* sobt.swift in Sources */,
 				28FFC17E1DB2DCCA006D7430 /* bencoding-json.swift in Sources */,

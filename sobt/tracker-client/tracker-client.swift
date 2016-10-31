@@ -33,9 +33,12 @@ extension Sobt.TrackerClient {
     }
     
     func addManifest(fromMegnetLink link: String) {
-      let matches = Array(Sobt.Helper.String.MatchingStrings(link, regex: "^magnet:(\\?[^\\?&]*)?(&[^&]*)*").flatten());
-      if (matches.count > 1) {
-        print(matches[1...(matches.count - 1)]);
+      print("Adding manifest from \(link)");
+
+      let (infoHash, trackers) = Sobt.Helper.MagnetLink.Parse(link);
+
+      if (infoHash != nil && !trackers.isEmpty) {
+        self.addManifest(infoHash: infoHash!, trackers: trackers);
       }
     }
     
@@ -141,22 +144,22 @@ extension Sobt.TrackerClient {
     private func establishConnection(connectionUUID: String) {
       var connectionData = self.connections[connectionUUID]!;
       let url = NSURL(string: connectionData.url)!;
+      
+      // if (url.host != "tracker.coppersurfer.tk") { return; }
 
-      if (url.host == "tracker.coppersurfer.tk") {
-        connectionData.udpSocket = UDPSocket(port: UInt16(url.port!.integerValue), host: url.host);
-        connectionData.udpSocket!.setListener({(data: Array<UInt8>) in
-          self.handleSocketData(data);
-        });
-        
-        connectionData.transactionId = Sobt.Helper.Number.GetRandomNumber();
-        connectionData.status = ConnectionStatus.Active;
-        
-        self.connections[connectionUUID] = connectionData;
+      connectionData.udpSocket = UDPSocket(port: UInt16(url.port!.integerValue), host: url.host);
+      connectionData.udpSocket!.setListener({(data: Array<UInt8>) in
+        self.handleSocketData(data);
+      });
+      
+      connectionData.transactionId = Sobt.Helper.Number.GetRandomNumber();
+      connectionData.status = ConnectionStatus.Active;
+      
+      self.connections[connectionUUID] = connectionData;
 
-        print("Connecting to \(connectionData.url)");
-        let request = ConnectRequest(transactionId: connectionData.transactionId);
-        connectionData.udpSocket!.sendData(request.getPayload());
-      }
+      print("Connecting to \(connectionData.url)");
+      let request = ConnectRequest(transactionId: connectionData.transactionId);
+      connectionData.udpSocket!.sendData(request.getPayload());
     }
 
     private func getTrackers(data: Sobt.Bencoding.BEncoded) -> Array<String> {

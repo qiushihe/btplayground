@@ -40,6 +40,8 @@
 		CE29D7171D779CBD006160E7 /* action.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29D7161D779CBD006160E7 /* action.swift */; };
 		CE29D7191D77A4D9006160E7 /* announce.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29D7181D77A4D9006160E7 /* announce.swift */; };
 		CEA709061DC7C4F20095A46D /* magnet-link.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA709051DC7C4F20095A46D /* magnet-link.swift */; };
+		CEA7090C1DC7F0C40095A46D /* connect.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA709081DC7E8CD0095A46D /* connect.swift */; };
+		CEA7090E1DC7F1BC0095A46D /* action.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA7090D1DC7F1BC0095A46D /* action.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -90,6 +92,8 @@
 		CE29D7161D779CBD006160E7 /* action.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = action.swift; sourceTree = "<group>"; };
 		CE29D7181D77A4D9006160E7 /* announce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = announce.swift; sourceTree = "<group>"; };
 		CEA709051DC7C4F20095A46D /* magnet-link.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "magnet-link.swift"; path = "sobt-lib/helper/magnet-link.swift"; sourceTree = "<group>"; };
+		CEA709081DC7E8CD0095A46D /* connect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = connect.swift; sourceTree = "<group>"; };
+		CEA7090D1DC7F1BC0095A46D /* action.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = action.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -155,6 +159,7 @@
 		28FFC17A1DB2DC80006D7430 /* sobt-lib */ = {
 			isa = PBXGroup;
 			children = (
+				CEA709071DC7E8910095A46D /* tracker-action */,
 				28FFC18C1DB2DDAC006D7430 /* helper */,
 				28FFC1851DB2DD6D006D7430 /* socket */,
 				28FFC1821DB2DD2A006D7430 /* sobt.swift */,
@@ -204,6 +209,16 @@
 				28FFC1961DB30118006D7430 /* udp-server.swift */,
 			);
 			path = "sobt-tracker";
+			sourceTree = "<group>";
+		};
+		CEA709071DC7E8910095A46D /* tracker-action */ = {
+			isa = PBXGroup;
+			children = (
+				CEA709081DC7E8CD0095A46D /* connect.swift */,
+				CEA7090D1DC7F1BC0095A46D /* action.swift */,
+			);
+			name = "tracker-action";
+			path = "sobt-lib/tracker-action";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -313,9 +328,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				28FFC1981DB310BB006D7430 /* crypto.swift in Sources */,
+				CEA7090C1DC7F0C40095A46D /* connect.swift in Sources */,
 				28FFC1991DB310BB006D7430 /* network.swift in Sources */,
 				28FFC19A1DB310BB006D7430 /* number.swift in Sources */,
 				28FFC19B1DB310BB006D7430 /* string.swift in Sources */,
+				CEA7090E1DC7F1BC0095A46D /* action.swift in Sources */,
 				28FFC19C1DB310BB006D7430 /* socket-tcp.swift in Sources */,
 				28FFC1A21DB31678006D7430 /* run-loop.swift in Sources */,
 				28FFC19D1DB310BB006D7430 /* socket-udp.swift in Sources */,

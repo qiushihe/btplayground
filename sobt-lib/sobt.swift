@@ -12,4 +12,5 @@ struct Sobt {
   struct Helper {}
   struct Bencoding {}
   struct TrackerClient {}
+  struct TrackerAction {}
 }

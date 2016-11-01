@@ -1,8 +1,8 @@
 //
 //  main.swift
-//  sobt
+//  sobt-client
 //
-//  Created by Qiushi (Billy) He on 2016-06-26.
+//  Created by Billy He on 11/1/16.
 //  Copyright © 2016 Billy He. All rights reserved.
 //
 

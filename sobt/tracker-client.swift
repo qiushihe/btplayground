@@ -29,7 +29,7 @@ extension Sobt.TrackerClient {
       let decodedData: Sobt.Bencoding.BEncoded = decoder.decode();
       let infoData: NSData = decoder.getInfoValue();
       
-      self.addManifest(infoHash: Sobt.Helper.Crypto.SHA1(infoData), trackers: self.getTrackers(decodedData));
+      self.addManifest(withInfoHash: Sobt.Helper.Crypto.SHA1(infoData), andTrackers: self.getTrackers(decodedData));
     }
     
     func addManifest(fromMegnetLink link: String) {
@@ -38,21 +38,17 @@ extension Sobt.TrackerClient {
       let (infoHash, trackers) = Sobt.Helper.MagnetLink.Parse(link);
 
       if (infoHash != nil && !trackers.isEmpty) {
-        self.addManifest(infoHash: infoHash!, trackers: trackers);
+        self.addManifest(withInfoHash: infoHash!, andTrackers: trackers);
       }
     }
     
-    func addManifest(infoHash infoHash: String, tracker: String) {
-      self.addManifest(infoHash: infoHash, trackers: Array<String>(arrayLiteral: tracker));
+    func addManifest(withInfoHash infoHash: String, andTracker tracker: String) {
+      self.addManifest(withInfoHash: infoHash, andTrackers: Array<String>(arrayLiteral: tracker));
     }
     
-    func addManifest(infoHash infoHash: String, trackers: Array<String>) {
-      var manifest = ManifestData();
-
-      manifest.infoHash = infoHash;
-      manifest.trackers = trackers;
-      
-      self.manifests[manifest.uuid] = manifest;
+    func addManifest(withInfoHash infoHash: String, andTrackers trackers: Array<String>) {
+      let manifest = ManifestData(infoHash, trackers);
+      self.manifests[manifest.infoHash] = manifest;
 
       print("Added manifest:");
       print("* Info hash: \(manifest.infoHash)");
@@ -82,11 +78,11 @@ extension Sobt.TrackerClient {
       }
 
       // Queue connections
-      for (_, (uuid, manifest)) in self.manifests.enumerate() {
-        for (url) in manifest.trackers! {
-          let connectionUUID = uuid + "@" + url;
+      for (_, (infoHash, manifest)) in self.manifests.enumerate() {
+        for (url) in manifest.trackers {
+          let connectionUUID = infoHash + "@" + url;
           if (self.connections[connectionUUID] == nil) {
-            self.connections[connectionUUID] = ConnectionData(connectionUUID, uuid, url);
+            self.connections[connectionUUID] = ConnectionData(connectionUUID, infoHash, url);
           }
         }
       }
@@ -120,10 +116,10 @@ extension Sobt.TrackerClient {
       
       self.updating = false;
     }
-    
+
     private func announceToTracker(connectionUUID: String) {
       var connectionData = self.connections[connectionUUID]!;
-      let manifest = self.manifests[connectionData.manifestUUID]!;
+      let manifest = self.manifests[connectionData.infoHash]!;
       
       connectionData.transactionId = Sobt.Helper.Number.GetRandomNumber();
       connectionData.status = ConnectionStatus.Active;
@@ -134,7 +130,7 @@ extension Sobt.TrackerClient {
       let requestPayload = Sobt.TrackerAction.Announce.EncodeRequest(
         connectionId: connectionData.connectionId,
         transactionId: connectionData.transactionId,
-        infoHash: manifest.infoHash!,
+        infoHash: manifest.infoHash,
         peerId: self.peerId,
         downloaded: 0,
         left: 0,
@@ -148,7 +144,7 @@ extension Sobt.TrackerClient {
       );
       connectionData.udpSocket!.sendData(requestPayload);
     }
-    
+
     private func establishConnection(connectionUUID: String) {
       var connectionData = self.connections[connectionUUID]!;
       let url = NSURL(string: connectionData.url)!;
@@ -238,18 +234,18 @@ extension Sobt.TrackerClient {
     }
 
     private struct ManifestData {
-      let uuid: String;
-      var infoHash: String? = nil;
-      var trackers: Array<String>? = nil;
+      var infoHash: String;
+      var trackers: Array<String>;
       
-      init() {
-        self.uuid = NSUUID().UUIDString;
+      init(_ infoHash: String, _ trackers: Array<String>) {
+        self.infoHash = infoHash;
+        self.trackers = trackers;
       }
     }
 
     private struct ConnectionData {
       let uuid: String;
-      let manifestUUID: String;
+      let infoHash: String;
       let url: String;
       var status: ConnectionStatus = ConnectionStatus.Idle;
       var udpSocket: UDPSocket? = nil;
@@ -258,9 +254,9 @@ extension Sobt.TrackerClient {
       var announceInterval: UInt32 = 0;
       var peers: Array<Sobt.TrackerAction.Announce.Peer>? = nil;
 
-      init(_ uuid: String, _ manifestUUID: String, _ url: String) {
+      init(_ uuid: String, _ infoHash: String, _ url: String) {
         self.uuid = uuid;
-        self.manifestUUID = manifestUUID;
+        self.infoHash = infoHash;
         self.url = url;
       }
     }

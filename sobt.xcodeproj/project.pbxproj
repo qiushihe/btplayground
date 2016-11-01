@@ -392,10 +392,10 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				CE894B5E1DC95C6900EB834D /* sobt-client */,
 				CE26CDBE1DB04EC600CE06B7 /* sobt-tracker */,
 				CE894B361DC9516C00EB834D /* socket-echo */,
 				CE894B4E1DC95A6800EB834D /* bencode2json */,
-				CE894B5E1DC95C6900EB834D /* sobt-client */,
 			);
 		};
 /* End PBXProject section */

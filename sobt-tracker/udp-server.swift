@@ -14,7 +14,7 @@ enum UDPServerError: ErrorType {
 
 class UDPServer {
   private let port: UInt16;
-  private var udpSocket: UDPSocket? = nil;
+  private var udpSocket: Sobt.Socket.UDPSocket? = nil;
   private var connections = Dictionary<UInt64, ConnectionData>();
 
   init(port: UInt16) {
@@ -22,7 +22,7 @@ class UDPServer {
   }
 
   func start() {
-    self.udpSocket = UDPSocket(port: self.port);
+    self.udpSocket = Sobt.Socket.UDPSocket(port: self.port);
     
     self.udpSocket!.setListener({(socket: Int32) in
       self.handleSocketData(socket);
@@ -38,13 +38,13 @@ class UDPServer {
   private func handleSocketData(socket: Int32) {
     var inAddress = sockaddr_storage();
     var inAddressLength = socklen_t(sizeof(sockaddr_storage.self));
-    let buffer = [UInt8](count: UDPSocket.MAX_PACKET_SIZE, repeatedValue: 0);
+    let buffer = [UInt8](count: Sobt.Socket.UDPSocket.MAX_PACKET_SIZE, repeatedValue: 0);
 
     let bytesRead = withUnsafeMutablePointer(&inAddress) {
       recvfrom(socket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0, UnsafeMutablePointer($0), &inAddressLength);
     };
-    
-    let (ipAddress, servicePort) = Socket.GetSocketHostAndPort(Socket.CastSocketAddress(&inAddress));
+
+    let (ipAddress, servicePort) = Sobt.Socket.Socket.GetSocketHostAndPort(Sobt.Socket.Socket.CastSocketAddress(&inAddress));
     let message = "Got data from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
     print(message);
     
@@ -54,7 +54,7 @@ class UDPServer {
     let action = Sobt.TrackerAction.Action.ParseRequest(data);
     if (action == Sobt.TrackerAction.Action.Connect) {
       let request = Sobt.TrackerAction.Connect.DecodeRequest(data);
-      let replySocket = UDPSocket(socket: socket, address: Socket.CastSocketAddress(&inAddress), addressLength: inAddressLength);
+      let replySocket = Sobt.Socket.UDPSocket(socket: socket, address: Sobt.Socket.Socket.CastSocketAddress(&inAddress), addressLength: inAddressLength);
       let connection = ConnectionData(Sobt.Helper.Number.GetRandomNumber(), replySocket);
       
       self.connections[connection.connectionId] = connection;
@@ -74,9 +74,9 @@ class UDPServer {
   private struct ConnectionData {
     var connectionId: UInt64 = 0;
     var status: ConnectionStatus = ConnectionStatus.Idle;
-    var udpSocket: UDPSocket? = nil;
+    var udpSocket: Sobt.Socket.UDPSocket? = nil;
     
-    init(_ connectionId: UInt64, _ udpSocket: UDPSocket) {
+    init(_ connectionId: UInt64, _ udpSocket: Sobt.Socket.UDPSocket) {
       self.connectionId = connectionId;
       self.udpSocket = udpSocket;
     }

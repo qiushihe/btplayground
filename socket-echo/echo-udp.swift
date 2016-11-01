@@ -8,12 +8,16 @@
 
 import Foundation
 
+enum UDPEchoError: ErrorType {
+  case InvalidArguments
+}
+
 class UDPEcho: SocketEchoer {
   private let port: UInt16;
   private let host: String?;
   private var isServer: Bool;
   
-  private var udpSocket: UDPSocket? = nil;
+  private var udpSocket: Sobt.Socket.UDPSocket? = nil;
   
   init(port: UInt16, host: String? = nil) {
     self.port = port;
@@ -21,8 +25,29 @@ class UDPEcho: SocketEchoer {
     self.isServer = host == nil;
   }
   
+  init(argv: Array<String>) throws {
+    guard argv.count > 2 else { throw UDPEchoError.InvalidArguments; }
+    
+    let type = argv[1];
+    let argPort: UInt16? = UInt16(argv[2]);
+    
+    guard argPort != nil else { throw UDPEchoError.InvalidArguments; }
+    self.port = argPort!;
+    
+    if (type == "server") {
+      self.host = nil;
+      self.isServer = true;
+    } else if (type == "client") {
+      guard argv.count > 3 else { throw UDPEchoError.InvalidArguments; }
+      self.host = argv[3];
+      self.isServer = false;
+    } else {
+      throw UDPEchoError.InvalidArguments;
+    }
+  }
+
   func start() {
-    self.udpSocket = UDPSocket(port: self.port, host: self.host);
+    self.udpSocket = Sobt.Socket.UDPSocket(port: self.port, host: self.host);
 
     self.udpSocket!.setListener({(socket: Int32) in
       self.handleSocketData(socket);
@@ -50,7 +75,7 @@ class UDPEcho: SocketEchoer {
       recvfrom(socket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0, UnsafeMutablePointer($0), &inAddressLength);
     };
     
-    let (ipAddress, servicePort) = Socket.GetSocketHostAndPort(Socket.CastSocketAddress(&inAddress));
+    let (ipAddress, servicePort) = Sobt.Socket.Socket.GetSocketHostAndPort(Sobt.Socket.Socket.CastSocketAddress(&inAddress));
     let message = "Got data from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
     print(message);
     
@@ -65,7 +90,7 @@ class UDPEcho: SocketEchoer {
       let replyStr = "Bay Area Men Wakes Up To No New Email!";
       let replyData = replyStr.dataUsingEncoding(NSUTF8StringEncoding)!;
       
-      let replySocket = UDPSocket(socket: socket, address: Socket.CastSocketAddress(&inAddress), addressLength: inAddressLength);
+      let replySocket = Sobt.Socket.UDPSocket(socket: socket, address: Sobt.Socket.Socket.CastSocketAddress(&inAddress), addressLength: inAddressLength);
       replySocket.sendData(replyData);
       
       print("Server sent: \(replyStr)");

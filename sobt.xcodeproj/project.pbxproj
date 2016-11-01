@@ -148,11 +148,11 @@
 		28FFC17A1DB2DC80006D7430 /* sobt-lib */ = {
 			isa = PBXGroup;
 			children = (
-				CEA709071DC7E8910095A46D /* tracker-action */,
-				28FFC18C1DB2DDAC006D7430 /* helper */,
-				28FFC1851DB2DD6D006D7430 /* socket */,
-				28FFC1821DB2DD2A006D7430 /* sobt.swift */,
 				28FFC17B1DB2DC97006D7430 /* bencoding */,
+				28FFC18C1DB2DDAC006D7430 /* helper */,
+				28FFC1821DB2DD2A006D7430 /* sobt.swift */,
+				28FFC1851DB2DD6D006D7430 /* socket */,
+				CEA709071DC7E8910095A46D /* tracker-action */,
 			);
 			name = "sobt-lib";
 			sourceTree = "<group>";
@@ -180,13 +180,13 @@
 			isa = PBXGroup;
 			children = (
 				28FFC18D1DB2DE04006D7430 /* crypto.swift */,
+				CEA709051DC7C4F20095A46D /* magnet-link.swift */,
 				28FFC18E1DB2DE04006D7430 /* network.swift */,
 				28FFC18F1DB2DE04006D7430 /* number.swift */,
+				28FFC1A11DB31678006D7430 /* run-loop.swift */,
+				28FFC19F1DB314F6006D7430 /* signal.swift */,
 				28FFC1901DB2DE04006D7430 /* sobt-Bridging-Header.h */,
 				28FFC1911DB2DE04006D7430 /* string.swift */,
-				28FFC19F1DB314F6006D7430 /* signal.swift */,
-				28FFC1A11DB31678006D7430 /* run-loop.swift */,
-				CEA709051DC7C4F20095A46D /* magnet-link.swift */,
 			);
 			name = helper;
 			sourceTree = "<group>";
@@ -203,9 +203,9 @@
 		CEA709071DC7E8910095A46D /* tracker-action */ = {
 			isa = PBXGroup;
 			children = (
+				CEA7090D1DC7F1BC0095A46D /* action.swift */,
 				CE6E6A1D1DC81C7400CF364E /* announce.swift */,
 				CEA709081DC7E8CD0095A46D /* connect.swift */,
-				CEA7090D1DC7F1BC0095A46D /* action.swift */,
 			);
 			name = "tracker-action";
 			path = "sobt-lib/tracker-action";

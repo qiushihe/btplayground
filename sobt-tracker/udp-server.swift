@@ -15,6 +15,7 @@ enum UDPServerError: ErrorType {
 class UDPServer {
   private let port: UInt16;
   private var udpSocket: UDPSocket? = nil;
+  private var connections = Dictionary<UInt64, ConnectionData>();
 
   init(port: UInt16) {
     self.port = port;
@@ -47,7 +48,43 @@ class UDPServer {
     let message = "Got data from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
     print(message);
     
-    let dataRead = buffer[0..<bytesRead];
-    print("Server received \(bytesRead) bytes: \(dataRead)");
+    let data = Array(buffer[0..<bytesRead]);
+    print("Server received \(data.count) bytes: \(data)");
+
+    let action = Sobt.TrackerAction.Action.ParseRequest(data);
+    if (action == Sobt.TrackerAction.Action.Connect) {
+      let request = Sobt.TrackerAction.Connect.DecodeRequest(data);
+      let replySocket = UDPSocket(socket: socket, address: Socket.CastSocketAddress(&inAddress), addressLength: inAddressLength);
+      let connection = ConnectionData(Sobt.Helper.Number.GetRandomNumber(), replySocket);
+      
+      self.connections[connection.connectionId] = connection;
+      print("Created connection \(connection.connectionId) for transaction ID \(request.transactionId)");
+
+      let responsePayload = Sobt.TrackerAction.Connect.EncodeResponse(
+        transactionId: request.transactionId,
+        connectionId: connection.connectionId
+      );
+      replySocket.sendData(responsePayload);
+    } else if (action == Sobt.TrackerAction.Action.Announce) {
+      let request = Sobt.TrackerAction.Announce.DecodeRequest(data);
+      print(request);
+    }
+  }
+  
+  private struct ConnectionData {
+    var connectionId: UInt64 = 0;
+    var status: ConnectionStatus = ConnectionStatus.Idle;
+    var udpSocket: UDPSocket? = nil;
+    
+    init(_ connectionId: UInt64, _ udpSocket: UDPSocket) {
+      self.connectionId = connectionId;
+      self.udpSocket = udpSocket;
+    }
+  }
+  
+  private enum ConnectionStatus {
+    case Idle;
+    case Active;
+    case Stale;
   }
 }

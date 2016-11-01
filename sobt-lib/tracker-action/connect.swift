@@ -10,7 +10,7 @@ import Foundation
 
 extension Sobt.TrackerAction {
   struct Connect {
-    private static let MagicNumber = 0x41727101980 as UInt64;
+    static let MagicNumber = 0x41727101980 as UInt64;
     
     struct Request {
       let connectionId: UInt64;
@@ -24,7 +24,7 @@ extension Sobt.TrackerAction {
       let connectionId: UInt64;
     }
 
-    static func CreateRequest(transactionId transactionId: UInt32) -> NSData {
+    static func EncodeRequest(transactionId transactionId: UInt32) -> NSData {
       let payload = NSMutableData();
       
       var payloadConnectionId = Sobt.Helper.Network.HostToNetwork(MagicNumber);
@@ -38,7 +38,7 @@ extension Sobt.TrackerAction {
       return payload;
     }
     
-    static func ParseRequest(data: Array<UInt8>) -> Request {
+    static func DecodeRequest(data: Array<UInt8>) -> Request {
       return Request(
         connectionId: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[0...7])),
         action: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[8...11])),
@@ -46,7 +46,7 @@ extension Sobt.TrackerAction {
       );
     }
     
-    static func CreateResponse(transactionId: UInt32, connectionId: UInt64) -> NSData {
+    static func EncodeResponse(transactionId transactionId: UInt32, connectionId: UInt64) -> NSData {
       let payload = NSMutableData();
       
       var payloadAction = Sobt.Helper.Network.HostToNetwork(Action.Connect.rawValue);
@@ -60,7 +60,7 @@ extension Sobt.TrackerAction {
       return payload;
     }
 
-    static func PraseResponse(data: Array<UInt8>) -> Response {
+    static func DecodeResponse(data: Array<UInt8>) -> Response {
       return Response(
         action: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[0...3])),
         transactionId: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[4...7])),

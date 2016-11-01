@@ -39,6 +39,7 @@
 		CE59D6B51DC9292A00DC4DD7 /* announce.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6E6A1D1DC81C7400CF364E /* announce.swift */; };
 		CE59D6B61DC9292D00DC4DD7 /* connect.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA709081DC7E8CD0095A46D /* connect.swift */; };
 		CE59D6B71DC9292F00DC4DD7 /* action.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA7090D1DC7F1BC0095A46D /* action.swift */; };
+		CE59D6B81DC92FD600DC4DD7 /* action.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA7090D1DC7F1BC0095A46D /* action.swift */; };
 		CE6E6A1F1DC81CC700CF364E /* announce.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6E6A1D1DC81C7400CF364E /* announce.swift */; };
 		CE6E6A201DC8222C00CF364E /* magnet-link.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA709051DC7C4F20095A46D /* magnet-link.swift */; };
 		CEA709061DC7C4F20095A46D /* magnet-link.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA709051DC7C4F20095A46D /* magnet-link.swift */; };
@@ -321,6 +322,7 @@
 				CE6E6A1F1DC81CC700CF364E /* announce.swift in Sources */,
 				CEA7090C1DC7F0C40095A46D /* connect.swift in Sources */,
 				28FFC1991DB310BB006D7430 /* network.swift in Sources */,
+				CE59D6B81DC92FD600DC4DD7 /* action.swift in Sources */,
 				28FFC19A1DB310BB006D7430 /* number.swift in Sources */,
 				28FFC19B1DB310BB006D7430 /* string.swift in Sources */,
 				28FFC19C1DB310BB006D7430 /* socket-tcp.swift in Sources */,

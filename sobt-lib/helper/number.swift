@@ -14,5 +14,12 @@ extension Sobt.Helper {
       let num = arc4random() as UInt32;
       return num;
     }
+    
+    // http://stackoverflow.com/a/26550169
+    static func GetRandomNumber() -> UInt64 {
+      var rnd : UInt64 = 0
+      arc4random_buf(&rnd, sizeofValue(rnd));
+      return rnd;
+    }
   }
 }

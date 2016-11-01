@@ -38,5 +38,32 @@ extension Sobt.Helper {
         };
       }
     }
+    
+    // http://stackoverflow.com/a/26502285
+    static func HexStringToNSData(string: Swift.String) -> NSData? {
+      let data = NSMutableData(capacity: string.characters.count / 2);
+      let regex = try! NSRegularExpression(pattern: "[0-9a-f]{1,2}", options: .CaseInsensitive);
+      
+      regex.enumerateMatchesInString(string, options: [], range: NSMakeRange(0, string.characters.count)) {(match, flags, stop) in
+        let byteString = (string as NSString).substringWithRange(match!.range);
+        var num = UInt8(byteString, radix: 16);
+        data?.appendBytes(&num, length: 1);
+      }
+      
+      return data
+    }
+    
+    // http://stackoverflow.com/a/26502285
+    static func NSDataToHexString(data: NSData) -> Swift.String {
+      var string = "";
+      var byte: UInt8 = 0;
+      
+      for index in 0 ..< data.length {
+        data.getBytes(&byte, range: NSMakeRange(index, 1));
+        string += Swift.String(format: "%02x", byte);
+      }
+      
+      return string
+    }
   }
 }

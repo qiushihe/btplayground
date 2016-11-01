@@ -131,7 +131,7 @@ extension Sobt.TrackerClient {
       self.connections[connectionUUID] = connectionData;
       
       print("Accouncing to \(connectionData.url)");
-      let requestPayload = Sobt.TrackerAction.Announce.CreateRequest(
+      let requestPayload = Sobt.TrackerAction.Announce.EncodeRequest(
         connectionId: connectionData.connectionId,
         transactionId: connectionData.transactionId,
         infoHash: manifest.infoHash!,
@@ -153,7 +153,7 @@ extension Sobt.TrackerClient {
       var connectionData = self.connections[connectionUUID]!;
       let url = NSURL(string: connectionData.url)!;
       
-      if (url.host != "tracker.coppersurfer.tk") { return; }
+      // if (url.host != "tracker.coppersurfer.tk") { return; }
 
       connectionData.udpSocket = UDPSocket(port: UInt16(url.port!.integerValue), host: url.host);
       connectionData.udpSocket!.setListener({(data: Array<UInt8>) in
@@ -166,7 +166,7 @@ extension Sobt.TrackerClient {
       self.connections[connectionUUID] = connectionData;
 
       print("Connecting to \(connectionData.url)");
-      let requestPayload = Sobt.TrackerAction.Connect.CreateRequest(transactionId: connectionData.transactionId);
+      let requestPayload = Sobt.TrackerAction.Connect.EncodeRequest(transactionId: connectionData.transactionId);
       connectionData.udpSocket!.sendData(requestPayload);
     }
 
@@ -195,10 +195,10 @@ extension Sobt.TrackerClient {
     }
     
     private func handleSocketData(data: Array<UInt8>) {
-      let action = Sobt.TrackerAction.Action.Parse(data);
+      let action = Sobt.TrackerAction.Action.ParseResponse(data);
 
       if (action == Sobt.TrackerAction.Action.Connect) {
-        let response = Sobt.TrackerAction.Connect.PraseResponse(data);
+        let response = Sobt.TrackerAction.Connect.DecodeResponse(data);
         let result = self.connections.filter({(_, connection) in
           return connection.transactionId == response.transactionId;
         });
@@ -215,7 +215,7 @@ extension Sobt.TrackerClient {
           print("No connection found for transaction \(response.transactionId)");
         }
       } else if (action == Sobt.TrackerAction.Action.Announce) {
-        let response = Sobt.TrackerAction.Announce.PraseResponse(data);
+        let response = Sobt.TrackerAction.Announce.DecodeResponse(data);
         let result = self.connections.filter({(_, connection) in
           return connection.transactionId == response.transactionId;
         });

@@ -17,7 +17,7 @@ class UDPEcho: SocketEchoer {
   private let host: String?;
   private var isServer: Bool;
   
-  private var udpSocket: Sobt.Socket.UDPSocket? = nil;
+  private var udpSocket: SobtLib.Socket.UDPSocket? = nil;
   
   init(port: UInt16, host: String? = nil) {
     self.port = port;
@@ -47,7 +47,7 @@ class UDPEcho: SocketEchoer {
   }
 
   func start() {
-    self.udpSocket = Sobt.Socket.UDPSocket(port: self.port, host: self.host);
+    self.udpSocket = SobtLib.Socket.UDPSocket(port: self.port, host: self.host);
 
     self.udpSocket!.setListener({(socket: Int32) in
       self.handleSocketData(socket);
@@ -75,7 +75,7 @@ class UDPEcho: SocketEchoer {
       recvfrom(socket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0, UnsafeMutablePointer($0), &inAddressLength);
     };
     
-    let (ipAddress, servicePort) = Sobt.Socket.Socket.GetSocketHostAndPort(Sobt.Socket.Socket.CastSocketAddress(&inAddress));
+    let (ipAddress, servicePort) = SobtLib.Socket.Socket.GetSocketHostAndPort(SobtLib.Socket.Socket.CastSocketAddress(&inAddress));
     let message = "Got data from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
     print(message);
     
@@ -90,7 +90,7 @@ class UDPEcho: SocketEchoer {
       let replyStr = "Bay Area Men Wakes Up To No New Email!";
       let replyData = replyStr.dataUsingEncoding(NSUTF8StringEncoding)!;
       
-      let replySocket = Sobt.Socket.UDPSocket(socket: socket, address: Sobt.Socket.Socket.CastSocketAddress(&inAddress), addressLength: inAddressLength);
+      let replySocket = SobtLib.Socket.UDPSocket(socket: socket, address: SobtLib.Socket.Socket.CastSocketAddress(&inAddress), addressLength: inAddressLength);
       replySocket.sendData(replyData);
       
       print("Server sent: \(replyStr)");

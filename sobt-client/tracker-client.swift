@@ -13,7 +13,7 @@ class TrackerClient : NSObject {
   private var connections = Dictionary<String, ConnectionData>();
   private var updating = false;
   private var updateTimer: NSTimer? = nil;
-  private let peerId: String = "M4-20-8-" + Sobt.Helper.String.RandomStringWithLength(12);
+  private let peerId: String = "M4-20-8-" + SobtLib.Helper.String.RandomStringWithLength(12);
   private var port: UInt16? = nil;
 
   func setPort(port: UInt16) {
@@ -24,17 +24,17 @@ class TrackerClient : NSObject {
     print("Adding manifest from \(path)");
 
     let sourceData: NSData? = NSData(contentsOfFile: path);
-    let decoder = Sobt.Bencoding.BEncodingDecoder(data: sourceData!);
-    let decodedData: Sobt.Bencoding.BEncoded = decoder.decode();
+    let decoder = SobtLib.Bencoding.BEncodingDecoder(data: sourceData!);
+    let decodedData: SobtLib.Bencoding.BEncoded = decoder.decode();
     let infoData: NSData = decoder.getInfoValue();
 
-    self.addManifest(withInfoHash: Sobt.Helper.Crypto.SHA1(infoData), andTrackers: self.getTrackers(decodedData));
+    self.addManifest(withInfoHash: SobtLib.Helper.Crypto.SHA1(infoData), andTrackers: self.getTrackers(decodedData));
   }
 
   func addManifest(fromMegnetLink link: String) {
     print("Adding manifest from \(link)");
 
-    let (infoHash, trackers) = Sobt.Helper.MagnetLink.Parse(link);
+    let (infoHash, trackers) = SobtLib.Helper.MagnetLink.Parse(link);
 
     if (infoHash != nil && !trackers.isEmpty) {
       self.addManifest(withInfoHash: infoHash!, andTrackers: trackers);
@@ -120,13 +120,13 @@ class TrackerClient : NSObject {
     var connectionData = self.connections[connectionUUID]!;
     let manifest = self.manifests[connectionData.infoHash]!;
 
-    connectionData.transactionId = Sobt.Helper.Number.GetRandomNumber();
+    connectionData.transactionId = SobtLib.Helper.Number.GetRandomNumber();
     connectionData.status = ConnectionStatus.Active;
 
     self.connections[connectionUUID] = connectionData;
 
     print("Accouncing to \(connectionData.url)");
-    let requestPayload = Sobt.TrackerAction.Announce.EncodeRequest(
+    let requestPayload = SobtLib.TrackerAction.Announce.EncodeRequest(
       connectionId: connectionData.connectionId,
       transactionId: connectionData.transactionId,
       infoHash: manifest.infoHash,
@@ -136,7 +136,7 @@ class TrackerClient : NSObject {
       uploaded: 0,
       event: 0,
       ip: 0,
-      key: Sobt.Helper.Number.GetRandomNumber(),
+      key: SobtLib.Helper.Number.GetRandomNumber(),
       numWant: 9999,
       port: self.port!,
       extensions: 0
@@ -150,23 +150,23 @@ class TrackerClient : NSObject {
 
     // if (url.host != "tracker.coppersurfer.tk") { return; }
 
-    connectionData.udpSocket = Sobt.Socket.UDPSocket(port: UInt16(url.port!.integerValue), host: url.host);
+    connectionData.udpSocket = SobtLib.Socket.UDPSocket(port: UInt16(url.port!.integerValue), host: url.host);
     connectionData.udpSocket!.setListener({(data: Array<UInt8>) in
       self.handleSocketData(data);
     });
 
-    connectionData.transactionId = Sobt.Helper.Number.GetRandomNumber();
+    connectionData.transactionId = SobtLib.Helper.Number.GetRandomNumber();
     connectionData.status = ConnectionStatus.Active;
 
     self.connections[connectionUUID] = connectionData;
 
     print("Connecting to \(connectionData.url)");
-    let requestPayload = Sobt.TrackerAction.Connect.EncodeRequest(transactionId: connectionData.transactionId);
+    let requestPayload = SobtLib.TrackerAction.Connect.EncodeRequest(transactionId: connectionData.transactionId);
     connectionData.udpSocket!.sendData(requestPayload);
   }
 
-  private func getTrackers(data: Sobt.Bencoding.BEncoded) -> Array<String> {
-    let manifest = data.value as! Dictionary<String, Sobt.Bencoding.BEncoded>;
+  private func getTrackers(data: SobtLib.Bencoding.BEncoded) -> Array<String> {
+    let manifest = data.value as! Dictionary<String, SobtLib.Bencoding.BEncoded>;
 
     var trackers = Array<String>();
 
@@ -177,8 +177,8 @@ class TrackerClient : NSObject {
 
     let announceList = manifest["announce-list"];
     if (announceList != nil) {
-      for (_, tier) in (announceList!.value as! Array<Sobt.Bencoding.BEncoded>).enumerate() {
-        for (_, url) in (tier.value as! Array<Sobt.Bencoding.BEncoded>).enumerate() {
+      for (_, tier) in (announceList!.value as! Array<SobtLib.Bencoding.BEncoded>).enumerate() {
+        for (_, url) in (tier.value as! Array<SobtLib.Bencoding.BEncoded>).enumerate() {
           if (trackers.indexOf(url.value as! String) == nil) {
             trackers.append(url.value as! String);
           }
@@ -190,10 +190,10 @@ class TrackerClient : NSObject {
   }
 
   private func handleSocketData(data: Array<UInt8>) {
-    let action = Sobt.TrackerAction.Action.ParseResponse(data);
+    let action = SobtLib.TrackerAction.Action.ParseResponse(data);
 
-    if (action == Sobt.TrackerAction.Action.Connect) {
-      let response = Sobt.TrackerAction.Connect.DecodeResponse(data);
+    if (action == SobtLib.TrackerAction.Action.Connect) {
+      let response = SobtLib.TrackerAction.Connect.DecodeResponse(data);
       let result = self.connections.filter({(_, connection) in
         return connection.transactionId == response.transactionId;
       });
@@ -209,8 +209,8 @@ class TrackerClient : NSObject {
       } else {
         print("No connection found for transaction \(response.transactionId)");
       }
-    } else if (action == Sobt.TrackerAction.Action.Announce) {
-      let response = Sobt.TrackerAction.Announce.DecodeResponse(data);
+    } else if (action == SobtLib.TrackerAction.Action.Announce) {
+      let response = SobtLib.TrackerAction.Announce.DecodeResponse(data);
       let result = self.connections.filter({(_, connection) in
         return connection.transactionId == response.transactionId;
       });
@@ -247,11 +247,11 @@ class TrackerClient : NSObject {
     let infoHash: String;
     let url: String;
     var status: ConnectionStatus = ConnectionStatus.Idle;
-    var udpSocket: Sobt.Socket.UDPSocket? = nil;
+    var udpSocket: SobtLib.Socket.UDPSocket? = nil;
     var connectionId: UInt64 = 0;
     var transactionId: UInt32 = 0;
     var announceInterval: UInt32 = 0;
-    var peers: Array<Sobt.TrackerAction.Announce.Peer>? = nil;
+    var peers: Array<SobtLib.TrackerAction.Announce.Peer>? = nil;
 
     init(_ uuid: String, _ infoHash: String, _ url: String) {
       self.uuid = uuid;

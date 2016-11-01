@@ -47,7 +47,7 @@ do {
   exit(0);
 }
 
-Sobt.Helper.RunLoop.StartRunLoopWithTrap(
+SobtLib.Helper.RunLoop.StartRunLoopWithTrap(
   before: {() in
     echoer?.start();
   },

@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension Sobt.TrackerAction {
+extension SobtLib.TrackerAction {
   struct Announce {
     private static let PeerChunkLength: Int = 6;
     private static let PeerChunksStartIndex: Int = 20;
@@ -51,20 +51,20 @@ extension Sobt.TrackerAction {
     ) -> NSData {
       let payload = NSMutableData();
       
-      var payloadConnectionId = Sobt.Helper.Network.HostToNetwork(connectionId);
-      var payloadAction = Sobt.Helper.Network.HostToNetwork(Action.Announce.rawValue);
-      var payloadTransactionId = Sobt.Helper.Network.HostToNetwork(transactionId);
-      let payloadInfoHash = Sobt.Helper.String.HexStringToNSData(infoHash)!;
+      var payloadConnectionId = SobtLib.Helper.Network.HostToNetwork(connectionId);
+      var payloadAction = SobtLib.Helper.Network.HostToNetwork(Action.Announce.rawValue);
+      var payloadTransactionId = SobtLib.Helper.Network.HostToNetwork(transactionId);
+      let payloadInfoHash = SobtLib.Helper.String.HexStringToNSData(infoHash)!;
       let payloadPeerId = Array(peerId.utf8);
-      var payloadDownloaded = Sobt.Helper.Network.HostToNetwork(downloaded);
-      var payloadLeft = Sobt.Helper.Network.HostToNetwork(left);
-      var payloadUploaded = Sobt.Helper.Network.HostToNetwork(uploaded);
-      var payloadEvent = Sobt.Helper.Network.HostToNetwork(event);
-      var payloadIp = Sobt.Helper.Network.HostToNetwork(ip);
-      var payloadKey = Sobt.Helper.Network.HostToNetwork(key);
-      var payloadNumWant = Sobt.Helper.Network.HostToNetwork(numWant);
-      var payloadPort = Sobt.Helper.Network.HostToNetwork(port);
-      var payloadExtensions = Sobt.Helper.Network.HostToNetwork(extensions);
+      var payloadDownloaded = SobtLib.Helper.Network.HostToNetwork(downloaded);
+      var payloadLeft = SobtLib.Helper.Network.HostToNetwork(left);
+      var payloadUploaded = SobtLib.Helper.Network.HostToNetwork(uploaded);
+      var payloadEvent = SobtLib.Helper.Network.HostToNetwork(event);
+      var payloadIp = SobtLib.Helper.Network.HostToNetwork(ip);
+      var payloadKey = SobtLib.Helper.Network.HostToNetwork(key);
+      var payloadNumWant = SobtLib.Helper.Network.HostToNetwork(numWant);
+      var payloadPort = SobtLib.Helper.Network.HostToNetwork(port);
+      var payloadExtensions = SobtLib.Helper.Network.HostToNetwork(extensions);
       
       payload.appendBytes(&payloadConnectionId, length: 8);
       payload.appendBytes(&payloadAction, length: 4);
@@ -86,31 +86,31 @@ extension Sobt.TrackerAction {
 
     static func DecodeRequest(data: Array<UInt8>) -> Request {
       return Request(
-        connectionId: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[0...7])),
-        action: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[8...11])),
-        transactionId: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[12...15])),
-        infoHash: Sobt.Helper.String.NSDataToHexString(NSData(bytes: Array<UInt8>(data[16...35]), length: 20)),
+        connectionId: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[0...7])),
+        action: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[8...11])),
+        transactionId: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[12...15])),
+        infoHash: SobtLib.Helper.String.NSDataToHexString(NSData(bytes: Array<UInt8>(data[16...35]), length: 20)),
         peerId: String(bytes: Array<UInt8>(data[36...55]), encoding: NSUTF8StringEncoding)!,
-        downloaded: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[56...63])),
-        left: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[64...71])),
-        uploaded: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[72...79])),
-        event: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[80...83])),
-        ip: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[84...87])),
-        key: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[88...91])),
-        numWant: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[92...95])),
-        port: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[96...97])),
-        extensions: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[98...99]))
+        downloaded: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[56...63])),
+        left: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[64...71])),
+        uploaded: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[72...79])),
+        event: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[80...83])),
+        ip: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[84...87])),
+        key: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[88...91])),
+        numWant: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[92...95])),
+        port: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[96...97])),
+        extensions: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[98...99]))
       );
     }
     
     static func EncodeResponse(transactionId transactionId: UInt32, interval: UInt32, leechers: UInt32, seeders: UInt32, peers: Array<Peer>) -> NSData {
       let payload = NSMutableData();
       
-      var payloadAction = Sobt.Helper.Network.HostToNetwork(Action.Announce.rawValue);
-      var payloadTransactionId = Sobt.Helper.Network.HostToNetwork(transactionId);
-      var payloadInterval = Sobt.Helper.Network.HostToNetwork(interval);
-      var payloadLeechers = Sobt.Helper.Network.HostToNetwork(leechers);
-      var payloadSeeders = Sobt.Helper.Network.HostToNetwork(seeders);
+      var payloadAction = SobtLib.Helper.Network.HostToNetwork(Action.Announce.rawValue);
+      var payloadTransactionId = SobtLib.Helper.Network.HostToNetwork(transactionId);
+      var payloadInterval = SobtLib.Helper.Network.HostToNetwork(interval);
+      var payloadLeechers = SobtLib.Helper.Network.HostToNetwork(leechers);
+      var payloadSeeders = SobtLib.Helper.Network.HostToNetwork(seeders);
       let payloadPeers = EncodePeers(peers);
       
       payload.appendBytes(&payloadAction, length: 4);
@@ -128,7 +128,7 @@ extension Sobt.TrackerAction {
       
       for peer in peers {
         let payloadIp = peer.ip;
-        var payloadPort = Sobt.Helper.Network.HostToNetwork(peer.port);
+        var payloadPort = SobtLib.Helper.Network.HostToNetwork(peer.port);
 
         payload.appendBytes(payloadIp, length: 4);
         payload.appendBytes(&payloadPort, length: 2);
@@ -139,11 +139,11 @@ extension Sobt.TrackerAction {
     
     static func DecodeResponse(data: Array<UInt8>) -> Response {
       return Response(
-        action: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[0...3])),
-        transactionId: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[4...7])),
-        interval: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[8...11])),
-        leechers: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[12...15])),
-        seeders: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[16...19])),
+        action: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[0...3])),
+        transactionId: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[4...7])),
+        interval: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[8...11])),
+        leechers: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[12...15])),
+        seeders: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(data[16...19])),
         peers: DecodePeers(data)
       );
     }
@@ -163,7 +163,7 @@ extension Sobt.TrackerAction {
         
         peers.append(Peer(
           ip: Array<UInt8>(peerChunk[0...3]),
-          port: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(peerChunk[4...5]))
+          port: SobtLib.Helper.Network.NetworkToHost(Array<UInt8>(peerChunk[4...5]))
         ));
         
         offset = offset + PeerChunkLength;

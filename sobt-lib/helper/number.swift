@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension Sobt.Helper {
+extension SobtLib.Helper {
   struct Number {
     static func GetRandomNumber() -> UInt32 {
       let num = arc4random() as UInt32;

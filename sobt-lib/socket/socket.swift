@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension Sobt.Socket {
+extension SobtLib.Socket {
   enum SocketType {
     case Client, Server, Reply
   }
@@ -67,7 +67,7 @@ extension Sobt.Socket {
         // For server mode there is no `host`.
         address.sin_len = __uint8_t(sizeofValue(address));
         address.sin_family = sa_family_t(AF_INET);
-        address.sin_port = Sobt.Helper.Network.HostToNetwork(port);
+        address.sin_port = SobtLib.Helper.Network.HostToNetwork(port);
         address.sin_addr.s_addr = in_addr_t(0);
       } else {
         // For client mode, we need to resolve the host info to obtain the adress data
@@ -85,7 +85,7 @@ extension Sobt.Socket {
         let data = addresses![0];
 
         data.getBytes(&address, length: data.length);
-        address.sin_port = Sobt.Helper.Network.HostToNetwork(port);
+        address.sin_port = SobtLib.Helper.Network.HostToNetwork(port);
         // TODO: Assert for valid address.sin_family
       }
 

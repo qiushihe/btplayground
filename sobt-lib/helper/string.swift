@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension Sobt.Helper {
+extension SobtLib.Helper {
   struct String {
     // http://stackoverflow.com/a/36438273
     static func RandomStringWithLength(length: Int) -> Swift.String {

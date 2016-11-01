@@ -12,7 +12,7 @@ import Foundation
 // * https://gist.github.com/NeoTeo/b6195efb779d925fd7b8
 // * https://developer.apple.com/library/mac/samplecode/UDPEcho/Introduction/Intro.html
 
-extension Sobt.Socket {
+extension SobtLib.Socket {
   class UDPSocket: Socket {
     // 65535 - 8 byte UDP header − 20 byte IP header
     static let MAX_PACKET_SIZE = 65507;
@@ -126,7 +126,7 @@ extension Sobt.Socket {
         // For server mode there is no `host`.
         address.sin_len = __uint8_t(sizeofValue(address));
         address.sin_family = sa_family_t(AF_INET);
-        address.sin_port = Sobt.Helper.Network.HostToNetwork(self.port);
+        address.sin_port = SobtLib.Helper.Network.HostToNetwork(self.port);
         address.sin_addr.s_addr = in_addr_t(0);
       } else {
         // For client mode, we need to resolve the host info to obtain the adress data
@@ -144,7 +144,7 @@ extension Sobt.Socket {
         let data = addresses![0];
 
         data.getBytes(&address, length: data.length);
-        address.sin_port = Sobt.Helper.Network.HostToNetwork(self.port);
+        address.sin_port = SobtLib.Helper.Network.HostToNetwork(self.port);
         // TODO: Assert for valid address.sin_family
       }
 

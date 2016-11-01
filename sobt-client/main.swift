@@ -15,7 +15,7 @@ trackerClient.addManifest(fromMegnetLink: "magnet:?xt=urn:btih:f36ccb2248d556663
 
 trackerClient.setPort(4321);
 
-Sobt.Helper.RunLoop.StartRunLoopWithTrap(
+SobtLib.Helper.RunLoop.StartRunLoopWithTrap(
   before: {() in
     trackerClient.autoUpdate(5);
   },

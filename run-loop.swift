@@ -8,10 +8,10 @@
 
 import Foundation
 
-extension Sobt.Helper {
+extension SobtLib.Helper {
   struct RunLoop {
     static func StartRunLoopWithTrap(before beforeRunLoop: () -> (), after afterRunLoop: () -> ()) {
-      Sobt.Helper.Signal.TrapSignal(Sobt.Helper.Signal.SIGNAL.INT) {(signal) in
+      SobtLib.Helper.Signal.TrapSignal(SobtLib.Helper.Signal.SIGNAL.INT) {(signal) in
         CFRunLoopStop(CFRunLoopGetCurrent());
       }
       

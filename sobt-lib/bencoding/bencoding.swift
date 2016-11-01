@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension Sobt.Bencoding {
+extension SobtLib.Bencoding {
   enum BEncodedSeparator: UInt8 {
     case Colon = 58; // :
     case End = 101;  // e

@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension Sobt.Bencoding {
+extension SobtLib.Bencoding {
   struct Json {
     static func indentsWithSpace(level: Int) -> String {
       return String(count: level * 2, repeatedValue: Character(" "));

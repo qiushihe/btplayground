@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Sobt {
+struct SobtLib {
   struct Bencoding {}
   struct Helper {}
   struct Socket {}

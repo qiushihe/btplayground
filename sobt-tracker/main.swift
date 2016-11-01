@@ -10,7 +10,7 @@ import Foundation
 
 let server = UDPServer(port: 4242);
 
-Sobt.Helper.RunLoop.StartRunLoopWithTrap(
+SobtLib.Helper.RunLoop.StartRunLoopWithTrap(
   before: {() in
     server.start();
   },

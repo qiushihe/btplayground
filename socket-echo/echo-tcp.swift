@@ -13,7 +13,7 @@ class TCPEcho: SocketEchoer {
   private let host: String?;
   private var isServer: Bool;
   
-  private var tcpSocket: Sobt.Socket.TCPSocket? = nil;
+  private var tcpSocket: SobtLib.Socket.TCPSocket? = nil;
   
   init(port: UInt16, host: String? = nil) {
     self.port = port;
@@ -22,12 +22,12 @@ class TCPEcho: SocketEchoer {
   }
 
   func start() {
-    var tcpSocketOptions = Sobt.Socket.SocketOptions();
+    var tcpSocketOptions = SobtLib.Socket.SocketOptions();
     tcpSocketOptions.port = self.port;
     tcpSocketOptions.host = self.host;
-    tcpSocketOptions.type = self.host == nil ? Sobt.Socket.SocketType.Server : Sobt.Socket.SocketType.Client;
+    tcpSocketOptions.type = self.host == nil ? SobtLib.Socket.SocketType.Server : SobtLib.Socket.SocketType.Client;
     
-    self.tcpSocket = Sobt.Socket.TCPSocket(options: tcpSocketOptions);
+    self.tcpSocket = SobtLib.Socket.TCPSocket(options: tcpSocketOptions);
     self.tcpSocket!.setListener(self.handleSocketData);
     
     print("\(self.isServer ? "Server" : "Client") listening ...");
@@ -43,7 +43,7 @@ class TCPEcho: SocketEchoer {
     self.tcpSocket?.closeSocket();
   }
 
-  private func handleSocketData(dataSocket: Sobt.Socket.TCPSocket) {
+  private func handleSocketData(dataSocket: SobtLib.Socket.TCPSocket) {
     let dataRead = dataSocket.readData();
     
     if let dataString = String(data: dataRead, encoding: NSUTF8StringEncoding) {

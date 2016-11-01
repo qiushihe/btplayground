@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension Sobt.Helper {
+extension SobtLib.Helper {
   struct Crypto {
     static func SHA1(data: NSData) -> Array<UInt8> {
       var digest = Array<UInt8>(count:Int(CC_SHA1_DIGEST_LENGTH), repeatedValue: 0);

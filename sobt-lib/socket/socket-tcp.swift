@@ -12,7 +12,7 @@ import Foundation
 // * http://swiftrien.blogspot.ca/2015/10/socket-programming-in-swift-part-1.html
 // * https://github.com/Swiftrien/SwifterSockets
 
-extension Sobt.Socket {
+extension SobtLib.Socket {
   class TCPSocket: Socket {
     private let type: SocketType;
 

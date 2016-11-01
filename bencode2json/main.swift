@@ -19,9 +19,9 @@ do {
   }
 
   let data = NSData(contentsOfFile: arguments[1]);
-  let decoder = Sobt.Bencoding.BEncodingDecoder(data: data!);
+  let decoder = SobtLib.Bencoding.BEncodingDecoder(data: data!);
   let decoded = decoder.decode();
-  let jsonString = Sobt.Bencoding.Json.bEncodedToJsonString(decoded);
+  let jsonString = SobtLib.Bencoding.Json.bEncodedToJsonString(decoded);
   print(jsonString);
 } catch BEncode2Json.InvalidArguments {
   print("bencode2json Usage:");

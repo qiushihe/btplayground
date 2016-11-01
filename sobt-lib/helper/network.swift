@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension Sobt.Helper {
+extension SobtLib.Helper {
   struct Network {
     // Polyfill for some missing C macros and constants in Swift
     // https://gist.github.com/NeoTeo/b6195efb779d925fd7b8

@@ -21,7 +21,7 @@
 
 import Foundation
 
-extension Sobt.Helper {
+extension SobtLib.Helper {
   struct Signal {
     enum SIGNAL:Int32 {
       case HUP    = 1

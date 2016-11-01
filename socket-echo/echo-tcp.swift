@@ -8,11 +8,7 @@
 
 import Foundation
 
-enum TCPEchoError: ErrorType {
-  case InvalidArguments
-}
-
-class TCPEcho {
+class TCPEcho: SocketEchoer {
   private let port: UInt16;
   private let host: String?;
   private var isServer: Bool;
@@ -25,27 +21,6 @@ class TCPEcho {
     self.isServer = host == nil;
   }
 
-  init(argv: Array<String>) throws {
-    guard argv.count > 2 else { throw TCPEchoError.InvalidArguments; }
-    
-    let type = argv[1];
-    let argPort: UInt16? = UInt16(argv[2]);
-    
-    guard argPort != nil else { throw TCPEchoError.InvalidArguments; }
-    self.port = argPort!;
-    
-    if (type == "server") {
-      self.host = nil;
-      self.isServer = true;
-    } else if (type == "client") {
-      guard argv.count > 3 else { throw TCPEchoError.InvalidArguments; }
-      self.host = argv[3];
-      self.isServer = false;
-    } else {
-      throw TCPEchoError.InvalidArguments;
-    }
-  }
-  
   func start() {
     var tcpSocketOptions = SocketOptions();
     tcpSocketOptions.port = self.port;

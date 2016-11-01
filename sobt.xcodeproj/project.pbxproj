@@ -7,10 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		282B17541D3A037200FCFF33 /* echo-tcp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282B17531D3A037200FCFF33 /* echo-tcp.swift */; };
 		282B44E41D20FD040073C9D1 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282B44E31D20FD040073C9D1 /* main.swift */; };
-		28413FBF1D2E268C001E1DCE /* signal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28413FBE1D2E268C001E1DCE /* signal.swift */; };
-		28413FC11D2E342D001E1DCE /* echo-udp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28413FC01D2E342D001E1DCE /* echo-udp.swift */; };
 		28EE19351D5683B0004E2A3A /* tracker-client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28EE19341D5683B0004E2A3A /* tracker-client.swift */; };
 		28FFC17E1DB2DCCA006D7430 /* bencoding-json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC17C1DB2DCAB006D7430 /* bencoding-json.swift */; };
 		28FFC17F1DB2DCCA006D7430 /* bencoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC17D1DB2DCAB006D7430 /* bencoding.swift */; };
@@ -42,6 +39,17 @@
 		CE59D6B81DC92FD600DC4DD7 /* action.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA7090D1DC7F1BC0095A46D /* action.swift */; };
 		CE6E6A1F1DC81CC700CF364E /* announce.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6E6A1D1DC81C7400CF364E /* announce.swift */; };
 		CE6E6A201DC8222C00CF364E /* magnet-link.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA709051DC7C4F20095A46D /* magnet-link.swift */; };
+		CE894B3A1DC9516C00EB834D /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE894B391DC9516C00EB834D /* main.swift */; };
+		CE894B401DC952BF00EB834D /* echo-tcp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE894B3E1DC952BF00EB834D /* echo-tcp.swift */; };
+		CE894B411DC952BF00EB834D /* echo-udp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE894B3F1DC952BF00EB834D /* echo-udp.swift */; };
+		CE894B421DC9535500EB834D /* signal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC19F1DB314F6006D7430 /* signal.swift */; };
+		CE894B431DC9538300EB834D /* socket-tcp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1861DB2DD77006D7430 /* socket-tcp.swift */; };
+		CE894B441DC9538300EB834D /* socket-udp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1871DB2DD77006D7430 /* socket-udp.swift */; };
+		CE894B451DC9538300EB834D /* socket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1881DB2DD77006D7430 /* socket.swift */; };
+		CE894B461DC9538A00EB834D /* sobt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1821DB2DD2A006D7430 /* sobt.swift */; };
+		CE894B471DC9539300EB834D /* run-loop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1A11DB31678006D7430 /* run-loop.swift */; };
+		CE894B481DC953BE00EB834D /* network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC18E1DB2DE04006D7430 /* network.swift */; };
+		CE894B4A1DC958B100EB834D /* socker-echoer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE894B491DC958B100EB834D /* socker-echoer.swift */; };
 		CEA709061DC7C4F20095A46D /* magnet-link.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA709051DC7C4F20095A46D /* magnet-link.swift */; };
 		CEA7090C1DC7F0C40095A46D /* connect.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA709081DC7E8CD0095A46D /* connect.swift */; };
 /* End PBXBuildFile section */
@@ -65,14 +73,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		CE894B351DC9516C00EB834D /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		282B17531D3A037200FCFF33 /* echo-tcp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "echo-tcp.swift"; sourceTree = "<group>"; };
 		282B44E01D20FD040073C9D1 /* sobt */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sobt; sourceTree = BUILT_PRODUCTS_DIR; };
 		282B44E31D20FD040073C9D1 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		28413FBE1D2E268C001E1DCE /* signal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = signal.swift; sourceTree = "<group>"; };
-		28413FC01D2E342D001E1DCE /* echo-udp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "echo-udp.swift"; sourceTree = "<group>"; };
 		28EE19341D5683B0004E2A3A /* tracker-client.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "tracker-client.swift"; path = "sobt/tracker-client.swift"; sourceTree = SOURCE_ROOT; };
 		28FFC17C1DB2DCAB006D7430 /* bencoding-json.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "bencoding-json.swift"; path = "sobt-lib/bencoding/bencoding-json.swift"; sourceTree = "<group>"; };
 		28FFC17D1DB2DCAB006D7430 /* bencoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = bencoding.swift; path = "sobt-lib/bencoding/bencoding.swift"; sourceTree = "<group>"; };
@@ -91,6 +105,11 @@
 		CE26CDBF1DB04EC600CE06B7 /* sobt-tracker */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "sobt-tracker"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26CDC11DB04EC600CE06B7 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		CE6E6A1D1DC81C7400CF364E /* announce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = announce.swift; sourceTree = "<group>"; };
+		CE894B371DC9516C00EB834D /* socket-echo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "socket-echo"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE894B391DC9516C00EB834D /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		CE894B3E1DC952BF00EB834D /* echo-tcp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "echo-tcp.swift"; sourceTree = "<group>"; };
+		CE894B3F1DC952BF00EB834D /* echo-udp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "echo-udp.swift"; sourceTree = "<group>"; };
+		CE894B491DC958B100EB834D /* socker-echoer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "socker-echoer.swift"; sourceTree = "<group>"; };
 		CEA709051DC7C4F20095A46D /* magnet-link.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "magnet-link.swift"; path = "sobt-lib/helper/magnet-link.swift"; sourceTree = "<group>"; };
 		CEA709081DC7E8CD0095A46D /* connect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = connect.swift; sourceTree = "<group>"; };
 		CEA7090D1DC7F1BC0095A46D /* action.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = action.swift; sourceTree = "<group>"; };
@@ -111,6 +130,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CE894B341DC9516C00EB834D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -121,6 +147,7 @@
 				282B44E21D20FD040073C9D1 /* sobt */,
 				28FFC17A1DB2DC80006D7430 /* sobt-lib */,
 				CE26CDC01DB04EC600CE06B7 /* sobt-tracker */,
+				CE894B381DC9516C00EB834D /* socket-echo */,
 			);
 			sourceTree = "<group>";
 		};
@@ -129,6 +156,7 @@
 			children = (
 				282B44E01D20FD040073C9D1 /* sobt */,
 				CE26CDBF1DB04EC600CE06B7 /* sobt-tracker */,
+				CE894B371DC9516C00EB834D /* socket-echo */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -136,10 +164,7 @@
 		282B44E21D20FD040073C9D1 /* sobt */ = {
 			isa = PBXGroup;
 			children = (
-				282B17531D3A037200FCFF33 /* echo-tcp.swift */,
-				28413FC01D2E342D001E1DCE /* echo-udp.swift */,
 				282B44E31D20FD040073C9D1 /* main.swift */,
-				28413FBE1D2E268C001E1DCE /* signal.swift */,
 				28EE19341D5683B0004E2A3A /* tracker-client.swift */,
 			);
 			path = sobt;
@@ -200,6 +225,17 @@
 			path = "sobt-tracker";
 			sourceTree = "<group>";
 		};
+		CE894B381DC9516C00EB834D /* socket-echo */ = {
+			isa = PBXGroup;
+			children = (
+				CE894B3E1DC952BF00EB834D /* echo-tcp.swift */,
+				CE894B3F1DC952BF00EB834D /* echo-udp.swift */,
+				CE894B491DC958B100EB834D /* socker-echoer.swift */,
+				CE894B391DC9516C00EB834D /* main.swift */,
+			);
+			path = "socket-echo";
+			sourceTree = "<group>";
+		};
 		CEA709071DC7E8910095A46D /* tracker-action */ = {
 			isa = PBXGroup;
 			children = (
@@ -248,6 +284,23 @@
 			productReference = CE26CDBF1DB04EC600CE06B7 /* sobt-tracker */;
 			productType = "com.apple.product-type.tool";
 		};
+		CE894B361DC9516C00EB834D /* socket-echo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CE894B3D1DC9516C00EB834D /* Build configuration list for PBXNativeTarget "socket-echo" */;
+			buildPhases = (
+				CE894B331DC9516C00EB834D /* Sources */,
+				CE894B341DC9516C00EB834D /* Frameworks */,
+				CE894B351DC9516C00EB834D /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "socket-echo";
+			productName = "socket-echo";
+			productReference = CE894B371DC9516C00EB834D /* socket-echo */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -263,6 +316,10 @@
 						LastSwiftMigration = 0800;
 					};
 					CE26CDBE1DB04EC600CE06B7 = {
+						CreatedOnToolsVersion = 8.0;
+						ProvisioningStyle = Automatic;
+					};
+					CE894B361DC9516C00EB834D = {
 						CreatedOnToolsVersion = 8.0;
 						ProvisioningStyle = Automatic;
 					};
@@ -282,6 +339,7 @@
 			targets = (
 				282B44DF1D20FD040073C9D1 /* sobt */,
 				CE26CDBE1DB04EC600CE06B7 /* sobt-tracker */,
+				CE894B361DC9516C00EB834D /* socket-echo */,
 			);
 		};
 /* End PBXProject section */
@@ -305,10 +363,7 @@
 				28FFC17E1DB2DCCA006D7430 /* bencoding-json.swift in Sources */,
 				28FFC17F1DB2DCCA006D7430 /* bencoding.swift in Sources */,
 				282B44E41D20FD040073C9D1 /* main.swift in Sources */,
-				28413FBF1D2E268C001E1DCE /* signal.swift in Sources */,
-				282B17541D3A037200FCFF33 /* echo-tcp.swift in Sources */,
 				28EE19351D5683B0004E2A3A /* tracker-client.swift in Sources */,
-				28413FC11D2E342D001E1DCE /* echo-udp.swift in Sources */,
 				CE59D6B71DC9292F00DC4DD7 /* action.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -335,6 +390,24 @@
 				28FFC1971DB30118006D7430 /* udp-server.swift in Sources */,
 				28FFC1811DB2DCCF006D7430 /* bencoding.swift in Sources */,
 				CE26CDCC1DB04FE500CE06B7 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE894B331DC9516C00EB834D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE894B481DC953BE00EB834D /* network.swift in Sources */,
+				CE894B471DC9539300EB834D /* run-loop.swift in Sources */,
+				CE894B461DC9538A00EB834D /* sobt.swift in Sources */,
+				CE894B431DC9538300EB834D /* socket-tcp.swift in Sources */,
+				CE894B441DC9538300EB834D /* socket-udp.swift in Sources */,
+				CE894B451DC9538300EB834D /* socket.swift in Sources */,
+				CE894B421DC9535500EB834D /* signal.swift in Sources */,
+				CE894B4A1DC958B100EB834D /* socker-echoer.swift in Sources */,
+				CE894B401DC952BF00EB834D /* echo-tcp.swift in Sources */,
+				CE894B411DC952BF00EB834D /* echo-udp.swift in Sources */,
+				CE894B3A1DC9516C00EB834D /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -386,6 +459,7 @@
 				SDKROOT = macosx;
 				"SWIFT_OBJC_BRIDGING_HEADER[arch=*]" = "sobt-lib/helper/sobt-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Debug;
 		};
@@ -427,6 +501,7 @@
 				SDKROOT = macosx;
 				"SWIFT_OBJC_BRIDGING_HEADER[arch=*]" = "sobt-lib/helper/sobt-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Release;
 		};
@@ -434,7 +509,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 2.3;
 			};
 			name = Debug;
 		};
@@ -442,7 +516,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 2.3;
 			};
 			name = Release;
 		};
@@ -453,7 +526,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 2.3;
 			};
 			name = Debug;
 		};
@@ -464,7 +536,26 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 2.3;
+			};
+			name = Release;
+		};
+		CE894B3B1DC9516C00EB834D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		CE894B3C1DC9516C00EB834D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -497,6 +588,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		CE894B3D1DC9516C00EB834D /* Build configuration list for PBXNativeTarget "socket-echo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE894B3B1DC9516C00EB834D /* Debug */,
+				CE894B3C1DC9516C00EB834D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

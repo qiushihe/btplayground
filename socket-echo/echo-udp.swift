@@ -8,11 +8,7 @@
 
 import Foundation
 
-enum UDPEchoError: ErrorType {
-  case InvalidArguments
-}
-
-class UDPEcho {
+class UDPEcho: SocketEchoer {
   private let port: UInt16;
   private let host: String?;
   private var isServer: Bool;
@@ -25,27 +21,6 @@ class UDPEcho {
     self.isServer = host == nil;
   }
   
-  init(argv: Array<String>) throws {
-    guard argv.count > 2 else { throw UDPEchoError.InvalidArguments; }
-    
-    let type = argv[1];
-    let argPort: UInt16? = UInt16(argv[2]);
-    
-    guard argPort != nil else { throw UDPEchoError.InvalidArguments; }
-    self.port = argPort!;
-    
-    if (type == "server") {
-      self.host = nil;
-      self.isServer = true;
-    } else if (type == "client") {
-      guard argv.count > 3 else { throw UDPEchoError.InvalidArguments; }
-      self.host = argv[3];
-      self.isServer = false;
-    } else {
-      throw UDPEchoError.InvalidArguments;
-    }
-  }
-
   func start() {
     self.udpSocket = UDPSocket(port: self.port, host: self.host);
 

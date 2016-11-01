@@ -24,7 +24,7 @@ extension Sobt.TrackerAction {
       let connectionId: UInt64;
     }
 
-    static func CreateRequest(transactionId: UInt32) -> NSData {
+    static func CreateRequest(transactionId transactionId: UInt32) -> NSData {
       let payload = NSMutableData();
       
       var payloadConnectionId = Sobt.Helper.Network.HostToNetwork(MagicNumber);

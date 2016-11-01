@@ -45,7 +45,7 @@ extension Sobt.TrackerAction {
     }
 
     static func CreateRequest(
-      connectionId: UInt64, transactionId: UInt32, infoHash: String, peerId: String,
+      connectionId connectionId: UInt64, transactionId: UInt32, infoHash: String, peerId: String,
       downloaded: UInt64, left: UInt64, uploaded: UInt64, event: UInt32,
       ip: UInt32, key: UInt32, numWant: UInt32, port: UInt16, extensions: UInt16
     ) -> NSData {

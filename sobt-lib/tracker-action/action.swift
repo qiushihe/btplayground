@@ -14,5 +14,9 @@ extension Sobt.TrackerAction {
     case Announce = 1;
     case Scrape = 2;
     case Error = 3;
+    
+    static func Parse(data: Array<UInt8>) -> Action? {
+      return Action(rawValue: Sobt.Helper.Network.NetworkToHost(Array<UInt8>(data[0...3])));
+    }
   }
 }

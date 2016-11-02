@@ -57,6 +57,7 @@
 		CE894B771DC95CF200EB834D /* action.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA7090D1DC7F1BC0095A46D /* action.swift */; };
 		CE894B781DC95CF200EB834D /* announce.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6E6A1D1DC81C7400CF364E /* announce.swift */; };
 		CE894B791DC95CF200EB834D /* connect.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA709081DC7E8CD0095A46D /* connect.swift */; };
+		CE894B7B1DC9668100EB834D /* peer-node.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE894B7A1DC9668100EB834D /* peer-node.swift */; };
 		CEA7090C1DC7F0C40095A46D /* connect.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA709081DC7E8CD0095A46D /* connect.swift */; };
 /* End PBXBuildFile section */
 
@@ -127,6 +128,7 @@
 		CE894B5F1DC95C6900EB834D /* sobt-client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "sobt-client"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE894B611DC95C6900EB834D /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		CE894B661DC95C8E00EB834D /* tracker-client.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "tracker-client.swift"; sourceTree = "<group>"; };
+		CE894B7A1DC9668100EB834D /* peer-node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "peer-node.swift"; sourceTree = "<group>"; };
 		CEA709051DC7C4F20095A46D /* magnet-link.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "magnet-link.swift"; path = "sobt-lib/helper/magnet-link.swift"; sourceTree = "<group>"; };
 		CEA709081DC7E8CD0095A46D /* connect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = connect.swift; sourceTree = "<group>"; };
 		CEA7090D1DC7F1BC0095A46D /* action.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = action.swift; sourceTree = "<group>"; };
@@ -266,6 +268,7 @@
 			children = (
 				CE894B611DC95C6900EB834D /* main.swift */,
 				CE894B661DC95C8E00EB834D /* tracker-client.swift */,
+				CE894B7A1DC9668100EB834D /* peer-node.swift */,
 			);
 			path = "sobt-client";
 			sourceTree = "<group>";
@@ -476,6 +479,7 @@
 				CE894B781DC95CF200EB834D /* announce.swift in Sources */,
 				CE894B791DC95CF200EB834D /* connect.swift in Sources */,
 				CE894B621DC95C6900EB834D /* main.swift in Sources */,
+				CE894B7B1DC9668100EB834D /* peer-node.swift in Sources */,
 				CE894B671DC95C8E00EB834D /* tracker-client.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

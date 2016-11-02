@@ -8,10 +8,6 @@
 
 import Foundation
 
-enum UDPServerError: ErrorType {
-  case InvalidArguments
-}
-
 class UDPServer {
   private let port: UInt16;
   private var udpSocket: SobtLib.Socket.UDPSocket? = nil;

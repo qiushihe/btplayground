@@ -9,14 +9,15 @@
 import Foundation
 
 class TrackerClient : NSObject {
+  private var peerId: String? = nil;
+  private var port: UInt16? = nil;
   private var manifests = Dictionary<String, ManifestData>();
   private var connections = Dictionary<String, ConnectionData>();
   private var updating = false;
   private var updateTimer: NSTimer? = nil;
-  private let peerId: String = "M4-20-8-" + SobtLib.Helper.String.RandomStringWithLength(12);
-  private var port: UInt16? = nil;
 
-  func setPort(port: UInt16) {
+  init(id: String, port: UInt16) {
+    self.peerId = id;
     self.port = port;
   }
 
@@ -130,7 +131,7 @@ class TrackerClient : NSObject {
       connectionId: connectionData.connectionId,
       transactionId: connectionData.transactionId,
       infoHash: manifest.infoHash,
-      peerId: self.peerId,
+      peerId: self.peerId!,
       downloaded: 0,
       left: 0,
       uploaded: 0,

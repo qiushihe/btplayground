@@ -49,7 +49,7 @@ class PeerNode: TrackerClientDelegate {
 
       print("Peer node opened socket to \(peerIp) on \(peerPort)...");
 
-      let pingMsg = "Holy Shit! Men on the Fucking Moon!";
+      let pingMsg = self.peerId!;
       peerSocket.sendData(pingMsg.dataUsingEncoding(NSUTF8StringEncoding)!);
     }
   }

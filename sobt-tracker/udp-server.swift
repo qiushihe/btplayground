@@ -40,10 +40,10 @@ class UDPServer {
       recvfrom(socket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0, UnsafeMutablePointer($0), &inAddressLength);
     };
 
-    let (ipAddress, servicePort) = SobtLib.Socket.Socket.GetSocketHostAndPort(SobtLib.Socket.Socket.CastSocketAddress(&inAddress));
+    let (ipAddress, servicePort): (String?, String?) = SobtLib.Socket.Socket.GetSocketHostAndPort(SobtLib.Socket.Socket.CastSocketAddress(&inAddress));
     let message = "Got data from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
     print(message);
-    
+
     let data = Array(buffer[0..<bytesRead]);
     print("Server received \(data.count) bytes: \(data)");
 
@@ -51,7 +51,11 @@ class UDPServer {
     if (action == SobtLib.TrackerAction.Action.Connect) {
       let request = SobtLib.TrackerAction.Connect.DecodeRequest(data);
       let replySocket = SobtLib.Socket.UDPSocket(socket: socket, address: SobtLib.Socket.Socket.CastSocketAddress(&inAddress), addressLength: inAddressLength);
-      let connection = ConnectionData(SobtLib.Helper.Number.GetRandomNumber(), replySocket);
+
+      var connection = ConnectionData(SobtLib.Helper.Number.GetRandomNumber(), replySocket);
+      connection.ip = ipAddress?.characters.split(".").map(String.init).map() {part in
+        return UInt8(part)!;
+      };
       
       self.connections[connection.connectionId] = connection;
       print("Created connection \(connection.connectionId) for transaction ID \(request.transactionId)");
@@ -64,6 +68,30 @@ class UDPServer {
     } else if (action == SobtLib.TrackerAction.Action.Announce) {
       let request = SobtLib.TrackerAction.Announce.DecodeRequest(data);
       print(request);
+
+      var connection = self.connections[request.connectionId]!;
+      connection.port = request.port;
+      connection.status = ConnectionStatus.Active;
+      self.connections[connection.connectionId] = connection;
+      print("Activated connection \(connection.connectionId) for transaction ID \(request.transactionId)");
+
+      let responsePeers = self.connections.filter() {(_, connection) in
+        return connection.status == ConnectionStatus.Active;
+      }.map() {(_, connection) in
+        return SobtLib.TrackerAction.Announce.Peer(
+          ip: connection.ip!,
+          port: connection.port
+        );
+      };
+
+      let responsePayload = SobtLib.TrackerAction.Announce.EncodeResponse(
+        transactionId: request.transactionId,
+        interval: 0,
+        leechers: 0,
+        seeders: 0,
+        peers: responsePeers
+      );
+      connection.udpSocket?.sendData(responsePayload);
     }
   }
   
@@ -71,6 +99,8 @@ class UDPServer {
     var connectionId: UInt64 = 0;
     var status: ConnectionStatus = ConnectionStatus.Idle;
     var udpSocket: SobtLib.Socket.UDPSocket? = nil;
+    var ip: Array<UInt8>? = nil;
+    var port: UInt16 = 0;
     
     init(_ connectionId: UInt64, _ udpSocket: SobtLib.Socket.UDPSocket) {
       self.connectionId = connectionId;

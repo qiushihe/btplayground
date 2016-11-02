@@ -56,7 +56,14 @@ class PeerNode: TrackerClientDelegate {
 
   private func handleSocketData(socket: SobtLib.Socket.TCPSocket) {
     let dataRead = socket.readData();
-    if let dataString = String(data: dataRead, encoding: NSUTF8StringEncoding) {
+    let dataString = String(data: dataRead, encoding: NSUTF8StringEncoding);
+
+    if (dataString == self.peerId) {
+      print("Self ping -- ignored.");
+      return;
+    }
+
+    if dataString != nil {
       print("Peer node received message: \(dataString)");
     } else {
       print("Peer node received \(dataRead.length) bytes: \(dataRead)");

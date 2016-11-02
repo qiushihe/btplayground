@@ -24,6 +24,7 @@
 		CE59D6B81DC92FD600DC4DD7 /* action.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA7090D1DC7F1BC0095A46D /* action.swift */; };
 		CE6E6A1F1DC81CC700CF364E /* announce.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6E6A1D1DC81C7400CF364E /* announce.swift */; };
 		CE6E6A201DC8222C00CF364E /* magnet-link.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA709051DC7C4F20095A46D /* magnet-link.swift */; };
+		CE7419C81DCA7B860037F190 /* tracker-client-delegate-protocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7419C71DCA7B860037F190 /* tracker-client-delegate-protocol.swift */; };
 		CE894B3A1DC9516C00EB834D /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE894B391DC9516C00EB834D /* main.swift */; };
 		CE894B401DC952BF00EB834D /* echo-tcp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE894B3E1DC952BF00EB834D /* echo-tcp.swift */; };
 		CE894B411DC952BF00EB834D /* echo-udp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE894B3F1DC952BF00EB834D /* echo-udp.swift */; };
@@ -34,7 +35,7 @@
 		CE894B461DC9538A00EB834D /* sobt-lib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1821DB2DD2A006D7430 /* sobt-lib.swift */; };
 		CE894B471DC9539300EB834D /* run-loop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1A11DB31678006D7430 /* run-loop.swift */; };
 		CE894B481DC953BE00EB834D /* network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC18E1DB2DE04006D7430 /* network.swift */; };
-		CE894B4A1DC958B100EB834D /* socker-echoer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE894B491DC958B100EB834D /* socker-echoer.swift */; };
+		CE894B4A1DC958B100EB834D /* socker-echoer-protocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE894B491DC958B100EB834D /* socker-echoer-protocol.swift */; };
 		CE894B521DC95A6900EB834D /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE894B511DC95A6900EB834D /* main.swift */; };
 		CE894B561DC95AA400EB834D /* bencoding-json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC17C1DB2DCAB006D7430 /* bencoding-json.swift */; };
 		CE894B571DC95AA400EB834D /* bencoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC17D1DB2DCAB006D7430 /* bencoding.swift */; };
@@ -118,11 +119,12 @@
 		CE26CDBF1DB04EC600CE06B7 /* sobt-tracker */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "sobt-tracker"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26CDC11DB04EC600CE06B7 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		CE6E6A1D1DC81C7400CF364E /* announce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = announce.swift; sourceTree = "<group>"; };
+		CE7419C71DCA7B860037F190 /* tracker-client-delegate-protocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "tracker-client-delegate-protocol.swift"; sourceTree = "<group>"; };
 		CE894B371DC9516C00EB834D /* socket-echo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "socket-echo"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE894B391DC9516C00EB834D /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		CE894B3E1DC952BF00EB834D /* echo-tcp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "echo-tcp.swift"; sourceTree = "<group>"; };
 		CE894B3F1DC952BF00EB834D /* echo-udp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "echo-udp.swift"; sourceTree = "<group>"; };
-		CE894B491DC958B100EB834D /* socker-echoer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "socker-echoer.swift"; sourceTree = "<group>"; };
+		CE894B491DC958B100EB834D /* socker-echoer-protocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "socker-echoer-protocol.swift"; sourceTree = "<group>"; };
 		CE894B4F1DC95A6800EB834D /* bencode2json */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = bencode2json; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE894B511DC95A6900EB834D /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		CE894B5F1DC95C6900EB834D /* sobt-client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "sobt-client"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -249,7 +251,7 @@
 			children = (
 				CE894B3E1DC952BF00EB834D /* echo-tcp.swift */,
 				CE894B3F1DC952BF00EB834D /* echo-udp.swift */,
-				CE894B491DC958B100EB834D /* socker-echoer.swift */,
+				CE894B491DC958B100EB834D /* socker-echoer-protocol.swift */,
 				CE894B391DC9516C00EB834D /* main.swift */,
 			);
 			path = "socket-echo";
@@ -267,8 +269,9 @@
 			isa = PBXGroup;
 			children = (
 				CE894B611DC95C6900EB834D /* main.swift */,
-				CE894B661DC95C8E00EB834D /* tracker-client.swift */,
 				CE894B7A1DC9668100EB834D /* peer-node.swift */,
+				CE7419C71DCA7B860037F190 /* tracker-client-delegate-protocol.swift */,
+				CE894B661DC95C8E00EB834D /* tracker-client.swift */,
 			);
 			path = "sobt-client";
 			sourceTree = "<group>";
@@ -440,7 +443,7 @@
 				CE894B441DC9538300EB834D /* socket-udp.swift in Sources */,
 				CE894B451DC9538300EB834D /* socket.swift in Sources */,
 				CE894B421DC9535500EB834D /* signal.swift in Sources */,
-				CE894B4A1DC958B100EB834D /* socker-echoer.swift in Sources */,
+				CE894B4A1DC958B100EB834D /* socker-echoer-protocol.swift in Sources */,
 				CE894B401DC952BF00EB834D /* echo-tcp.swift in Sources */,
 				CE894B411DC952BF00EB834D /* echo-udp.swift in Sources */,
 				CE894B3A1DC9516C00EB834D /* main.swift in Sources */,
@@ -470,6 +473,7 @@
 				CE894B6F1DC95CF200EB834D /* number.swift in Sources */,
 				CE894B701DC95CF200EB834D /* run-loop.swift in Sources */,
 				CE894B711DC95CF200EB834D /* signal.swift in Sources */,
+				CE7419C81DCA7B860037F190 /* tracker-client-delegate-protocol.swift in Sources */,
 				CE894B721DC95CF200EB834D /* string.swift in Sources */,
 				CE894B731DC95CF200EB834D /* sobt-lib.swift in Sources */,
 				CE894B741DC95CF200EB834D /* socket-tcp.swift in Sources */,
@@ -695,6 +699,7 @@
 				CE894B541DC95A6900EB834D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		CE894B631DC95C6900EB834D /* Build configuration list for PBXNativeTarget "sobt-client" */ = {
 			isa = XCConfigurationList;
@@ -703,6 +708,7 @@
 				CE894B651DC95C6900EB834D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

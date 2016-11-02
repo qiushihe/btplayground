@@ -9,6 +9,8 @@
 import Foundation
 
 class TrackerClient : NSObject {
+  var delegate: TrackerClientDelegate? = nil;
+
   private var peerId: String? = nil;
   private var port: UInt16? = nil;
   private var manifests = Dictionary<String, ManifestData>();
@@ -149,7 +151,7 @@ class TrackerClient : NSObject {
     var connectionData = self.connections[connectionUUID]!;
     let url = NSURL(string: connectionData.url)!;
 
-    // if (url.host != "tracker.coppersurfer.tk") { return; }
+    if (url.host != "tracker.coppersurfer.tk") { return; }
 
     connectionData.udpSocket = SobtLib.Socket.UDPSocket(port: UInt16(url.port!.integerValue), host: url.host);
     connectionData.udpSocket!.setListener({(data: Array<UInt8>) in
@@ -205,8 +207,8 @@ class TrackerClient : NSObject {
         connectionData.connectionId = response.connectionId;
         connectionData.status = ConnectionStatus.Idle;
 
-        self.connections[uuid] = connectionData;
         print("Got connection ID \(connectionData.connectionId) for transaction \(response.transactionId) for connection \(connectionData.uuid)");
+        self.connections[uuid] = connectionData;
       } else {
         print("No connection found for transaction \(response.transactionId)");
       }
@@ -223,8 +225,9 @@ class TrackerClient : NSObject {
         connectionData.peers = response.peers;
         connectionData.status = ConnectionStatus.Idle;
 
-        self.connections[uuid] = connectionData;
         print("Got peers \(response.peers) for transaction \(response.transactionId) for connection \(connectionData.uuid)");
+        self.connections[uuid] = connectionData;
+        self.delegate?.trackerClientReceivedPeer(connectionData.infoHash, peers: response.peers);
       } else {
         print("No connection found for transaction \(response.transactionId)");
       }

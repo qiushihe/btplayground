@@ -35,16 +35,13 @@ class PeerNode: TrackerClientDelegate {
   }
 
   func trackerClientReceivedPeer(infoHash: String, peers: Array<SobtLib.TrackerAction.Announce.Peer>) {
-    print("Peer node got peers \(peers) for \(infoHash)");
-
     for peer in peers {
       let peerIp = peer.ip.map() {part in return "\(part)";}.joinWithSeparator(".");
       let peerPort = peer.port;
-
+      
       var peerSocketOption = SobtLib.Socket.SocketOptions();
       peerSocketOption.port = peerPort;
       peerSocketOption.host = peerIp;
-      // peerSocketOption.host = "127.0.0.1";
       peerSocketOption.type = SobtLib.Socket.SocketType.Client;
 
       let peerSocket = SobtLib.Socket.TCPSocket(options: peerSocketOption);

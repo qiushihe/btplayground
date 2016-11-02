@@ -151,7 +151,7 @@ class TrackerClient : NSObject {
     var connectionData = self.connections[connectionUUID]!;
     let url = NSURL(string: connectionData.url)!;
 
-    if (url.host != "tracker.coppersurfer.tk") { return; }
+    // if (url.host != "tracker.coppersurfer.tk") { return; }
 
     connectionData.udpSocket = SobtLib.Socket.UDPSocket(port: UInt16(url.port!.integerValue), host: url.host);
     connectionData.udpSocket!.setListener({(data: Array<UInt8>) in

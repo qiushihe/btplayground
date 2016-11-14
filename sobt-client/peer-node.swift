@@ -49,7 +49,7 @@ class PeerNode: TrackerClientDelegate {
 
       print("Peer node opened socket to \(peerIp) on \(peerPort)...");
 
-      let pingMsg = self.peerId!;
+      let pingMsg = "PING \(self.peerId!)";
       peerSocket.sendData(pingMsg.dataUsingEncoding(NSUTF8StringEncoding)!);
     }
   }
@@ -58,15 +58,20 @@ class PeerNode: TrackerClientDelegate {
     let dataRead = socket.readData();
     let dataString = String(data: dataRead, encoding: NSUTF8StringEncoding);
 
-    if (dataString == self.peerId) {
-      print("Self ping -- ignored.");
+    if (dataString == nil) {
+      print("Peer node received \(dataRead.length) bytes: \(dataRead)");
       return;
     }
 
-    if dataString != nil {
-      print("Peer node received message: \(dataString)");
-    } else {
-      print("Peer node received \(dataRead.length) bytes: \(dataRead)");
+    let pingMatches = Array(SobtLib.Helper.String.MatchingStrings(dataString!, regex: "PING ([^\\(\\)]*)").flatten());
+    if (!pingMatches.isEmpty) {
+      let pingPeerId = pingMatches[1];
+      if (pingPeerId == self.peerId) {
+        print("Self ping -- ignored.");
+        return;
+      }
     }
+
+    print("Peer node received message: \(dataString)");
   }
 }

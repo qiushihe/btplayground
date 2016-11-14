@@ -25,6 +25,10 @@ do {
     throw SocketEchoError.InvalidArguments;
   }
 
+  if (echoerType == "client" && arguments.count < 5) {
+    throw SocketEchoError.InvalidArguments;
+  }
+
   let socketProtocol = arguments[2];
   if (socketProtocol != "tcp" && socketProtocol != "udp") {
     throw SocketEchoError.InvalidArguments;

@@ -77,7 +77,7 @@ class PeerNode: TrackerClientDelegate {
 
     if (
       self.handlePing(socket, message: dataString!) ||
-      self.handlPong(socket, message: dataString!)
+      self.handlePong(socket, message: dataString!)
     ) {
       return;
     }
@@ -101,7 +101,7 @@ class PeerNode: TrackerClientDelegate {
     return true;
   }
 
-  private func handlPong(socket: SobtLib.Socket.TCPSocket, message: String) -> Bool {
+  private func handlePong(socket: SobtLib.Socket.TCPSocket, message: String) -> Bool {
     let matches = Array(SobtLib.Helper.String.MatchingStrings(message, regex: "PONG ([^\\s]*) ([^\\s]*) ([^\\s]*)").flatten());
     if (matches.isEmpty) {
       return false;

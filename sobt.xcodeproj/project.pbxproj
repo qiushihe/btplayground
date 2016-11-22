@@ -21,6 +21,7 @@
 		28FFC1A01DB314F6006D7430 /* signal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC19F1DB314F6006D7430 /* signal.swift */; };
 		28FFC1A21DB31678006D7430 /* run-loop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FFC1A11DB31678006D7430 /* run-loop.swift */; };
 		CE26CDCC1DB04FE500CE06B7 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE26CDC11DB04EC600CE06B7 /* main.swift */; };
+		CE3BFEDB1DE3CAE50015EC9E /* cracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3BFEDA1DE3CAE50015EC9E /* cracker.swift */; };
 		CE59D6B81DC92FD600DC4DD7 /* action.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA7090D1DC7F1BC0095A46D /* action.swift */; };
 		CE6E6A1F1DC81CC700CF364E /* announce.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6E6A1D1DC81C7400CF364E /* announce.swift */; };
 		CE6E6A201DC8222C00CF364E /* magnet-link.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA709051DC7C4F20095A46D /* magnet-link.swift */; };
@@ -118,6 +119,7 @@
 		28FFC1A11DB31678006D7430 /* run-loop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "run-loop.swift"; sourceTree = "<group>"; };
 		CE26CDBF1DB04EC600CE06B7 /* sobt-tracker */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "sobt-tracker"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26CDC11DB04EC600CE06B7 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		CE3BFEDA1DE3CAE50015EC9E /* cracker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = cracker.swift; sourceTree = "<group>"; };
 		CE6E6A1D1DC81C7400CF364E /* announce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = announce.swift; sourceTree = "<group>"; };
 		CE7419C71DCA7B860037F190 /* tracker-client-delegate-protocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "tracker-client-delegate-protocol.swift"; sourceTree = "<group>"; };
 		CE894B371DC9516C00EB834D /* socket-echo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "socket-echo"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -268,6 +270,7 @@
 		CE894B601DC95C6900EB834D /* sobt-client */ = {
 			isa = PBXGroup;
 			children = (
+				CE3BFEDA1DE3CAE50015EC9E /* cracker.swift */,
 				CE894B611DC95C6900EB834D /* main.swift */,
 				CE894B7A1DC9668100EB834D /* peer-node.swift */,
 				CE7419C71DCA7B860037F190 /* tracker-client-delegate-protocol.swift */,
@@ -469,6 +472,7 @@
 				CE894B6B1DC95CF200EB834D /* bencoding.swift in Sources */,
 				CE894B6C1DC95CF200EB834D /* crypto.swift in Sources */,
 				CE894B6D1DC95CF200EB834D /* magnet-link.swift in Sources */,
+				CE3BFEDB1DE3CAE50015EC9E /* cracker.swift in Sources */,
 				CE894B6E1DC95CF200EB834D /* network.swift in Sources */,
 				CE894B6F1DC95CF200EB834D /* number.swift in Sources */,
 				CE894B701DC95CF200EB834D /* run-loop.swift in Sources */,

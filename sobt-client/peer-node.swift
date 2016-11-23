@@ -31,7 +31,6 @@ class PeerNode: TrackerClientDelegate {
 
     print("Peer node listening on port \(self.port)...");
 
-    /*
     let cracker = Cracker(alphabet: Array<String>([
       "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
       "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
@@ -39,7 +38,6 @@ class PeerNode: TrackerClientDelegate {
     ]), maxLength: 12);
 
     cracker.start("499226fde1d3c2e0729388ecf031b6a7487393dd");
-    */
   }
 
   func stop() {

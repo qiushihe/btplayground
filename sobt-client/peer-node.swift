@@ -12,12 +12,19 @@ class PeerNode: TrackerClientDelegate {
   private var peerId: String? = nil;
   private let port: UInt16;
   private var tcpSocket: SobtLib.Socket.TCPSocket? = nil;
-  private var peers: Dictionary<String, (String, UInt16)>;
+  private var peers: Dictionary<String, SobtLib.Socket.TCPSocket>;
+  private let cracker: Cracker;
+  private var targetHash: String? = nil;
 
   init(id: String, port: UInt16) {
     self.peerId = id;
     self.port = port;
-    self.peers = Dictionary<String, (String, UInt16)>();
+    self.peers = Dictionary<String, SobtLib.Socket.TCPSocket>();
+    self.cracker = Cracker(alphabet: Array<String>([
+      "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+      "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+      "!", " "
+    ]), maxLength: 12);
   }
 
   func start() {
@@ -29,19 +36,19 @@ class PeerNode: TrackerClientDelegate {
     self.tcpSocket = SobtLib.Socket.TCPSocket(options: tcpSocketOptions);
     self.tcpSocket!.setListener(self.handleSocketData);
 
-    print("Peer node listening on port \(self.port)...");
+    print("Peer node \(self.peerId!) listening on port \(self.port)...");
 
-    let cracker = Cracker(alphabet: Array<String>([
-      "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-      "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
-      "!", " "
-    ]), maxLength: 12);
-
-    cracker.start("499226fde1d3c2e0729388ecf031b6a7487393dd");
+    if (self.targetHash != nil) {
+      self.cracker.start(self.targetHash!);
+    }
   }
 
   func stop() {
     self.tcpSocket?.closeSocket();
+  }
+
+  func setTargetHash(targetHash: String?) {
+    self.targetHash = targetHash;
   }
 
   func trackerClientReceivedPeer(infoHash: String, peers: Array<SobtLib.TrackerAction.Announce.Peer>) {
@@ -59,7 +66,7 @@ class PeerNode: TrackerClientDelegate {
 
       print("Peer node opened socket to \(peerIp) on \(peerPort)...");
 
-      let pingMsg = "PING \(self.peerId!) \(peerIp) \(peerPort)";
+      let pingMsg = "PING \(self.peerId!)";
       peerSocket.sendData(pingMsg.dataUsingEncoding(NSUTF8StringEncoding)!);
     }
   }
@@ -84,15 +91,18 @@ class PeerNode: TrackerClientDelegate {
   }
 
   private func handlePing(socket: SobtLib.Socket.TCPSocket, message: String) -> Bool {
-    let matches = Array(SobtLib.Helper.String.MatchingStrings(message, regex: "PING ([^\\s]*) ([^\\s]*) ([^\\s]*)").flatten());
+    let matches = Array(SobtLib.Helper.String.MatchingStrings(message, regex: "PING ([^\\s]*)").flatten());
     if (matches.isEmpty) {
       return false;
     }
 
     if (matches[1] == self.peerId) {
-      print("Ignored self ping from \(matches[2]) on port \(matches[3])");
+      print("Ignored self ping");
     } else {
-      let pongMsg = "PONG \(matches[1]) \(matches[2]) \(matches[3])";
+      self.peers[matches[1]] = socket;
+      print("Registered peer \(matches[1])");
+
+      let pongMsg = "PONG \(self.peerId!)";
       socket.sendData(pongMsg.dataUsingEncoding(NSUTF8StringEncoding)!);
     }
 
@@ -100,13 +110,13 @@ class PeerNode: TrackerClientDelegate {
   }
 
   private func handlePong(socket: SobtLib.Socket.TCPSocket, message: String) -> Bool {
-    let matches = Array(SobtLib.Helper.String.MatchingStrings(message, regex: "PONG ([^\\s]*) ([^\\s]*) ([^\\s]*)").flatten());
+    let matches = Array(SobtLib.Helper.String.MatchingStrings(message, regex: "PONG ([^\\s]*)").flatten());
     if (matches.isEmpty) {
       return false;
     }
 
-    self.peers[matches[1]] = (matches[2], UInt16(matches[3])!);
-    print("Registered peer \(matches[1]) from \(matches[2]) on port \(matches[3])");
+    self.peers[matches[1]] = socket;
+    print("Registered peer \(matches[1])");
 
     return true;
   }

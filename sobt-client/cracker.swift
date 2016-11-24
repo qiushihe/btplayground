@@ -36,13 +36,14 @@ class Cracker {
     self.running = true;
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+      var lastMessageTime = Int(NSDate().timeIntervalSince1970);
       while (true) {
         if (!self.operationLock.tryLock()) {
           continue;
         }
 
         var shouldBreak = false;
-        var attemptMessage = "";
+        var attemptMessage: String? = nil;
 
         if (self.curIndex >= self.endIndex) {
           shouldBreak = true;
@@ -53,7 +54,11 @@ class Cracker {
           let message = self.itemAtIndex(self.curIndex);
           let hash = SobtLib.Helper.Crypto.SHA1(message.dataUsingEncoding(NSUTF8StringEncoding)!) as String;
 
-          attemptMessage = "Attempting [\(self.curIndex)]: \(hash) - \(message) ...";
+          let nowTime = Int(NSDate().timeIntervalSince1970);
+          if (nowTime - lastMessageTime > 5) {
+            attemptMessage = "Attempting [\(self.curIndex)]: \(hash) - \(message) ...";
+            lastMessageTime = nowTime;
+          }
 
           if (hash == target) {
             shouldBreak = true;
@@ -66,8 +71,10 @@ class Cracker {
           attemptMessage = "Stopped.";
         }
 
-        dispatch_async(dispatch_get_main_queue()) {
-          print(attemptMessage);
+        if (attemptMessage != nil) {
+          dispatch_async(dispatch_get_main_queue()) {
+            print(attemptMessage!);
+          }
         }
 
         self.curIndex = self.curIndex + 1;

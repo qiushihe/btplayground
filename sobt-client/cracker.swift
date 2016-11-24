@@ -12,24 +12,17 @@ class Cracker {
   private let alphabet: Array<String>;
   private let maxLength: Int;
   private let maxIndex: Int;
-  private var startIndex: Int;
   private var endIndex: Int;
-  private var curIndex: Int;
-  private let operationLock: NSLock;
-  private var running: Bool;
+  private var startIndex: Int = 0;
+  private var curIndex: Int = 0;
+  private let operationLock: NSLock = NSLock();
+  private var running: Bool = false;
 
   init(alphabet: Array<String>, maxLength: Int) {
     self.alphabet = alphabet;
-
     self.maxLength = maxLength;
     self.maxIndex = Int(pow(Double(self.alphabet.count), Double(self.maxLength))) - 1;
-
-    self.startIndex = 0;
     self.endIndex = self.maxIndex;
-    self.curIndex = 0;
-
-    self.operationLock = NSLock();
-    self.running = false;
   }
 
   func start(target: String) {
@@ -90,6 +83,10 @@ class Cracker {
 
   func stop() {
     self.running = false;
+  }
+
+  func isRunning() -> Bool {
+    return self.running;
   }
 
   func getRemainCount() -> Int {

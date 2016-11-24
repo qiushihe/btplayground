@@ -15,8 +15,8 @@ class TrackerClient : NSObject {
   private var port: UInt16? = nil;
   private var manifests = Dictionary<String, ManifestData>();
   private var connections = Dictionary<String, ConnectionData>();
-  private var updating = false;
   private var updateTimer: NSTimer? = nil;
+  private let updateLock: NSLock = NSLock();
 
   init(id: String, port: UInt16) {
     self.peerId = id;
@@ -73,10 +73,10 @@ class TrackerClient : NSObject {
   }
 
   func update() {
-    if (self.updating) {
-      return;
-    } else {
-      self.updating = true;
+    while (true) {
+      if (self.updateLock.tryLock()) {
+        break;
+      }
     }
 
     // Queue connections
@@ -116,7 +116,7 @@ class TrackerClient : NSObject {
       }
     }
 
-    self.updating = false;
+    self.updateLock.unlock();
   }
 
   private func announceToTracker(connectionUUID: String) {

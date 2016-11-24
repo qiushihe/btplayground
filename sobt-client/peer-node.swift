@@ -8,43 +8,104 @@
 
 import Foundation
 
-class PeerNode: TrackerClientDelegate {
-  private var peerId: String? = nil;
+class PeerNode: NSObject, TrackerClientDelegate {
+  private var peerId: String;
   private let port: UInt16;
+  private var state: PeerState = PeerState.Idle;
   private var tcpSocket: SobtLib.Socket.TCPSocket? = nil;
-  private var peers: Dictionary<String, SobtLib.Socket.TCPSocket>;
-  private let cracker: Cracker;
+  private var peers: Dictionary<String, SobtLib.Socket.TCPSocket> = Dictionary<String, SobtLib.Socket.TCPSocket>();
+  private var updateTimer: NSTimer? = nil;
+  private let updateLock: NSLock = NSLock();
+  private let requestLock: NSLock = NSLock();
   private var targetHash: String? = nil;
+  private let cracker: Cracker = Cracker(alphabet: Array<String>([
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+    "!", " "
+  ]), maxLength: 4); // Max 12
+
+  private var peerRemainCounts: Array<(String, Int)> = Array<(String, Int)>();
+  private var helpRange: (Int, Int)? = nil;
 
   init(id: String, port: UInt16) {
     self.peerId = id;
     self.port = port;
-    self.peers = Dictionary<String, SobtLib.Socket.TCPSocket>();
-    self.cracker = Cracker(alphabet: Array<String>([
-      "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-      "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
-      "!", " "
-    ]), maxLength: 12);
   }
 
-  func start() {
-    var tcpSocketOptions = SobtLib.Socket.SocketOptions();
-    tcpSocketOptions.port = self.port;
-    tcpSocketOptions.host = nil;
-    tcpSocketOptions.type = SobtLib.Socket.SocketType.Server;
-
-    self.tcpSocket = SobtLib.Socket.TCPSocket(options: tcpSocketOptions);
-    self.tcpSocket!.setListener(self.handleSocketData);
-
-    print("Peer node \(self.peerId!) listening on port \(self.port)...");
-
-    if (self.targetHash != nil) {
-      self.cracker.start(self.targetHash!);
-    }
+  func autoUpdate(interval: Double) {
+    self.stopAutoUpdate();
+    self.updateTimer = NSTimer.scheduledTimerWithTimeInterval(
+      interval,
+      target: self,
+      selector: #selector(PeerNode.update),
+      userInfo: nil,
+      repeats: true
+    );
   }
 
-  func stop() {
+  func stopAutoUpdate() {
+    self.updateTimer?.invalidate();
     self.tcpSocket?.closeSocket();
+    self.cracker.stop();
+  }
+
+  func update() {
+    while (true) {
+      if (self.updateLock.tryLock()) {
+        break;
+      }
+    }
+
+    switch (self.state) {
+    case PeerState.Idle:
+      if (self.targetHash != nil && !self.cracker.isRunning()) {
+        self.cracker.start(self.targetHash!);
+      }
+      self.startListener();
+      self.state = PeerState.Ready;
+      break;
+    case PeerState.Ready:
+      if (!self.peers.isEmpty) {
+        if (self.targetHash == nil) {
+          self.sendGetTarget();
+          self.state = PeerState.GetTarget;
+        } else if (self.targetHash != nil && self.peerRemainCounts.isEmpty) {
+          self.sendGetRemainCount();
+          self.state = PeerState.GetRemainCount;
+        } else if (self.targetHash != nil && !self.peerRemainCounts.isEmpty && self.helpRange == nil) {
+          let (peerId, _) = self.peerRemainCounts.sort {(a, b) in
+            return a.1 > b.1;
+          }.first!;
+          self.sendOfferHelp(peerId);
+          self.state = PeerState.OfferHelp;
+        } else if (self.targetHash != nil && !self.peerRemainCounts.isEmpty && self.helpRange != nil && !self.cracker.isRunning()) {
+          self.cracker.setRange(self.helpRange!.0, endIndex: self.helpRange!.1);
+          self.cracker.start(self.targetHash!);
+        }
+      }
+      break;
+    case PeerState.GetTarget:
+      if (self.targetHash != nil) {
+        self.state = PeerState.Ready;
+      }
+      break;
+    case PeerState.GetRemainCount:
+      if (!self.peerRemainCounts.isEmpty) {
+        self.state = PeerState.Ready;
+      }
+      break;
+    case PeerState.OfferHelp:
+      if (self.helpRange != nil) {
+        self.state = PeerState.Ready;
+      }
+      break;
+    default: // PeerState.Finish
+      self.stopAutoUpdate();
+      self.state = PeerState.Idle;
+      break;
+    }
+
+    self.updateLock.unlock();
   }
 
   func setTargetHash(targetHash: String?) {
@@ -66,28 +127,64 @@ class PeerNode: TrackerClientDelegate {
 
       print("Peer node opened socket to \(peerIp) on \(peerPort)...");
 
-      let pingMsg = "PING \(self.peerId!)";
+      let pingMsg = "PING \(self.peerId)";
       peerSocket.sendData(pingMsg.dataUsingEncoding(NSUTF8StringEncoding)!);
     }
   }
 
+  private func startListener() {
+    var tcpSocketOptions = SobtLib.Socket.SocketOptions();
+    tcpSocketOptions.port = self.port;
+    tcpSocketOptions.host = nil;
+    tcpSocketOptions.type = SobtLib.Socket.SocketType.Server;
+
+    self.tcpSocket = SobtLib.Socket.TCPSocket(options: tcpSocketOptions);
+    self.tcpSocket!.setListener(self.handleSocketData);
+
+    print("Peer node \(self.peerId) listening on port \(self.port)...");
+  }
+
   private func handleSocketData(socket: SobtLib.Socket.TCPSocket) {
+    while (true) {
+      if (self.updateLock.tryLock()) {
+        break;
+      }
+    }
+
+    var handled = false;
+    var handledMsg: String? = nil;
+
     let dataRead = socket.readData();
     let dataString = String(data: dataRead, encoding: NSUTF8StringEncoding);
 
     if (dataString == nil) {
-      print("Peer node received \(dataRead.length) bytes: \(dataRead)");
-      return;
+      handled = true;
+      handledMsg = "Peer node received \(dataRead.length) bytes: \(dataRead)";
     }
 
-    if (
+    if (!handled && (
       self.handlePing(socket, message: dataString!) ||
-      self.handlePong(socket, message: dataString!)
-    ) {
-      return;
+      self.handlePong(socket, message: dataString!) ||
+      self.handleGetTarget(socket, message: dataString!) ||
+      self.handleTargetIs(socket, message: dataString!) ||
+      self.handleGetRemainCount(socket, message: dataString!) ||
+      self.handleRemainCountIs(socket, message: dataString!) ||
+      self.handleLetMeHelp(socket, message: dataString!) ||
+      self.handlePleaseHelp(socket, message: dataString!)
+    )) {
+      handled = true;
     }
 
-    print("Peer node received message: \(dataString)");
+    if (!handled) {
+      handled = true;
+      handledMsg = "Peer node received message: \(dataString)";
+    }
+
+    if (handledMsg != nil) {
+      print(handledMsg);
+    }
+
+    self.updateLock.unlock();
   }
 
   private func handlePing(socket: SobtLib.Socket.TCPSocket, message: String) -> Bool {
@@ -102,7 +199,7 @@ class PeerNode: TrackerClientDelegate {
       self.peers[matches[1]] = socket;
       print("Registered peer \(matches[1])");
 
-      let pongMsg = "PONG \(self.peerId!)";
+      let pongMsg = "PONG \(self.peerId)";
       socket.sendData(pongMsg.dataUsingEncoding(NSUTF8StringEncoding)!);
     }
 
@@ -119,5 +216,114 @@ class PeerNode: TrackerClientDelegate {
     print("Registered peer \(matches[1])");
 
     return true;
+  }
+
+  private func sendGetTarget() {
+    for (_, peerSocket) in self.peers {
+      let peerMsg = "GET TARGET";
+      peerSocket.sendData(peerMsg.dataUsingEncoding(NSUTF8StringEncoding)!);
+    }
+  }
+
+  private func handleGetTarget(socket: SobtLib.Socket.TCPSocket, message: String) -> Bool {
+    let matches = Array(SobtLib.Helper.String.MatchingStrings(message, regex: "GET TARGET").flatten());
+    if (matches.isEmpty) {
+      return false;
+    }
+
+    if (self.targetHash != nil) {
+      let targetIsMsg = "TARGET IS \(self.targetHash!)";
+      socket.sendData(targetIsMsg.dataUsingEncoding(NSUTF8StringEncoding)!);
+    }
+
+    return true;
+  }
+
+  private func handleTargetIs(socket: SobtLib.Socket.TCPSocket, message: String) -> Bool {
+    let matches = Array(SobtLib.Helper.String.MatchingStrings(message, regex: "TARGET IS ([^\\s]*)").flatten());
+    if (matches.isEmpty) {
+      return false;
+    }
+
+    self.targetHash = matches[1];
+    print("Got target \(matches[1])");
+
+    return true;
+  }
+
+  private func sendGetRemainCount() {
+    for (_, peerSocket) in self.peers {
+      let peerMsg = "GET REMAIN COUNT";
+      peerSocket.sendData(peerMsg.dataUsingEncoding(NSUTF8StringEncoding)!);
+    }
+  }
+
+  private func handleGetRemainCount(socket: SobtLib.Socket.TCPSocket, message: String) -> Bool {
+    let matches = Array(SobtLib.Helper.String.MatchingStrings(message, regex: "GET REMAIN COUNT").flatten());
+    if (matches.isEmpty) {
+      return false;
+    }
+
+    if (self.cracker.isRunning()) {
+      let remainCountIsMsg = "REMAIN COUNT IS \(self.peerId) \(self.cracker.getRemainCount())";
+      socket.sendData(remainCountIsMsg.dataUsingEncoding(NSUTF8StringEncoding)!);
+    }
+
+    return true;
+  }
+
+  private func handleRemainCountIs(socket: SobtLib.Socket.TCPSocket, message: String) -> Bool {
+    let matches = Array(SobtLib.Helper.String.MatchingStrings(message, regex: "REMAIN COUNT IS ([^\\s]*) ([^\\s]*)").flatten());
+    if (matches.isEmpty) {
+      return false;
+    }
+
+    let peerRemainCount = (matches[1], Int(matches[2])!);
+    self.peerRemainCounts.append(peerRemainCount);
+    print("Got peer remain count \(peerRemainCount)");
+
+    return true;
+  }
+
+  private func sendOfferHelp(peerId: String) {
+    let peerSocket = self.peers[peerId]!;
+    let peerMsg = "LET ME HELP";
+    peerSocket.sendData(peerMsg.dataUsingEncoding(NSUTF8StringEncoding)!);
+  }
+
+  private func handleLetMeHelp(socket: SobtLib.Socket.TCPSocket, message: String) -> Bool {
+    let matches = Array(SobtLib.Helper.String.MatchingStrings(message, regex: "LET ME HELP").flatten());
+    if (matches.isEmpty) {
+      return false;
+    }
+
+    if (self.cracker.isRunning()) {
+      let (helpStart, helpEnd) = self.cracker.divideRemaining();
+      let remainCountIsMsg = "PLEASE HELP \(helpStart) \(helpEnd)";
+      socket.sendData(remainCountIsMsg.dataUsingEncoding(NSUTF8StringEncoding)!);
+    }
+
+    return true;
+  }
+
+  private func handlePleaseHelp(socket: SobtLib.Socket.TCPSocket, message: String) -> Bool {
+    let matches = Array(SobtLib.Helper.String.MatchingStrings(message, regex: "PLEASE HELP ([^\\s]*) ([^\\s]*)").flatten());
+    if (matches.isEmpty) {
+      return false;
+    }
+
+    self.helpRange = (Int(matches[1])!, Int(matches[2])!);
+    print("Got help range \(self.helpRange)");
+
+    return true;
+  }
+
+  private enum PeerState {
+    case Idle;
+    case Ready;
+    case GetTarget;
+    case GetRemainCount;
+    case OfferHelp;
+    case Finish;
   }
 }

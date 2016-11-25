@@ -9,6 +9,8 @@
 import Foundation
 
 class Cracker {
+  var delegate: CrackerDelegate? = nil;
+
   private let alphabet: Array<String>;
   private let maxLength: Int;
   private let maxIndex: Int;
@@ -41,6 +43,7 @@ class Cracker {
         if (self.curIndex >= self.endIndex) {
           shouldBreak = true;
           attemptMessage = "Max index reached :(";
+          self.delegate?.crackerFailed();
         }
 
         if (!shouldBreak) {
@@ -55,7 +58,8 @@ class Cracker {
 
           if (hash == target) {
             shouldBreak = true;
-            attemptMessage = "Message found: \(message).";
+            attemptMessage = "Message found: \"\(message)\".";
+            self.delegate?.crackerFoundMessage(message);
           }
         }
 

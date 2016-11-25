@@ -61,6 +61,7 @@
 		CE894B791DC95CF200EB834D /* connect.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA709081DC7E8CD0095A46D /* connect.swift */; };
 		CE894B7B1DC9668100EB834D /* peer-node.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE894B7A1DC9668100EB834D /* peer-node.swift */; };
 		CEA7090C1DC7F0C40095A46D /* connect.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA709081DC7E8CD0095A46D /* connect.swift */; };
+		CEC64B601DE7BDFA00609C1B /* cracker-delegate-protocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC64B5F1DE7BDFA00609C1B /* cracker-delegate-protocol.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -136,6 +137,7 @@
 		CEA709051DC7C4F20095A46D /* magnet-link.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "magnet-link.swift"; path = "sobt-lib/helper/magnet-link.swift"; sourceTree = "<group>"; };
 		CEA709081DC7E8CD0095A46D /* connect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = connect.swift; sourceTree = "<group>"; };
 		CEA7090D1DC7F1BC0095A46D /* action.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = action.swift; sourceTree = "<group>"; };
+		CEC64B5F1DE7BDFA00609C1B /* cracker-delegate-protocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "cracker-delegate-protocol.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -270,6 +272,7 @@
 		CE894B601DC95C6900EB834D /* sobt-client */ = {
 			isa = PBXGroup;
 			children = (
+				CEC64B5F1DE7BDFA00609C1B /* cracker-delegate-protocol.swift */,
 				CE3BFEDA1DE3CAE50015EC9E /* cracker.swift */,
 				CE894B611DC95C6900EB834D /* main.swift */,
 				CE894B7A1DC9668100EB834D /* peer-node.swift */,
@@ -482,6 +485,7 @@
 				CE894B731DC95CF200EB834D /* sobt-lib.swift in Sources */,
 				CE894B741DC95CF200EB834D /* socket-tcp.swift in Sources */,
 				CE894B751DC95CF200EB834D /* socket-udp.swift in Sources */,
+				CEC64B601DE7BDFA00609C1B /* cracker-delegate-protocol.swift in Sources */,
 				CE894B761DC95CF200EB834D /* socket.swift in Sources */,
 				CE894B771DC95CF200EB834D /* action.swift in Sources */,
 				CE894B781DC95CF200EB834D /* announce.swift in Sources */,

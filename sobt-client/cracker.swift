@@ -106,7 +106,7 @@ class Cracker {
     return remainCount;
   }
 
-  func divideRemaining() -> (Int, Int) {
+  func divideRemaining(percent: Int = 50) -> (Int, Int) {
     while (true) {
       if (self.operationLock.tryLock()) {
         break;
@@ -114,7 +114,7 @@ class Cracker {
     }
 
     let otherEndIndex = self.endIndex;
-    self.endIndex = self.curIndex + ((self.endIndex - self.curIndex) / 2);
+    self.endIndex = self.curIndex + ((self.endIndex - self.curIndex) / 100 * percent);
     let otherStartIndex = self.endIndex;
 
     print("New end set to \(self.endIndex). Currently at \(self.curIndex). Remaining [\(otherStartIndex)..\(otherEndIndex)].");
@@ -131,8 +131,7 @@ class Cracker {
 
     self.startIndex = startIndex >= 0 ? startIndex : 0;
     self.endIndex = endIndex <= self.maxIndex ? endIndex : self.maxIndex;
-    self.curIndex = self.curIndex < self.startIndex ? self.startIndex : self.curIndex;
-    self.curIndex = self.curIndex > self.endIndex ? self.endIndex : self.curIndex;
+    self.curIndex = self.startIndex;
 
     print("Range set to [\(self.startIndex)..\(self.endIndex)]. Currently at \(self.curIndex).");
     self.operationLock.unlock();

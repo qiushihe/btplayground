@@ -76,23 +76,52 @@ class PeerNode: NSObject, TrackerClientDelegate, CrackerDelegate {
           self.sendMessageFound(self.targetMessage!);
         }
         self.state = PeerState.Finish;
-      } else if (!self.peers.isEmpty && !self.cracker.isRunning()) {
-        if (self.targetHash == nil) {
-          self.sendGetTarget();
-          self.state = PeerState.GetTarget;
-        } else if (self.targetHash != nil && self.peerRemainCounts.isEmpty) {
-          self.sendGetRemainCount();
-          self.state = PeerState.GetRemainCount;
-        } else if (self.targetHash != nil && !self.peerRemainCounts.isEmpty && self.helpRange == nil) {
-          let (peerId, _) = self.peerRemainCounts.sort {(a, b) in
-            return a.1 > b.1;
-          }.first!;
+        break;
+      }
+
+      if (self.cracker.isRunning()) {
+        self.state = PeerState.Working;
+        break;
+      }
+
+      if (self.peers.isEmpty) {
+        self.state = PeerState.WaitForPeers;
+        break;
+      }
+
+      if (self.targetHash == nil) {
+        self.sendGetTarget();
+        self.state = PeerState.GetTarget;
+        break;
+      }
+
+      if (self.peerRemainCounts.isEmpty) {
+        self.sendGetRemainCount();
+        self.state = PeerState.GetRemainCount;
+        break;
+      }
+
+      if (self.helpRange == nil) {
+        let (peerId, peerRemain) = self.peerRemainCounts.sort {(a, b) in
+          return a.1 > b.1;
+        }.first!;
+
+        if (peerRemain < 100000) {
+          self.state = PeerState.WaitForFinish;
+        } else {
           self.sendOfferHelp(peerId);
           self.state = PeerState.OfferHelp;
-        } else if (self.targetHash != nil && !self.peerRemainCounts.isEmpty && self.helpRange != nil) {
-          self.cracker.setRange(self.helpRange!.0, endIndex: self.helpRange!.1);
-          self.cracker.start(self.targetHash!);
         }
+        break;
+      }
+
+      self.cracker.setRange(self.helpRange!.0, endIndex: self.helpRange!.1);
+      self.cracker.start(self.targetHash!);
+      self.state = PeerState.Working;
+      break;
+    case PeerState.WaitForPeers:
+      if (!self.peers.isEmpty) {
+        self.state = PeerState.Ready;
       }
       break;
     case PeerState.GetTarget:
@@ -108,6 +137,13 @@ class PeerNode: NSObject, TrackerClientDelegate, CrackerDelegate {
     case PeerState.OfferHelp:
       if (self.helpRange != nil) {
         self.state = PeerState.Ready;
+      }
+      break;
+    case PeerState.Working:
+      break;
+    case PeerState.WaitForFinish:
+      if (self.targetMessage != nil) {
+        self.state = PeerState.Finish;
       }
       break;
     default: // PeerState.Finish
@@ -151,6 +187,7 @@ class PeerNode: NSObject, TrackerClientDelegate, CrackerDelegate {
     }
 
     self.targetMessage = message;
+    self.state = PeerState.Ready;
 
     self.updateLock.unlock();
   }
@@ -165,6 +202,7 @@ class PeerNode: NSObject, TrackerClientDelegate, CrackerDelegate {
     self.cracker.stop();
     self.helpRange = nil;
     self.peerRemainCounts.removeAll();
+    self.state = PeerState.Ready;
 
     self.updateLock.unlock();
   }
@@ -336,7 +374,7 @@ class PeerNode: NSObject, TrackerClientDelegate, CrackerDelegate {
     }
 
     if (self.cracker.isRunning()) {
-      let (helpStart, helpEnd) = self.cracker.divideRemaining();
+      let (helpStart, helpEnd) = self.cracker.divideRemaining(90);
       let remainCountIsMsg = "PLEASE HELP \(helpStart) \(helpEnd)";
       socket.sendData(remainCountIsMsg.dataUsingEncoding(NSUTF8StringEncoding)!);
     }
@@ -379,9 +417,12 @@ class PeerNode: NSObject, TrackerClientDelegate, CrackerDelegate {
   private enum PeerState {
     case Idle;
     case Ready;
+    case WaitForPeers;
     case GetTarget;
     case GetRemainCount;
     case OfferHelp;
+    case Working;
+    case WaitForFinish;
     case Finish;
   }
 }

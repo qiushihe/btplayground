@@ -106,9 +106,7 @@ class PeerNode: NSObject, TrackerClientDelegate, CrackerDelegate {
           return a.1 > b.1;
         }.first!;
 
-        if (peerRemain < 100000) {
-          self.state = PeerState.WaitForFinish;
-        } else {
+        if (peerRemain > 100000) {
           self.sendOfferHelp(peerId);
           self.state = PeerState.OfferHelp;
         }
@@ -140,11 +138,6 @@ class PeerNode: NSObject, TrackerClientDelegate, CrackerDelegate {
       }
       break;
     case PeerState.Working:
-      break;
-    case PeerState.WaitForFinish:
-      if (self.targetMessage != nil) {
-        self.state = PeerState.Finish;
-      }
       break;
     default: // PeerState.Finish
       self.stopAutoUpdate();
@@ -422,7 +415,6 @@ class PeerNode: NSObject, TrackerClientDelegate, CrackerDelegate {
     case GetRemainCount;
     case OfferHelp;
     case Working;
-    case WaitForFinish;
     case Finish;
   }
 }

@@ -68,22 +68,24 @@ extension SobtLib.Socket {
           let requestSocket = TCPSocket(options: requestSocketOptions);
           requestSocket.setListener(listener);
         } else {
+          // TODO: Continue to read (i.e. in a loop) until there is nothing left to read
           let buffer = [UInt8](count: 4096, repeatedValue: 0);
           let bytesRead = recv(self.descriptor, UnsafeMutablePointer<Void>(buffer), buffer.count, 0);
-
-          if (bytesRead <= 0) {
-            print("TODO: Socket closed!");
-          }
+          let socketClosed = bytesRead <= 0;
 
           let dataEvent = SocketDataEvent(
-            inSocket: self,
+            socket: self,
             inIp: nil,
             inPort: nil,
-            data: Array<UInt8>(buffer[0..<bytesRead]),
-            outSocket: self
+            data: socketClosed ? Array<UInt8> () : Array<UInt8>(buffer[0..<bytesRead]),
+            closed: socketClosed
           );
 
           listener(dataEvent);
+
+          if (socketClosed) {
+            self.closeSocket();
+          }
         }
       };
 
@@ -129,9 +131,7 @@ extension SobtLib.Socket {
         }
       }
       
-      if (self.onReady != nil) {
-        self.onReady!(self);
-      }
+      self.onReady?(self);
     }
   }
 }

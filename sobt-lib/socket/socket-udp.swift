@@ -66,9 +66,8 @@ extension SobtLib.Socket {
           );
         };
 
+        let socketClosed = bytesRead <= 0;
         let (ipAddress, servicePort) = SobtLib.Socket.Socket.GetSocketHostAndPort(SobtLib.Socket.Socket.CastSocketAddress(&inAddress));
-        let message = "Got data from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
-        print(message);
 
         // Create a reply socket for the incoming connection
         var replySocketOptions = SocketOptions();
@@ -80,15 +79,21 @@ extension SobtLib.Socket {
           ? UDPSocket(options: replySocketOptions)
           : nil;
 
+        // (outSocket: Socket, inSocket: Socket, ip: String?, port: String?, data: Array<UInt8>)
         let dataEvent = SocketDataEvent(
+          outSocket: replySocket,
           inSocket: self,
           inIp: ipAddress,
           inPort: servicePort,
-          data: Array<UInt8>(readBuffer[0..<bytesRead]),
-          outSocket: replySocket
+          data: socketClosed ? Array<UInt8>() : Array<UInt8>(readBuffer[0..<bytesRead]),
+          closed: socketClosed
         );
 
         listener(dataEvent);
+
+        if (socketClosed) {
+          self.closeSocket();
+        }
       };
 
       // Start the listener thread
@@ -126,9 +131,7 @@ extension SobtLib.Socket {
         }
       }
 
-      if (self.onReady != nil) {
-        self.onReady!(self);
-      }
+      self.onReady?(self);
     }
   }
 }

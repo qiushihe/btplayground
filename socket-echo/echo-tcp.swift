@@ -44,6 +44,11 @@ class TCPEcho: SocketEchoer {
   }
 
   private func handleSocketData(evt: SobtLib.Socket.SocketDataEvent) {
+    if (evt.closed) {
+      print("\(self.isServer ? "Client" : "Server") closed socket");
+      return;
+    }
+
     if let dataString = String(bytes: evt.data, encoding: NSUTF8StringEncoding) {
       print("\(self.isServer ? "Server" : "Client") received message: \(dataString)");
     } else {

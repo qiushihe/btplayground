@@ -30,9 +30,25 @@ extension SobtLib.Socket {
     var inIp: String?;
     var inPort: String?;
 
+    var closed: Bool;
     var data: Array<UInt8>;
 
     var outSocket: Socket?;
+
+    init(outSocket: Socket?, inSocket: Socket, inIp: String?, inPort: String?, data: Array<UInt8>, closed: Bool = false) {
+      self.inSocket = inSocket;
+      self.outSocket = outSocket;
+
+      self.inIp = inIp;
+      self.inPort = inPort;
+
+      self.data = data;
+      self.closed = closed;
+    }
+
+    init(socket: Socket, inIp: String?, inPort: String?, data: Array<UInt8>, closed: Bool = false) {
+      self.init(outSocket: socket, inSocket: socket, inIp: inIp, inPort: inPort, data: data, closed: closed);
+    }
   }
 
   class Socket {
@@ -162,10 +178,7 @@ extension SobtLib.Socket {
 
     func closeSocket() {
       close(self.descriptor);
-
-      if (self.onClose != nil) {
-        self.onClose!(self);
-      }
+      self.onClose?(self);
     }
   }
 }

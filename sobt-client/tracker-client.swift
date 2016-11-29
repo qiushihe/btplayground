@@ -153,7 +153,12 @@ class TrackerClient : NSObject {
 
     // if (url.host != "tracker.coppersurfer.tk") { return; }
 
-    connectionData.udpSocket = SobtLib.Socket.UDPSocket(port: UInt16(url.port!.integerValue), host: url.host);
+    var udpSocketOptions = SobtLib.Socket.SocketOptions();
+    udpSocketOptions.host = url.host;
+    udpSocketOptions.port = UInt16(url.port!.integerValue);
+    udpSocketOptions.type = SobtLib.Socket.SocketType.Client;
+
+    connectionData.udpSocket = SobtLib.Socket.UDPSocket(options: udpSocketOptions);
     connectionData.udpSocket!.setListener(self.handleSocketData);
 
     connectionData.transactionId = SobtLib.Helper.Number.GetRandomNumber();

@@ -47,7 +47,12 @@ class UDPEcho: SocketEchoer {
   }
 
   func start() {
-    self.udpSocket = SobtLib.Socket.UDPSocket(port: self.port, host: self.host);
+    var udpSocketOptions = SobtLib.Socket.SocketOptions();
+    udpSocketOptions.port = self.port;
+    udpSocketOptions.host = self.host;
+    udpSocketOptions.type = self.host == nil ? SobtLib.Socket.SocketType.Server : SobtLib.Socket.SocketType.Client;
+
+    self.udpSocket = SobtLib.Socket.UDPSocket(options: udpSocketOptions);
     self.udpSocket!.setListener(self.handleSocketData);
     
     print("\(self.isServer ? "Server" : "Client") listening ...");

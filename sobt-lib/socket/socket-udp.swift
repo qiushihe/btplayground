@@ -17,34 +17,36 @@ extension SobtLib.Socket {
     // 65535 - 8 byte UDP header − 20 byte IP header
     static let MAX_PACKET_SIZE = 65507;
 
-    private let port: UInt16;
-    private let host: String?
-    private let isServer: Bool;
+    private let type: SocketType;
 
-    private var socketAddress: UnsafePointer<sockaddr> = nil;
+    private var socketAddress: sockaddr? = nil;
     private var socketAddressLength: UInt32 = UInt32(sizeof(sockaddr));
     private var udpSocket: Int32 = -1;
     private var dispatchSource: dispatch_source_t? = nil;
 
-    init(port: UInt16, host: String? = nil) {
-      self.port = port;
-      self.host = host;
-      self.isServer = self.host == nil;
+    private var onReady: ((Socket) -> ())? = nil;
+    private var onClose: ((Socket) -> ())? = nil;
 
-      super.init();
+    init(options: SocketOptions) {
+      self.onReady = options.onReady;
+      self.onClose = options.onClose;
+      self.type = options.type!;
 
-      self.setupAddress();
-      self.setupSocket();
-    }
+      if (options.descriptor != nil && options.address != nil) {
+        self.udpSocket = options.descriptor!;
+        self.socketAddress = options.address!;
+        self.socketAddressLength = socklen_t(sizeofValue(options.address!));
 
-    init(socket: Int32, address: UnsafePointer<sockaddr>, addressLength: UInt32) {
-      self.port = 0;
-      self.host = nil;
-      self.isServer = true;
+        super.init();
+      } else {
+        super.init();
 
-      self.udpSocket = socket;
-      self.socketAddress = address;
-      self.socketAddressLength = addressLength;
+        var address = Socket.GetSocketAddress(options.port == nil ? 0 : options.port!, host: options.host);
+        self.socketAddress = Socket.CastSocketAddress(&address).memory;
+        self.socketAddressLength = UInt32(sizeofValue(address));
+
+        self.setupSocket(self.type == SocketType.Server);
+      }
     }
 
     func setListener(listener: (SocketDataEvent) -> ()) {
@@ -92,8 +94,14 @@ extension SobtLib.Socket {
         let message = "Got data from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
         print(message);
 
-        let replySocket: UDPSocket? = self.isServer
-          ? UDPSocket(socket: inSocket, address: SobtLib.Socket.Socket.CastSocketAddress(&inAddress), addressLength: inAddressLength)
+        // Create a reply socket for the incoming connection
+        var replySocketOptions = SocketOptions();
+        replySocketOptions.descriptor = inSocket;
+        replySocketOptions.address = Socket.CastSocketAddress(&inAddress).memory;
+        replySocketOptions.type = SocketType.Reply;
+
+        let replySocket: UDPSocket? = self.type == SocketType.Server
+          ? UDPSocket(options: replySocketOptions)
           : nil;
 
         let dataEvent = SocketDataEvent(
@@ -112,13 +120,27 @@ extension SobtLib.Socket {
     }
 
     func sendData(data: NSData) {
-      let bytesSent = sendto(
-        self.udpSocket,
-        data.bytes, data.length,
-        0,
-        self.isServer ? self.socketAddress : nil,
-        self.isServer ? self.socketAddressLength : 0
-      );
+      var bytesSent = 0;
+
+      if (self.type == SocketType.Server || self.type == SocketType.Reply) {
+        bytesSent = sendto(
+          self.udpSocket,
+          data.bytes,
+          data.length,
+          0,
+          &self.socketAddress!,
+          self.socketAddressLength
+        );
+      } else {
+        bytesSent = sendto(
+          self.udpSocket,
+          data.bytes,
+          data.length,
+          0,
+          nil,
+          0
+        );
+      }
 
       guard bytesSent >= 0  else {
         return assertionFailure("Could not send data: \(getErrorDescription(errno))");
@@ -129,52 +151,18 @@ extension SobtLib.Socket {
       close(self.udpSocket);
     }
 
-    private func setupAddress() {
-      var address: sockaddr_in = sockaddr_in();
-      memset(&address, 0, Int(socklen_t(sizeof(sockaddr_in))));
-
-      if (self.isServer) {
-        // For server mode there is no `host`.
-        address.sin_len = __uint8_t(sizeofValue(address));
-        address.sin_family = sa_family_t(AF_INET);
-        address.sin_port = SobtLib.Helper.Network.HostToNetwork(self.port);
-        address.sin_addr.s_addr = in_addr_t(0);
-      } else {
-        // For client mode, we need to resolve the host info to obtain the adress data
-        // from the given `host` string, which could be either an domain like "www.apple.ca"
-        // or an IP address like "17.178.96.7".
-        let cfHost = CFHostCreateWithName(nil, self.host!).takeRetainedValue();
-        CFHostStartInfoResolution(cfHost, .Addresses, nil);
-
-        var success: DarwinBoolean = false;
-        // TODO: Handle when address resolution fails.
-        let addresses = CFHostGetAddressing(cfHost, &success)?.takeUnretainedValue() as NSArray?;
-
-        // TODO: Loop through to actually find an usable address instead of alaways taking the
-        // first entry in the array.
-        let data = addresses![0];
-
-        data.getBytes(&address, length: data.length);
-        address.sin_port = SobtLib.Helper.Network.HostToNetwork(self.port);
-        // TODO: Assert for valid address.sin_family
-      }
-
-      self.socketAddress = Socket.CastSocketAddress(&address);
-      self.socketAddressLength = UInt32(sizeofValue(address));
-    }
-
-    private func setupSocket() {
+    private func setupSocket(bindAndListen: Bool) {
       self.udpSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
       guard self.udpSocket >= 0 else {
         return assertionFailure("Could not create socket: \(getErrorDescription(errno))!");
       }
 
-      if (self.isServer) {
+      if (bindAndListen) {
         // Server mode socket requires binding
         let bindErr = bind(
           self.udpSocket,
-          self.socketAddress,
+          &self.socketAddress!,
           self.socketAddressLength
         );
 
@@ -185,7 +173,7 @@ extension SobtLib.Socket {
         // Client mode socket requires connection
         let connectErr = connect(
           self.udpSocket,
-          self.socketAddress,
+          &self.socketAddress!,
           self.socketAddressLength
         );
         

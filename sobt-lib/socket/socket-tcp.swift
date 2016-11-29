@@ -121,7 +121,8 @@ extension SobtLib.Socket {
       if (self.type == SocketType.Server || self.type == SocketType.Reply) {
         bytesSent = sendto(
           self.tcpSocket,
-          data.bytes, data.length,
+          data.bytes,
+          data.length,
           0,
           &self.socketAddress!,
           self.socketAddressLength
@@ -129,7 +130,8 @@ extension SobtLib.Socket {
       } else {
         bytesSent = sendto(
           self.tcpSocket,
-          data.bytes, data.length,
+          data.bytes,
+          data.length,
           0,
           nil,
           0

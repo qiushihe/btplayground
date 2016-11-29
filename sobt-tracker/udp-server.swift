@@ -18,7 +18,11 @@ class UDPServer {
   }
 
   func start() {
-    self.udpSocket = SobtLib.Socket.UDPSocket(port: self.port);
+    var udpSocketOptions = SobtLib.Socket.SocketOptions();
+    udpSocketOptions.port = self.port;
+    udpSocketOptions.type = SobtLib.Socket.SocketType.Server;
+
+    self.udpSocket = SobtLib.Socket.UDPSocket(options: udpSocketOptions);
     self.udpSocket!.setListener(self.handleSocketData);
 
     print("Server listening on port \(self.port)...");

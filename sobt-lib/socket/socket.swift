@@ -101,9 +101,71 @@ extension SobtLib.Socket {
 
       return address;
     }
-    
+
+    let type: SocketType;
+
+    var socketAddress: sockaddr? = nil;
+    var socketAddressLength: UInt32 = UInt32(sizeof(sockaddr));
+    var descriptor: Int32 = -1;
+    var dispatchSource: dispatch_source_t? = nil;
+
+    var onReady: ((Socket) -> ())? = nil;
+    var onClose: ((Socket) -> ())? = nil;
+
+    init(options: SocketOptions) {
+      self.onReady = options.onReady;
+      self.onClose = options.onClose;
+      self.type = options.type!;
+
+      if (options.descriptor != nil && options.address != nil) {
+        self.descriptor = options.descriptor!;
+        self.socketAddress = options.address!;
+        self.socketAddressLength = socklen_t(sizeofValue(options.address!));
+      } else {
+        var address = Socket.GetSocketAddress(options.port == nil ? 0 : options.port!, host: options.host);
+        self.socketAddress = Socket.CastSocketAddress(&address).memory;
+        self.socketAddressLength = UInt32(sizeofValue(address));
+      }
+    }
+
     func getErrorDescription(errorNumber: Int32) -> String {
       return "\(errorNumber) - \(String.fromCString(strerror(errorNumber)))";
+    }
+
+    func sendData(data: NSData) {
+      var bytesSent = 0;
+
+      if (self.type == SocketType.Server || self.type == SocketType.Reply) {
+        bytesSent = sendto(
+          self.descriptor,
+          data.bytes,
+          data.length,
+          0,
+          &self.socketAddress!,
+          self.socketAddressLength
+        );
+      } else {
+        bytesSent = sendto(
+          self.descriptor,
+          data.bytes,
+          data.length,
+          0,
+          nil,
+          0
+        );
+      }
+
+      guard bytesSent >= 0  else {
+        return assertionFailure("Could not send data: \(getErrorDescription(errno))");
+      }
+    }
+
+    func closeSocket() {
+      close(self.descriptor);
+
+      if (self.onClose != nil) {
+        self.onClose!(self);
+      }
     }
   }
 }

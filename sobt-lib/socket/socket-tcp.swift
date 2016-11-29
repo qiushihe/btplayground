@@ -14,35 +14,11 @@ import Foundation
 
 extension SobtLib.Socket {
   class TCPSocket: Socket {
-    private let type: SocketType;
+    override init(options: SocketOptions) {
+      super.init(options: options);
 
-    private var socketAddress: sockaddr? = nil;
-    private var socketAddressLength: UInt32 = UInt32(sizeof(sockaddr));
-    private var tcpSocket: Int32 = -1;
-    private var dispatchSource: dispatch_source_t? = nil;
-
-    private var onReady: ((Socket) -> ())? = nil;
-    private var onClose: ((Socket) -> ())? = nil;
-
-    init(options: SocketOptions) {
-      self.onReady = options.onReady;
-      self.onClose = options.onClose;
-      self.type = options.type!;
-
-      if (options.descriptor != nil && options.address != nil) {
-        self.tcpSocket = options.descriptor!;
-        self.socketAddress = options.address!;
-        self.socketAddressLength = socklen_t(sizeofValue(options.address!));
-
-        super.init();
-      } else {
-        super.init();
-
-        var address = Socket.GetSocketAddress(options.port == nil ? 0 : options.port!, host: options.host);
-        self.socketAddress = Socket.CastSocketAddress(&address).memory;
-        self.socketAddressLength = UInt32(sizeofValue(address));
-
-        self.setupSocket(options.host == nil);
+      if (options.descriptor == nil || options.address == nil) {
+        self.setupSocket(self.type == SocketType.Server || self.type == SocketType.Reply);
       }
     }
 
@@ -50,20 +26,20 @@ extension SobtLib.Socket {
       // Create a GCD thread that can listen for network events.
       self.dispatchSource = dispatch_source_create(
         DISPATCH_SOURCE_TYPE_READ,
-        UInt(self.tcpSocket),
+        UInt(self.descriptor),
         0,
         dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
       );
 
       guard self.dispatchSource != nil else {
-        close(self.tcpSocket);
+        close(self.descriptor);
         assertionFailure("Can not create dispath source: \(self.getErrorDescription(errno))");
         return;
       };
 
       // Register the event handler for cancellation.
       dispatch_source_set_cancel_handler(dispatchSource!) {
-        close(self.tcpSocket);
+        close(self.descriptor);
         assertionFailure("Event handler cancelled: \(self.getErrorDescription(errno))");
       };
 
@@ -93,7 +69,7 @@ extension SobtLib.Socket {
           requestSocket.setListener(listener);
         } else {
           let buffer = [UInt8](count: 4096, repeatedValue: 0);
-          let bytesRead = recv(self.tcpSocket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0);
+          let bytesRead = recv(self.descriptor, UnsafeMutablePointer<Void>(buffer), buffer.count, 0);
 
           if (bytesRead <= 0) {
             print("TODO: Socket closed!");
@@ -115,53 +91,17 @@ extension SobtLib.Socket {
       dispatch_resume(self.dispatchSource!);
     }
 
-    func sendData(data: NSData) {
-      var bytesSent = 0;
-
-      if (self.type == SocketType.Server || self.type == SocketType.Reply) {
-        bytesSent = sendto(
-          self.tcpSocket,
-          data.bytes,
-          data.length,
-          0,
-          &self.socketAddress!,
-          self.socketAddressLength
-        );
-      } else {
-        bytesSent = sendto(
-          self.tcpSocket,
-          data.bytes,
-          data.length,
-          0,
-          nil,
-          0
-        );
-      }
-
-      guard bytesSent >= 0  else {
-        return assertionFailure("Could not send data: \(getErrorDescription(errno))");
-      }
-    }
-
-    func closeSocket() {
-      close(self.tcpSocket);
-
-      if (self.onClose != nil) {
-        self.onClose!(self);
-      }
-    }
-
     private func setupSocket(bindAndListen: Bool) {
-      self.tcpSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+      self.descriptor = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-      guard self.tcpSocket >= 0 else {
+      guard self.descriptor >= 0 else {
         return assertionFailure("Could not create socket: \(getErrorDescription(errno))!");
       }
 
       if (bindAndListen) {
         // Server mode socket requires binding and listening
         let bindErr = bind(
-          self.tcpSocket,
+          self.descriptor,
           &self.socketAddress!,
           self.socketAddressLength
         );
@@ -171,7 +111,7 @@ extension SobtLib.Socket {
         }
 
         let connectionBufferCount: Int32 = 10; // TODO: Move this to a variable
-        let listenErr = listen(tcpSocket, connectionBufferCount);
+        let listenErr = listen(self.descriptor, connectionBufferCount);
 
         guard listenErr == 0 else {
           return assertionFailure("Could not listen on socket: \(getErrorDescription(errno))!");
@@ -179,7 +119,7 @@ extension SobtLib.Socket {
       } else {
         // Client mode socket requires connection
         let connectErr = connect(
-          self.tcpSocket,
+          self.descriptor,
           &self.socketAddress!,
           self.socketAddressLength
         );

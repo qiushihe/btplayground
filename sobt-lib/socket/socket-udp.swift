@@ -47,7 +47,7 @@ extension SobtLib.Socket {
       self.socketAddressLength = addressLength;
     }
 
-    func setListener(listener: (Int32) -> ()) {
+    func setListener(listener: (SocketDataEvent) -> ()) {
       // Create a GCD thread that can listen for network events.
       self.dispatchSource = dispatch_source_create(
         DISPATCH_SOURCE_TYPE_READ,
@@ -72,22 +72,14 @@ extension SobtLib.Socket {
       dispatch_source_set_event_handler(self.dispatchSource!) {
         guard let source = self.dispatchSource else { return };
         let inSocket = Int32(dispatch_source_get_handle(source));
-        listener(inSocket);
-      };
 
-      // Start the listener thread
-      dispatch_resume(self.dispatchSource!);
-    }
-
-    func setListener(listener: (Array<UInt8>) -> ()) {
-      self.setListener({(socket: Int32) in
         var inAddress = sockaddr_storage();
         var inAddressLength = socklen_t(sizeof(sockaddr_storage.self));
         let readBuffer = [UInt8](count: UDPSocket.MAX_PACKET_SIZE, repeatedValue: 0);
 
         let bytesRead = withUnsafeMutablePointer(&inAddress) {
           recvfrom(
-            socket,
+            inSocket,
             UnsafeMutablePointer<Void>(readBuffer),
             readBuffer.count,
             0,
@@ -96,8 +88,27 @@ extension SobtLib.Socket {
           );
         };
 
-        listener(Array<UInt8>(readBuffer[0..<bytesRead]));
-      });
+        let (ipAddress, servicePort) = SobtLib.Socket.Socket.GetSocketHostAndPort(SobtLib.Socket.Socket.CastSocketAddress(&inAddress));
+        let message = "Got data from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
+        print(message);
+
+        let replySocket: UDPSocket? = self.isServer
+          ? UDPSocket(socket: inSocket, address: SobtLib.Socket.Socket.CastSocketAddress(&inAddress), addressLength: inAddressLength)
+          : nil;
+
+        let dataEvent = SocketDataEvent(
+          inSocket: self,
+          inIp: ipAddress,
+          inPort: servicePort,
+          data: Array<UInt8>(readBuffer[0..<bytesRead]),
+          outSocket: replySocket
+        );
+
+        listener(dataEvent);
+      };
+
+      // Start the listener thread
+      dispatch_resume(self.dispatchSource!);
     }
 
     func sendData(data: NSData) {

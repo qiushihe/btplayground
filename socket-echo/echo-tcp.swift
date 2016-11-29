@@ -43,18 +43,17 @@ class TCPEcho: SocketEchoer {
     self.tcpSocket?.closeSocket();
   }
 
-  private func handleSocketData(dataSocket: SobtLib.Socket.TCPSocket) {
-    let dataRead = dataSocket.readData();
-    
-    if let dataString = String(data: dataRead, encoding: NSUTF8StringEncoding) {
+  private func handleSocketData(evt: SobtLib.Socket.SocketDataEvent) {
+    if let dataString = String(bytes: evt.data, encoding: NSUTF8StringEncoding) {
       print("\(self.isServer ? "Server" : "Client") received message: \(dataString)");
     } else {
-      print("\(self.isServer ? "Server" : "Client") received \(dataRead.length) bytes: \(dataRead.bytes)");
+      print("\(self.isServer ? "Server" : "Client") received \(evt.data.count) bytes: \(evt.data)");
     }
     
     if (self.isServer) {
       let replyStr = "Bay Area Men Wakes Up To No New Email!";
-      dataSocket.sendData(replyStr.dataUsingEncoding(NSUTF8StringEncoding)!);
+      let replySocket = evt.outSocket as! SobtLib.Socket.TCPSocket;
+      replySocket.sendData(replyStr.dataUsingEncoding(NSUTF8StringEncoding)!);
       print("Server sent: \(replyStr)");
     }
   }

@@ -48,10 +48,7 @@ class UDPEcho: SocketEchoer {
 
   func start() {
     self.udpSocket = SobtLib.Socket.UDPSocket(port: self.port, host: self.host);
-
-    self.udpSocket!.setListener({(socket: Int32) in
-      self.handleSocketData(socket);
-    });
+    self.udpSocket!.setListener(self.handleSocketData);
     
     print("\(self.isServer ? "Server" : "Client") listening ...");
     
@@ -65,32 +62,19 @@ class UDPEcho: SocketEchoer {
   func stop() {
     self.udpSocket?.closeSocket();
   }
-  
-  private func handleSocketData(socket: Int32) {
-    var inAddress = sockaddr_storage();
-    var inAddressLength = socklen_t(sizeof(sockaddr_storage.self));
-    let buffer = [UInt8](count: 4096, repeatedValue: 0);
-    
-    let bytesRead = withUnsafeMutablePointer(&inAddress) {
-      recvfrom(socket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0, UnsafeMutablePointer($0), &inAddressLength);
-    };
-    
-    let (ipAddress, servicePort) = SobtLib.Socket.Socket.GetSocketHostAndPort(SobtLib.Socket.Socket.CastSocketAddress(&inAddress));
-    let message = "Got data from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
-    print(message);
-    
-    let dataRead = buffer[0..<bytesRead];
-    if let dataString = String(bytes: dataRead, encoding: NSUTF8StringEncoding) {
+
+  private func handleSocketData(evt: SobtLib.Socket.SocketDataEvent) {
+    if let dataString = String(bytes: evt.data, encoding: NSUTF8StringEncoding) {
       print("\(self.isServer ? "Server" : "Client") received message: \(dataString)");
     } else {
-      print("\(self.isServer ? "Server" : "Client") received \(bytesRead) bytes: \(dataRead)");
+      print("\(self.isServer ? "Server" : "Client") received \(evt.data.count) bytes: \(evt.data)");
     }
-    
-    if (self.isServer) {
+
+    if (self.isServer && evt.outSocket != nil) {
       let replyStr = "Bay Area Men Wakes Up To No New Email!";
       let replyData = replyStr.dataUsingEncoding(NSUTF8StringEncoding)!;
-      
-      let replySocket = SobtLib.Socket.UDPSocket(socket: socket, address: SobtLib.Socket.Socket.CastSocketAddress(&inAddress), addressLength: inAddressLength);
+      let replySocket = evt.outSocket as! SobtLib.Socket.UDPSocket;
+
       replySocket.sendData(replyData);
       
       print("Server sent: \(replyStr)");

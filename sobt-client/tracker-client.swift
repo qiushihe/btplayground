@@ -154,9 +154,7 @@ class TrackerClient : NSObject {
     // if (url.host != "tracker.coppersurfer.tk") { return; }
 
     connectionData.udpSocket = SobtLib.Socket.UDPSocket(port: UInt16(url.port!.integerValue), host: url.host);
-    connectionData.udpSocket!.setListener({(data: Array<UInt8>) in
-      self.handleSocketData(data);
-    });
+    connectionData.udpSocket!.setListener(self.handleSocketData);
 
     connectionData.transactionId = SobtLib.Helper.Number.GetRandomNumber();
     connectionData.status = ConnectionStatus.Active;
@@ -192,11 +190,11 @@ class TrackerClient : NSObject {
     return trackers;
   }
 
-  private func handleSocketData(data: Array<UInt8>) {
-    let action = SobtLib.TrackerAction.Action.ParseResponse(data);
+  private func handleSocketData(evt: SobtLib.Socket.SocketDataEvent) {
+    let action = SobtLib.TrackerAction.Action.ParseResponse(evt.data);
 
     if (action == SobtLib.TrackerAction.Action.Connect) {
-      let response = SobtLib.TrackerAction.Connect.DecodeResponse(data);
+      let response = SobtLib.TrackerAction.Connect.DecodeResponse(evt.data);
       let result = self.connections.filter({(_, connection) in
         return connection.transactionId == response.transactionId;
       });
@@ -213,7 +211,7 @@ class TrackerClient : NSObject {
         print("No connection found for transaction \(response.transactionId)");
       }
     } else if (action == SobtLib.TrackerAction.Action.Announce) {
-      let response = SobtLib.TrackerAction.Announce.DecodeResponse(data);
+      let response = SobtLib.TrackerAction.Announce.DecodeResponse(evt.data);
       let result = self.connections.filter({(_, connection) in
         return connection.transactionId == response.transactionId;
       });
@@ -232,7 +230,7 @@ class TrackerClient : NSObject {
         print("No connection found for transaction \(response.transactionId)");
       }
     } else {
-      print("Unhandled action: \(action) with data: \(data)");
+      print("Unhandled action: \(action) with data: \(evt.data)");
     }
   }
 

@@ -46,8 +46,8 @@ do {
     : UDPEcho(port: port!, host: host);
 } catch SocketEchoError.InvalidArguments {
   print("Socker Echo Usage:");
-  print("* Server mode: sobt server [tcp|udp] [port]");
-  print("* Client mode: sobt client [tcp|udp] [port] [host]");
+  print("* Server mode: socket-echo server [tcp|udp] [port]");
+  print("* Client mode: socket-echo client [tcp|udp] [port] [host]");
   exit(0);
 }
 

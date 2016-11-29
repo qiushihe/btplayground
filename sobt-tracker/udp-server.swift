@@ -19,10 +19,7 @@ class UDPServer {
 
   func start() {
     self.udpSocket = SobtLib.Socket.UDPSocket(port: self.port);
-    
-    self.udpSocket!.setListener({(socket: Int32) in
-      self.handleSocketData(socket);
-    });
+    self.udpSocket!.setListener(self.handleSocketData);
 
     print("Server listening on port \(self.port)...");
   }
@@ -31,32 +28,20 @@ class UDPServer {
     self.udpSocket?.closeSocket();
   }
   
-  private func handleSocketData(socket: Int32) {
-    var inAddress = sockaddr_storage();
-    var inAddressLength = socklen_t(sizeof(sockaddr_storage.self));
-    let buffer = [UInt8](count: SobtLib.Socket.UDPSocket.MAX_PACKET_SIZE, repeatedValue: 0);
+  private func handleSocketData(evt: SobtLib.Socket.SocketDataEvent) {
+    print("Server received \(evt.data.count) bytes: \(evt.data)");
 
-    let bytesRead = withUnsafeMutablePointer(&inAddress) {
-      recvfrom(socket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0, UnsafeMutablePointer($0), &inAddressLength);
-    };
+    let replySocket = evt.outSocket as! SobtLib.Socket.UDPSocket;
+    let action = SobtLib.TrackerAction.Action.ParseRequest(evt.data);
 
-    let (ipAddress, servicePort): (String?, String?) = SobtLib.Socket.Socket.GetSocketHostAndPort(SobtLib.Socket.Socket.CastSocketAddress(&inAddress));
-    let message = "Got data from: " + (ipAddress ?? "nil") + ", from port:" + (servicePort ?? "nil");
-    print(message);
-
-    let data = Array(buffer[0..<bytesRead]);
-    print("Server received \(data.count) bytes: \(data)");
-
-    let action = SobtLib.TrackerAction.Action.ParseRequest(data);
     if (action == SobtLib.TrackerAction.Action.Connect) {
-      let request = SobtLib.TrackerAction.Connect.DecodeRequest(data);
-      let replySocket = SobtLib.Socket.UDPSocket(socket: socket, address: SobtLib.Socket.Socket.CastSocketAddress(&inAddress), addressLength: inAddressLength);
+      let request = SobtLib.TrackerAction.Connect.DecodeRequest(evt.data);
 
       var connection = ConnectionData(SobtLib.Helper.Number.GetRandomNumber(), replySocket);
-      connection.ip = ipAddress?.characters.split(".").map(String.init).map() {part in
+      connection.ip = evt.inIp?.characters.split(".").map(String.init).map() {part in
         return UInt8(part)!;
       };
-      
+
       self.connections[connection.connectionId] = connection;
       print("Created connection \(connection.connectionId) for transaction ID \(request.transactionId)");
 
@@ -66,7 +51,7 @@ class UDPServer {
       );
       replySocket.sendData(responsePayload);
     } else if (action == SobtLib.TrackerAction.Action.Announce) {
-      let request = SobtLib.TrackerAction.Announce.DecodeRequest(data);
+      let request = SobtLib.TrackerAction.Announce.DecodeRequest(evt.data);
       print(request);
 
       var connection = self.connections[request.connectionId]!;

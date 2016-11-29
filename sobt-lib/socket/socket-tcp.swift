@@ -46,7 +46,7 @@ extension SobtLib.Socket {
       }
     }
 
-    func setListener(listener: (TCPSocket) -> ()) {
+    func setListener(listener: (SocketDataEvent) -> ()) {
       // Create a GCD thread that can listen for network events.
       self.dispatchSource = dispatch_source_create(
         DISPATCH_SOURCE_TYPE_READ,
@@ -92,26 +92,27 @@ extension SobtLib.Socket {
           let requestSocket = TCPSocket(options: requestSocketOptions);
           requestSocket.setListener(listener);
         } else {
-          listener(self);
+          let buffer = [UInt8](count: 4096, repeatedValue: 0);
+          let bytesRead = recv(self.tcpSocket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0);
+
+          if (bytesRead <= 0) {
+            print("TODO: Socket closed!");
+          }
+
+          let dataEvent = SocketDataEvent(
+            inSocket: self,
+            inIp: nil,
+            inPort: nil,
+            data: Array<UInt8>(buffer[0..<bytesRead]),
+            outSocket: self
+          );
+
+          listener(dataEvent);
         }
       };
 
       // Start the listener thread
       dispatch_resume(self.dispatchSource!);
-    }
-
-    func readData() -> NSData {
-      let buffer = [UInt8](count: 4096, repeatedValue: 0);
-
-      let bytesRead = recv(self.tcpSocket, UnsafeMutablePointer<Void>(buffer), buffer.count, 0);
-
-      if (bytesRead <= 0) {
-        print("TODO: Socket closed!");
-      }
-
-      let dataRead = Array<UInt8>(buffer[0..<bytesRead]);
-
-      return NSData(bytes: dataRead, length: bytesRead);
     }
 
     func sendData(data: NSData) {

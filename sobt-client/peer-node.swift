@@ -212,7 +212,7 @@ class PeerNode: NSObject, TrackerClientDelegate, CrackerDelegate {
     print("Peer node \(self.peerId) listening on port \(self.port)...");
   }
 
-  private func handleSocketData(socket: SobtLib.Socket.TCPSocket) {
+  private func handleSocketData(evt: SobtLib.Socket.SocketDataEvent) {
     while (true) {
       if (self.updateLock.tryLock()) {
         break;
@@ -222,24 +222,24 @@ class PeerNode: NSObject, TrackerClientDelegate, CrackerDelegate {
     var handled = false;
     var handledMsg: String? = nil;
 
-    let dataRead = socket.readData();
-    let dataString = String(data: dataRead, encoding: NSUTF8StringEncoding);
+    let dataString = String(bytes: evt.data, encoding: NSUTF8StringEncoding);
+    let dataSocket = evt.outSocket as! SobtLib.Socket.TCPSocket;
 
     if (dataString == nil) {
       handled = true;
-      handledMsg = "Peer node received \(dataRead.length) bytes: \(dataRead)";
+      handledMsg = "Peer node received \(evt.data.count) bytes: \(evt.data)";
     }
 
     if (!handled && (
-      self.handlePing(socket, message: dataString!) ||
-      self.handlePong(socket, message: dataString!) ||
-      self.handleGetTarget(socket, message: dataString!) ||
-      self.handleTargetIs(socket, message: dataString!) ||
-      self.handleGetRemainCount(socket, message: dataString!) ||
-      self.handleRemainCountIs(socket, message: dataString!) ||
-      self.handleLetMeHelp(socket, message: dataString!) ||
-      self.handlePleaseHelp(socket, message: dataString!) ||
-      self.handleMessageFound(socket, message: dataString!)
+      self.handlePing(dataSocket, message: dataString!) ||
+      self.handlePong(dataSocket, message: dataString!) ||
+      self.handleGetTarget(dataSocket, message: dataString!) ||
+      self.handleTargetIs(dataSocket, message: dataString!) ||
+      self.handleGetRemainCount(dataSocket, message: dataString!) ||
+      self.handleRemainCountIs(dataSocket, message: dataString!) ||
+      self.handleLetMeHelp(dataSocket, message: dataString!) ||
+      self.handlePleaseHelp(dataSocket, message: dataString!) ||
+      self.handleMessageFound(dataSocket, message: dataString!)
     )) {
       handled = true;
     }

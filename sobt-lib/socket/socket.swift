@@ -25,6 +25,16 @@ extension SobtLib.Socket {
     var onClose: ((Socket) -> ())? = nil;
   }
 
+  struct SocketDataEvent {
+    var inSocket: Socket;
+    var inIp: String?;
+    var inPort: String?;
+
+    var data: Array<UInt8>;
+
+    var outSocket: Socket?;
+  }
+
   class Socket {
     class func CastSocketAddress(address: UnsafePointer<sockaddr_storage>) -> UnsafePointer<sockaddr> {
       return UnsafePointer<sockaddr>(address);
